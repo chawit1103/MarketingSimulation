@@ -1,0 +1,62 @@
+# MiroFish MultiLang — Development Stack
+# =============================================================
+# Cloud-only stack: Neo4j + MiroFish with hot-reload.
+# No Ollama — uses cloud LLM providers configured in .env.dev.
+#
+# Usage:
+#   docker compose -f docker-compose.dev.yml up -d --build
+#   docker compose -f docker-compose.dev.yml down
+#
+# Ports (dev — offset from production to avoid conflicts):
+#   Frontend :3001  (prod: 3000)
+#   Backend  :5002  (prod: 5001)
+#   Neo4j    :7475 (browser), :7688 (bolt)  (prod: 7474, 7687)
+#
+# For local-only development with Ollama, use the production stack:
+#   docker compose --profile local up -d
+# =============================================================
+
+services:
+  mirofish-dev:
+    build: .
+    container_name: mirofish-multilang-dev
+    env_file:
+      - .env.dev
+    ports:
+      - "3001:3000"
+      - "5002:5001"
+    restart: unless-stopped
+    volumes:
+      - ./backend/uploads:/app/backend/uploads
+      # Hot-reload source code (no rebuild needed for Python changes)
+      - ./backend/app:/app/backend/app
+      - ./frontend/src:/app/frontend/src
+    depends_on:
+      neo4j-dev:
+        condition: service_healthy
+
+  neo4j-dev:
+    image: neo4j:5.18-community
+    container_name: mirofish-neo4j-dev
+    ports:
+      - "7475:7474"
+      - "7688:7687"
+    environment:
+      - NEO4J_AUTH=${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-mirofish}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_server_memory_heap_initial__size=256m
+      - NEO4J_server_memory_heap_max__size=1g
+    volumes:
+      - neo4j_data_dev:/data
+      - neo4j_logs_dev:/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  neo4j_data_dev:
+  neo4j_logs_dev:

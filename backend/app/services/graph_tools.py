@@ -15,7 +15,7 @@ from typing import Dict, Any, List, Optional
 from dataclasses import dataclass, field
 
 from ..utils.logger import get_logger
-from ..utils.llm_client import LLMClient
+from ..llm.provider_factory import LLMProviderFactory
 from ..storage import GraphStorage
 
 logger = get_logger('mirofish.graph_tools')
@@ -393,16 +393,16 @@ class GraphToolsService:
     - get_entity_summary - Get entity relationship summary
     """
 
-    def __init__(self, storage: GraphStorage, llm_client: Optional[LLMClient] = None):
+    def __init__(self, storage: GraphStorage, llm_client: Optional[Any] = None):
         self.storage = storage
         self._llm_client = llm_client
         logger.info("GraphToolsService initialization complete")
 
     @property
-    def llm(self) -> LLMClient:
+    def llm(self) -> Any:
         """Lazy initialization of LLM client"""
         if self._llm_client is None:
-            self._llm_client = LLMClient()
+            self._llm_client = LLMProviderFactory.get_provider('report')
         return self._llm_client
 
     # ========== Basic Tools ==========

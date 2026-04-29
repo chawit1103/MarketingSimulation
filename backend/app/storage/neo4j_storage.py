@@ -20,8 +20,9 @@ from neo4j.exceptions import (
 )
 
 from ..config import Config
+from ..llm.embedding_factory import EmbeddingProviderFactory
+from ..llm.embedding_base import AbstractEmbeddingProvider
 from .graph_storage import GraphStorage
-from .embedding_service import EmbeddingService
 from .ner_extractor import NERExtractor
 from .search_service import SearchService
 from . import neo4j_schema
@@ -40,7 +41,7 @@ class Neo4jStorage(GraphStorage):
         uri: Optional[str] = None,
         user: Optional[str] = None,
         password: Optional[str] = None,
-        embedding_service: Optional[EmbeddingService] = None,
+        embedding_service: Optional[AbstractEmbeddingProvider] = None,
         ner_extractor: Optional[NERExtractor] = None,
     ):
         self._uri = uri or Config.NEO4J_URI
@@ -50,7 +51,7 @@ class Neo4jStorage(GraphStorage):
         self._driver = GraphDatabase.driver(
             self._uri, auth=(self._user, self._password)
         )
-        self._embedding = embedding_service or EmbeddingService()
+        self._embedding = embedding_service or EmbeddingProviderFactory.get_provider()
         self._ner = ner_extractor or NERExtractor()
         self._search = SearchService(self._embedding)
 

@@ -138,6 +138,7 @@ def generate_ontology():
         simulation_requirement: Simulation requirement description (required)
         project_name: Project name (optional)
         additional_context: Additional notes (optional)
+        language: Language code for prompts (optional, default 'en', supports 'th', 'zh')
 
     Response:
         {
@@ -161,6 +162,7 @@ def generate_ontology():
         simulation_requirement = request.form.get('simulation_requirement', '')
         project_name = request.form.get('project_name', 'Unnamed Project')
         additional_context = request.form.get('additional_context', '')
+        language = request.form.get('language', 'en')
 
         logger.debug(f"Project name: {project_name}")
         logger.debug(f"Simulation requirement: {simulation_requirement[:100]}...")
@@ -221,7 +223,7 @@ def generate_ontology():
 
         # Generate ontology
         logger.info("Calling LLM to generate ontology definition...")
-        generator = OntologyGenerator()
+        generator = OntologyGenerator(language=language)
         ontology = generator.generate(
             document_texts=document_texts,
             simulation_requirement=simulation_requirement,

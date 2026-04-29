@@ -62,6 +62,9 @@ class SimulationState:
     config_generated: bool = False
     config_reasoning: str = ""
     
+    # Language
+    language: str = 'en'
+    
     # Runtime data
     current_round: int = 0
     twitter_status: str = "not_started"
@@ -88,6 +91,7 @@ class SimulationState:
             "entity_types": self.entity_types,
             "config_generated": self.config_generated,
             "config_reasoning": self.config_reasoning,
+            "language": self.language,
             "current_round": self.current_round,
             "twitter_status": self.twitter_status,
             "reddit_status": self.reddit_status,
@@ -108,6 +112,7 @@ class SimulationState:
             "entity_types": self.entity_types,
             "config_generated": self.config_generated,
             "error": self.error,
+            "language": self.language,
         }
 
 
@@ -196,6 +201,7 @@ class SimulationManager:
         graph_id: str,
         enable_twitter: bool = True,
         enable_reddit: bool = True,
+        language: str = 'en',
     ) -> SimulationState:
         """
         Create new simulation
@@ -219,6 +225,7 @@ class SimulationManager:
             enable_twitter=enable_twitter,
             enable_reddit=enable_reddit,
             status=SimulationStatus.CREATED,
+            language=language,
         )
         
         self._save_simulation_state(state)
@@ -236,6 +243,7 @@ class SimulationManager:
         progress_callback: Optional[callable] = None,
         parallel_profile_count: int = 3,
         storage: 'GraphStorage' = None,
+        language: str = 'en',
     ) -> SimulationState:
         """
         Prepare simulation environment (fully automated)
@@ -265,6 +273,7 @@ class SimulationManager:
         
         try:
             state.status = SimulationStatus.PREPARING
+            state.language = language
             self._save_simulation_state(state)
             
             sim_dir = self._get_simulation_dir(simulation_id)
@@ -410,7 +419,8 @@ class SimulationManager:
                 document_text=document_text,
                 entities=filtered.entities,
                 enable_twitter=state.enable_twitter,
-                enable_reddit=state.enable_reddit
+                enable_reddit=state.enable_reddit,
+                language=language,
             )
             
             if progress_callback:

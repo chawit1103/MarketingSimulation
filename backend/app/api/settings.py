@@ -1,0 +1,380 @@
+"""Settings API — read/update runtime configuration at /api/settings."""
+from flask import Blueprint, request, jsonify
+from ..models.settings import SettingsManager, ProviderType, EmbeddingProviderType, GraphDBMode
+
+settings_bp = Blueprint('settings', __name__)
+
+
+def _mask_key(key: str) -> str:
+    """Mask API key for safe display: '••••abcd'."""
+    if not key or len(key) < 5:
+        return '••••' if key else ''
+    return '••••' + key[-4:]
+
+
+@settings_bp.route('', methods=['GET'])
+def get_settings():
+    """Get current settings (masks API keys in response)."""
+    mgr = SettingsManager()
+    settings = mgr.get()
+    data = settings.model_dump()
+
+    # Mask API keys
+    if data.get('llm', {}).get('api_key'):
+        data['llm']['api_key'] = _mask_key(data['llm']['api_key'])
+    if data.get('embedding', {}).get('api_key'):
+        data['embedding']['api_key'] = _mask_key(data['embedding']['api_key'])
+
+    return jsonify({'success': True, 'settings': data})
+
+
+@settings_bp.route('', methods=['PUT'])
+def update_settings():
+    """Update runtime settings. Triggers provider reinitialization."""
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'No data provided'}), 400
+
+    try:
+        mgr = SettingsManager()
+        mgr.update(data)
+        return jsonify({'success': True, 'message': 'Settings updated and providers reinitialized'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+
+@settings_bp.route('/providers', methods=['GET'])
+def list_providers():
+    """List available LLM/embedding providers and their common models."""
+    return jsonify({
+        'success': True,
+        'llm_providers': [
+            {
+                'id': 'ollama',
+                'name': 'Ollama (Local)',
+                'needs_base_url': True,
+                'default_base_url': 'http://localhost:11434/v1',
+                'models': [
+                    {'id': 'qwen2.5:7b', 'name': 'Qwen 2.5 7B', 'context': 32768},
+                    {'id': 'qwen2.5:14b', 'name': 'Qwen 2.5 14B', 'context': 32768},
+                    {'id': 'qwen2.5:32b', 'name': 'Qwen 2.5 32B', 'context': 32768},
+                    {'id': 'llama3.2:latest', 'name': 'Llama 3.2', 'context': 131072},
+                    {'id': 'gemma3:12b', 'name': 'Gemma 3 12B', 'context': 8192},
+                    {'id': 'deepseek-r1:8b', 'name': 'DeepSeek R1 8B', 'context': 131072},
+                ]
+            },
+            {
+                'id': 'openai',
+                'name': 'OpenAI',
+                'needs_base_url': False,
+                'default_base_url': None,
+                'models': [
+                    {'id': 'gpt-4o', 'name': 'GPT-4o', 'context': 128000},
+                    {'id': 'gpt-4o-mini', 'name': 'GPT-4o Mini', 'context': 128000},
+                    {'id': 'gpt-4.1', 'name': 'GPT-4.1', 'context': 1000000},
+                    {'id': 'o4-mini', 'name': 'o4 Mini', 'context': 200000},
+                    {'id': 'o3', 'name': 'o3', 'context': 200000},
+                ]
+            },
+            {
+                'id': 'anthropic',
+                'name': 'Anthropic Claude',
+                'needs_base_url': False,
+                'default_base_url': None,
+                'models': [
+                    {'id': 'claude-sonnet-4-20250514', 'name': 'Claude Sonnet 4', 'context': 200000},
+                    {'id': 'claude-haiku-3-5-20250514', 'name': 'Claude Haiku 3.5', 'context': 200000},
+                    {'id': 'claude-opus-4-20250514', 'name': 'Claude Opus 4', 'context': 200000},
+                ]
+            },
+            {
+                'id': 'google',
+                'name': 'Google Gemini',
+                'needs_base_url': False,
+                'default_base_url': None,
+                'models': [
+                    {'id': 'gemini-2.5-flash', 'name': 'Gemini 2.5 Flash', 'context': 1048576},
+                    {'id': 'gemini-2.5-pro', 'name': 'Gemini 2.5 Pro', 'context': 1048576},
+                ]
+            },
+            {
+                'id': 'deepseek',
+                'name': 'DeepSeek',
+                'needs_base_url': False,
+                'default_base_url': 'https://api.deepseek.com/v1',
+                'models': [
+                    {'id': 'deepseek-chat', 'name': 'DeepSeek V3 (Chat)', 'context': 65536},
+                    {'id': 'deepseek-reasoner', 'name': 'DeepSeek R1 (Reasoner)', 'context': 65536},
+                ]
+            },
+            {
+                'id': 'groq',
+                'name': 'Groq',
+                'needs_base_url': False,
+                'default_base_url': 'https://api.groq.com/openai/v1',
+                'models': [
+                    {'id': 'llama-3.3-70b-versatile', 'name': 'Llama 3.3 70B', 'context': 128000},
+                    {'id': 'mixtral-8x7b-32768', 'name': 'Mixtral 8x7B', 'context': 32768},
+                    {'id': 'deepseek-r1-distill-llama-70b', 'name': 'DeepSeek R1 Distill 70B', 'context': 128000},
+                ]
+            },
+            {
+                'id': 'openrouter',
+                'name': 'OpenRouter',
+                'needs_base_url': False,
+                'default_base_url': 'https://openrouter.ai/api/v1',
+                'models': [
+                    {'id': 'openai/gpt-4o', 'name': 'OpenAI GPT-4o', 'context': 128000},
+                    {'id': 'anthropic/claude-sonnet-4', 'name': 'Claude Sonnet 4', 'context': 200000},
+                    {'id': 'google/gemini-2.5-pro', 'name': 'Gemini 2.5 Pro', 'context': 1048576},
+                    {'id': 'deepseek/deepseek-chat', 'name': 'DeepSeek V3', 'context': 65536},
+                ]
+            },
+            {
+                'id': 'xai',
+                'name': 'xAI (Grok)',
+                'needs_base_url': False,
+                'default_base_url': 'https://api.x.ai/v1',
+                'models': [
+                    {'id': 'grok-3-beta', 'name': 'Grok 3 Beta', 'context': 131072},
+                    {'id': 'grok-3-mini-beta', 'name': 'Grok 3 Mini Beta', 'context': 131072},
+                ]
+            },
+            {
+                'id': 'mistral',
+                'name': 'Mistral AI',
+                'needs_base_url': False,
+                'default_base_url': 'https://api.mistral.ai/v1',
+                'models': [
+                    {'id': 'mistral-large-latest', 'name': 'Mistral Large', 'context': 128000},
+                    {'id': 'mistral-small-latest', 'name': 'Mistral Small', 'context': 32000},
+                    {'id': 'codestral-latest', 'name': 'Codestral', 'context': 256000},
+                ]
+            },
+            {
+                'id': 'together',
+                'name': 'Together AI',
+                'needs_base_url': False,
+                'default_base_url': 'https://api.together.xyz/v1',
+                'models': [
+                    {'id': 'meta-llama/Llama-4-Maverick-17B-128E-Instruct', 'name': 'Llama 4 Maverick 17B', 'context': 131072},
+                    {'id': 'deepseek-ai/DeepSeek-V3', 'name': 'DeepSeek V3', 'context': 65536},
+                ]
+            },
+            {
+                'id': 'glm',
+                'name': 'Z.AI / GLM',
+                'needs_base_url': False,
+                'default_base_url': 'https://open.bigmodel.cn/api/paas/v4',
+                'models': [
+                    {'id': 'glm-4-plus', 'name': 'GLM-4 Plus', 'context': 128000},
+                    {'id': 'glm-4-flash', 'name': 'GLM-4 Flash', 'context': 128000},
+                ]
+            },
+            {
+                'id': 'minimax',
+                'name': 'MiniMax',
+                'needs_base_url': False,
+                'default_base_url': 'https://api.minimax.chat/v1',
+                'models': [
+                    {'id': 'abab7', 'name': 'ABAB7', 'context': 256000},
+                    {'id': 'MiniMax-M1', 'name': 'MiniMax M1', 'context': 256000},
+                ]
+            },
+            {
+                'id': 'kimi',
+                'name': 'Kimi (Moonshot)',
+                'needs_base_url': False,
+                'default_base_url': 'https://api.moonshot.cn/v1',
+                'models': [
+                    {'id': 'moonshot-v1-8k', 'name': 'Moonshot v1 8K', 'context': 8192},
+                    {'id': 'moonshot-v1-32k', 'name': 'Moonshot v1 32K', 'context': 32768},
+                ]
+            },
+            {
+                'id': 'dashscope',
+                'name': 'Alibaba DashScope',
+                'needs_base_url': False,
+                'default_base_url': 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
+                'models': [
+                    {'id': 'qwen-max', 'name': 'Qwen Max', 'context': 32768},
+                    {'id': 'qwen-plus', 'name': 'Qwen Plus', 'context': 131072},
+                    {'id': 'qwen-turbo', 'name': 'Qwen Turbo', 'context': 131072},
+                ]
+            },
+            {
+                'id': 'huggingface',
+                'name': 'HuggingFace TGI',
+                'needs_base_url': False,
+                'default_base_url': 'https://api-inference.huggingface.co/v1',
+                'models': [
+                    {'id': 'namespace/model-name', 'name': 'User-provided model (namespace/model-name)', 'context': None},
+                ]
+            },
+            {
+                'id': 'bedrock',
+                'name': 'Amazon Bedrock',
+                'needs_base_url': False,
+                'default_base_url': None,
+                'models': [],
+                'note': 'Coming soon — Bedrock uses IAM auth, not API keys. Use LiteLLM/OpenRouter proxy for now.'
+            },
+            {
+                'id': 'vercel',
+                'name': 'Vercel AI Gateway',
+                'needs_base_url': True,
+                'default_base_url': None,
+                'models': [],
+                'note': 'User provides model via gateway config'
+            },
+        ],
+        'embedding_providers': [
+            {
+                'id': 'ollama',
+                'name': 'Ollama (Local)',
+                'needs_base_url': True,
+                'default_base_url': 'http://localhost:11434',
+                'models': [
+                    {'id': 'nomic-embed-text', 'name': 'Nomic Embed Text (768d)', 'dimensions': 768},
+                    {'id': 'bge-m3', 'name': 'BGE-M3 Multilingual (1024d)', 'dimensions': 1024},
+                    {'id': 'mxbai-embed-large', 'name': 'MXBAI Embed Large (1024d)', 'dimensions': 1024},
+                ]
+            },
+            {
+                'id': 'openai',
+                'name': 'OpenAI',
+                'needs_base_url': False,
+                'default_base_url': None,
+                'models': [
+                    {'id': 'text-embedding-3-small', 'name': 'Embedding 3 Small (1536d)', 'dimensions': 1536},
+                    {'id': 'text-embedding-3-large', 'name': 'Embedding 3 Large (3072d)', 'dimensions': 3072},
+                ]
+            },
+            {
+                'id': 'google',
+                'name': 'Google',
+                'needs_base_url': False,
+                'default_base_url': None,
+                'models': [
+                    {'id': 'text-embedding-004', 'name': 'Text Embedding 004 (768d)', 'dimensions': 768},
+                ]
+            },
+            {
+                'id': 'cohere',
+                'name': 'Cohere',
+                'needs_base_url': False,
+                'default_base_url': None,
+                'models': [
+                    {'id': 'embed-english-v3.0', 'name': 'Embed English v3 (1024d)', 'dimensions': 1024},
+                    {'id': 'embed-multilingual-v3.0', 'name': 'Embed Multilingual v3 (1024d)', 'dimensions': 1024},
+                ]
+            },
+        ],
+        'graph_db_modes': [
+            {'id': 'local', 'name': 'Local Neo4j (Docker)', 'description': 'Neo4j Community running in Docker on this machine'},
+            {'id': 'cloud', 'name': 'Neo4j AuraDB (Cloud)', 'description': 'Managed Neo4j cloud — enter your AuraDB connection URI'},
+        ],
+        'languages': [
+            {'id': 'en', 'name': 'English', 'native': 'English'},
+            {'id': 'zh-CN', 'name': 'Chinese (Simplified)', 'native': '简体中文'},
+            {'id': 'hi', 'name': 'Hindi', 'native': 'हिन्दी'},
+            {'id': 'es', 'name': 'Spanish', 'native': 'Español'},
+            {'id': 'fr', 'name': 'French', 'native': 'Français'},
+            {'id': 'ar', 'name': 'Arabic', 'native': 'العربية'},
+            {'id': 'bn', 'name': 'Bengali', 'native': 'বাংলা'},
+            {'id': 'pt', 'name': 'Portuguese', 'native': 'Português'},
+            {'id': 'ru', 'name': 'Russian', 'native': 'Русский'},
+            {'id': 'ur', 'name': 'Urdu', 'native': 'اردو'},
+            {'id': 'th', 'name': 'Thai', 'native': 'ไทย'},
+        ],
+    })
+
+
+@settings_bp.route('/test-llm', methods=['POST'])
+def test_llm_connection():
+    """Test LLM provider connection with a simple ping message."""
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'No provider config provided'}), 400
+
+    try:
+        # Build a temporary provider to test
+        provider_type = ProviderType(data.get('provider', 'openai'))
+        model = data.get('model', 'gpt-4o-mini')
+        api_key = data.get('api_key', '')
+        base_url = data.get('base_url')
+
+        if provider_type == ProviderType.OPENAI or provider_type == ProviderType.DEEPSEEK or \
+           provider_type == ProviderType.GROQ or provider_type == ProviderType.OPENROUTER or \
+           provider_type == ProviderType.XAI or provider_type == ProviderType.MISTRAL or \
+           provider_type == ProviderType.TOGETHER or provider_type == ProviderType.GLM or \
+           provider_type == ProviderType.MINIMAX or provider_type == ProviderType.KIMI or \
+           provider_type == ProviderType.DASHSCOPE or provider_type == ProviderType.HUGGINGFACE or \
+           provider_type == ProviderType.VERCEL:
+            from openai import OpenAI
+            client = OpenAI(
+                api_key=api_key,
+                base_url=base_url or 'https://api.openai.com/v1',
+                timeout=15,
+            )
+            response = client.chat.completions.create(
+                model=model,
+                messages=[{'role': 'user', 'content': 'Reply with just "OK"'}],
+                max_tokens=5,
+            )
+            return jsonify({
+                'success': True,
+                'message': f'Connected! Model: {model}',
+                'response': response.choices[0].message.content.strip(),
+            })
+
+        elif provider_type == ProviderType.ANTHROPIC:
+            import anthropic
+            client = anthropic.Anthropic(api_key=api_key, timeout=15)
+            response = client.messages.create(
+                model=model,
+                max_tokens=5,
+                messages=[{'role': 'user', 'content': 'Reply with just "OK"'}],
+            )
+            return jsonify({
+                'success': True,
+                'message': f'Connected! Model: {model}',
+                'response': response.content[0].text.strip(),
+            })
+
+        elif provider_type == ProviderType.GOOGLE:
+            from google import genai
+            client = genai.Client(api_key=api_key)
+            response = client.models.generate_content(
+                model=model,
+                contents='Reply with just "OK"',
+            )
+            return jsonify({
+                'success': True,
+                'message': f'Connected! Model: {model}',
+                'response': response.text.strip(),
+            })
+
+        elif provider_type == ProviderType.OLLAMA:
+            from openai import OpenAI
+            client = OpenAI(
+                api_key='ollama',
+                base_url=base_url or 'http://localhost:11434/v1',
+                timeout=15,
+            )
+            response = client.chat.completions.create(
+                model=model,
+                messages=[{'role': 'user', 'content': 'Reply with just "OK"'}],
+                max_tokens=5,
+            )
+            return jsonify({
+                'success': True,
+                'message': f'Connected! Model: {model}',
+                'response': response.choices[0].message.content.strip(),
+            })
+
+        else:
+            return jsonify({'success': False, 'error': f'Provider {provider_type} not supported yet'}), 400
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': f'Connection failed: {str(e)}'}), 400

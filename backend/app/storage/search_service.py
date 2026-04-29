@@ -10,7 +10,7 @@ from typing import List, Dict, Any, Optional
 
 from neo4j import Session as Neo4jSession
 
-from .embedding_service import EmbeddingService
+from ..llm.embedding_base import AbstractEmbeddingProvider
 
 logger = logging.getLogger('mirofish.search')
 
@@ -61,7 +61,7 @@ class SearchService:
     VECTOR_WEIGHT = 0.7
     KEYWORD_WEIGHT = 0.3
 
-    def __init__(self, embedding_service: EmbeddingService):
+    def __init__(self, embedding_service: AbstractEmbeddingProvider):
         self.embedding = embedding_service
 
     def search_edges(

@@ -1,12 +1,12 @@
 <div align="center">
 
-<img src="./static/image/mirofish-offline-banner.png" alt="MiroFish Offline" width="100%"/>
+<img src="./static/image/mirofish-offline-banner.png" alt="MiroFish MultiLang" width="100%"/>
 
-# MiroFish-Offline
+# MiroFish MultiLang
 
-**Fully local fork of [MiroFish](https://github.com/666ghj/MiroFish) — no cloud APIs required. English UI.**
+**Multi-provider fork of [MiroFish](https://github.com/666ghj/MiroFish) — local or cloud LLMs. 11-language UI.**
 
-*A multi-agent swarm intelligence engine that simulates public opinion, market sentiment, and social dynamics. Entirely on your hardware.*
+*A multi-agent swarm intelligence engine that simulates public opinion, market sentiment, and social dynamics. Run entirely on your hardware with Ollama, or use any cloud LLM provider.*
 
 [![GitHub Stars](https://img.shields.io/github/stars/nikmcfly/MiroFish-Offline?style=flat-square&color=DAA520)](https://github.com/nikmcfly/MiroFish-Offline/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/nikmcfly/MiroFish-Offline?style=flat-square)](https://github.com/nikmcfly/MiroFish-Offline/network)
@@ -19,15 +19,15 @@
 
 MiroFish is a multi-agent simulation engine: upload any document (press release, policy draft, financial report), and it generates hundreds of AI agents with unique personalities that simulate the public reaction on social media. Posts, arguments, opinion shifts — hour by hour.
 
-The [original MiroFish](https://github.com/666ghj/MiroFish) was built for the Chinese market (Chinese UI, Zep Cloud for knowledge graphs, DashScope API). This fork makes it **fully local and fully English**:
+The [original MiroFish](https://github.com/666ghj/MiroFish) was built for the Chinese market (Chinese UI, Zep Cloud for knowledge graphs, DashScope API). This fork makes it **multi-provider and multilingual**:
 
-| Original MiroFish | MiroFish-Offline |
+| Original MiroFish | MiroFish MultiLang |
 |---|---|
-| Chinese UI | **English UI** (1,000+ strings translated) |
-| Zep Cloud (graph memory) | **Neo4j Community Edition 5.15** |
-| DashScope / OpenAI API (LLM) | **Ollama** (qwen2.5, llama3, etc.) |
-| Zep Cloud embeddings | **nomic-embed-text** via Ollama |
-| Cloud API keys required | **Zero cloud dependencies** |
+| Chinese UI | **11-language UI** (English, Chinese, Hindi, Spanish, French, Arabic, Bengali, Portuguese, Russian, Urdu, Thai) |
+| Zep Cloud (graph memory) | **Neo4j Community Edition 5.18** |
+| DashScope / OpenAI API (LLM) | **Ollama, OpenAI, Anthropic, Google, DeepSeek, Groq, OpenRouter** |
+| Zep Cloud embeddings | **Ollama, OpenAI, Google embeddings** |
+| Cloud API keys required | **Fully local option available** |
 
 ## Workflow
 
@@ -40,7 +40,7 @@ The [original MiroFish](https://github.com/666ghj/MiroFish) was built for the Ch
 ## Screenshot
 
 <div align="center">
-<img src="./static/image/mirofish-offline-screenshot.jpg" alt="MiroFish Offline — English UI" width="100%"/>
+<img src="./static/image/mirofish-offline-screenshot.jpg" alt="MiroFish MultiLang — English UI" width="100%"/>
 </div>
 
 ## Quick Start
@@ -48,26 +48,68 @@ The [original MiroFish](https://github.com/666ghj/MiroFish) was built for the Ch
 ### Prerequisites
 
 - Docker & Docker Compose (recommended), **or**
-- Python 3.11+, Node.js 18+, Neo4j 5.15+, Ollama
+- Python 3.11+, Node.js 18+, Neo4j 5.18+, Ollama (for local mode)
 
-### Option A: Docker (easiest)
+### Option A: Docker — Full Local (Ollama)
+
+No cloud APIs needed. Everything runs on your hardware.
 
 ```bash
 git clone https://github.com/nikmcfly/MiroFish-Offline.git
 cd MiroFish-Offline
 cp .env.example .env
 
-# Start all services (Neo4j, Ollama, MiroFish)
-docker compose up -d
+# Edit .env to set:
+#   LLM_PROVIDER=ollama
+#   EMBEDDING_PROVIDER=ollama
+
+# Start with Ollama (local profile)
+docker compose --profile local up -d
 
 # Pull the required models into Ollama
-docker exec mirofish-ollama ollama pull qwen2.5:32b
+docker exec mirofish-ollama ollama pull qwen2.5:7b
 docker exec mirofish-ollama ollama pull nomic-embed-text
 ```
 
 Open `http://localhost:3000` — that's it.
 
-### Option B: Manual
+### Option B: Docker — Cloud LLM (no GPU needed)
+
+Use any cloud LLM provider. Only Neo4j runs locally.
+
+```bash
+cp .env.example .env
+
+# Edit .env to set your cloud provider:
+#   LLM_PROVIDER=openai          (or anthropic, google, deepseek, groq, openrouter)
+#   LLM_API_KEY=sk-...
+#   EMBEDDING_PROVIDER=openai    (or google)
+#   EMBEDDING_API_KEY=sk-...
+
+# Start without Ollama
+docker compose up -d
+```
+
+Open `http://localhost:3000`.
+
+### Option C: Docker — Development (cloud LLM, hot-reload)
+
+```bash
+cp .env.example .env.dev
+
+# Edit .env.dev to set your cloud provider:
+#   LLM_PROVIDER=deepseek
+#   LLM_API_KEY=sk-...
+#   EMBEDDING_PROVIDER=openai
+#   EMBEDDING_API_KEY=sk-...
+
+# Start dev stack (separate ports: 3001/5002/7475/7688)
+docker compose -f docker-compose.dev.yml up -d --build
+```
+
+Source code changes are hot-reloaded — no rebuild needed for Python/JS edits.
+
+### Option D: Manual
 
 **1. Start Neo4j**
 
@@ -75,22 +117,22 @@ Open `http://localhost:3000` — that's it.
 docker run -d --name neo4j \
   -p 7474:7474 -p 7687:7687 \
   -e NEO4J_AUTH=neo4j/mirofish \
-  neo4j:5.15-community
+  neo4j:5.18-community
 ```
 
-**2. Start Ollama & pull models**
+**2. Start Ollama & pull models** (skip if using cloud LLM)
 
 ```bash
 ollama serve &
-ollama pull qwen2.5:32b      # LLM (or qwen2.5:14b for less VRAM)
-ollama pull nomic-embed-text  # Embeddings (768d)
+ollama pull qwen2.5:7b        # LLM
+ollama pull nomic-embed-text   # Embeddings
 ```
 
 **3. Configure & run backend**
 
 ```bash
 cp .env.example .env
-# Edit .env if your Neo4j/Ollama are on non-default ports
+# Edit .env with your provider settings
 
 cd backend
 pip install -r requirements.txt
@@ -109,25 +151,70 @@ Open `http://localhost:3000`.
 
 ## Configuration
 
-All settings are in `.env` (copy from `.env.example`):
+All settings are in `.env` (copy from `.env.example`). Values can also be changed at runtime via the Settings UI in the web interface.
+
+### LLM Providers
+
+| Provider | Env Value | Model Examples |
+|---|---|---|
+| Ollama (local) | `ollama` | `qwen2.5:7b`, `llama3.1:8b`, `mistral:7b` |
+| OpenAI | `openai` | `gpt-4o`, `gpt-4o-mini` |
+| Anthropic | `anthropic` | `claude-3-5-sonnet-20241022` |
+| Google | `google` | `gemini-2.0-flash`, `gemini-1.5-pro` |
+| DeepSeek | `deepseek` | `deepseek-chat`, `deepseek-reasoner` |
+| Groq | `groq` | `llama-3.3-70b-versatile` |
+| OpenRouter | `openrouter` | `openai/gpt-4o`, `anthropic/claude-3.5-sonnet` |
 
 ```bash
-# LLM — points to local Ollama (OpenAI-compatible API)
-LLM_API_KEY=ollama
+# Example: Ollama (fully local)
+LLM_PROVIDER=ollama
+LLM_MODEL_NAME=qwen2.5:7b
 LLM_BASE_URL=http://localhost:11434/v1
-LLM_MODEL_NAME=qwen2.5:32b
+LLM_API_KEY=ollama
 
-# Neo4j
-NEO4J_URI=bolt://localhost:7687
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=mirofish
+# Example: DeepSeek (cloud)
+# LLM_PROVIDER=deepseek
+# LLM_MODEL_NAME=deepseek-chat
+# LLM_BASE_URL=https://api.deepseek.com/v1
+# LLM_API_KEY=sk-...
+```
 
-# Embeddings
+### Embedding Providers
+
+| Provider | Env Value | Model Examples |
+|---|---|---|
+| Ollama (local) | `ollama` | `nomic-embed-text` (768d) |
+| OpenAI | `openai` | `text-embedding-3-small`, `text-embedding-3-large` |
+| Google | `google` | `text-embedding-004` |
+
+```bash
+EMBEDDING_PROVIDER=ollama
 EMBEDDING_MODEL=nomic-embed-text
 EMBEDDING_BASE_URL=http://localhost:11434
 ```
 
-Works with any OpenAI-compatible API — swap Ollama for Claude, GPT, or any other provider by changing `LLM_BASE_URL` and `LLM_API_KEY`.
+### Graph Database
+
+```bash
+GRAPH_DB_MODE=local              # local (Docker Neo4j) or cloud (AuraDB)
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=mirofish
+```
+
+### UI Language
+
+```bash
+LANGUAGE=en       # en, zh-CN, hi, es, fr, ar, bn, pt, ru, ur, th
+```
+
+### OASIS / CAMEL-AI
+
+```bash
+OPENAI_API_KEY=ollama
+OPENAI_API_BASE_URL=http://localhost:11434/v1
+# For cloud: match your LLM provider settings
+```
 
 ## Architecture
 
@@ -151,8 +238,8 @@ This fork introduces a clean abstraction layer between the application and the g
 │    ┌─────────▼─────────┐                │
 │    │   Neo4jStorage     │                │
 │    │  ┌───────────────┐ │                │
-│    │  │ EmbeddingService│ ← Ollama       │
-│    │  │ NERExtractor   │ ← Ollama LLM   │
+│    │  │ EmbeddingService│ ← Multi-provider│
+│    │  │ NERExtractor   │ ← Multi-provider│
 │    │  │ SearchService  │ ← Hybrid search │
 │    │  └───────────────┘ │                │
 │    └───────────────────┘                │
@@ -160,7 +247,7 @@ This fork introduces a clean abstraction layer between the application and the g
                │
         ┌──────▼──────┐
         │  Neo4j CE   │
-        │  5.15       │
+        │  5.18       │
         └─────────────┘
 ```
 
@@ -169,7 +256,10 @@ This fork introduces a clean abstraction layer between the application and the g
 - `GraphStorage` is an abstract interface — swap Neo4j for any other graph DB by implementing one class
 - Dependency injection via Flask `app.extensions` — no global singletons
 - Hybrid search: 0.7 × vector similarity + 0.3 × BM25 keyword search
-- Synchronous NER/RE extraction via local LLM (replaces Zep's async episodes)
+- Synchronous NER/RE extraction via configurable LLM (replaces Zep's async episodes)
+- Multi-provider LLM layer: 7 providers (Ollama, OpenAI, Anthropic, Google, DeepSeek, Groq, OpenRouter)
+- Multi-provider embedding layer: 3 providers (Ollama, OpenAI, Google)
+- Runtime settings — switch providers and models without restarting
 - All original dataclasses and LLM tools (InsightForge, Panorama, Agent Interviews) preserved
 
 ## Hardware Requirements
@@ -177,11 +267,11 @@ This fork introduces a clean abstraction layer between the application and the g
 | Component | Minimum | Recommended |
 |---|---|---|
 | RAM | 16 GB | 32 GB |
-| VRAM (GPU) | 10 GB (14b model) | 24 GB (32b model) |
+| VRAM (GPU) | 10 GB (7b model) | 24 GB (32b model) |
 | Disk | 20 GB | 50 GB |
 | CPU | 4 cores | 8+ cores |
 
-CPU-only mode works but is significantly slower for LLM inference. For lighter setups, use `qwen2.5:14b` or `qwen2.5:7b`.
+**No GPU needed** when using cloud LLM providers (Options B/C above). CPU-only mode with Ollama works but is significantly slower. For lighter local setups, use `qwen2.5:7b` or `qwen2.5:3b`.
 
 ## Use Cases
 
@@ -199,7 +289,11 @@ AGPL-3.0 — same as the original MiroFish project. See [LICENSE](./LICENSE).
 This is a modified fork of [MiroFish](https://github.com/666ghj/MiroFish) by [666ghj](https://github.com/666ghj), originally supported by [Shanda Group](https://www.shanda.com/). The simulation engine is powered by [OASIS](https://github.com/camel-ai/oasis) from the CAMEL-AI team.
 
 **Modifications in this fork:**
-- Backend migrated from Zep Cloud to local Neo4j CE 5.15 + Ollama
+- Multi-provider LLM layer: Ollama, OpenAI, Anthropic, Google, DeepSeek, Groq, OpenRouter
+- Multi-provider embedding layer: Ollama, OpenAI, Google
+- 11-language UI (English, Chinese, Hindi, Spanish, French, Arabic, Bengali, Portuguese, Russian, Urdu, Thai)
+- Backend migrated from Zep Cloud to local Neo4j CE 5.18 + configurable embeddings
 - Entire frontend translated from Chinese to English (20 files, 1,000+ strings)
 - All Zep references replaced with Neo4j across the UI
-- Rebranded to MiroFish Offline
+- Runtime settings API — switch providers/models live
+- Rebranded to MiroFish MultiLang

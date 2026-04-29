@@ -205,12 +205,15 @@ def create_simulation():
                 "error": "Project has not built knowledge graph yet, please call /api/graph/build first"
             }), 400
         
+        language = data.get('language', 'en')
+
         manager = SimulationManager()
         state = manager.create_simulation(
             project_id=project_id,
             graph_id=graph_id,
             enable_twitter=data.get('enable_twitter', True),
             enable_reddit=data.get('enable_reddit', True),
+            language=language,
         )
         
         return jsonify({
@@ -457,6 +460,7 @@ def prepare_simulation():
         entity_types_list = data.get('entity_types')
         use_llm_for_profiles = data.get('use_llm_for_profiles', True)
         parallel_profile_count = data.get('parallel_profile_count', 5)
+        language = data.get('language', 'en')
         
         # ========== Get GraphStorage（Capture reference before background task starts） ==========
         storage = current_app.extensions.get('neo4j_storage')
@@ -580,6 +584,7 @@ def prepare_simulation():
                     progress_callback=progress_callback,
                     parallel_profile_count=parallel_profile_count,
                     storage=storage,
+                    language=language,
                 )
                 
                 # Task complete
@@ -1498,6 +1503,7 @@ def start_simulation():
         max_rounds = data.get('max_rounds')  # Optional: Maximum simulation rounds
         enable_graph_memory_update = data.get('enable_graph_memory_update', False)  # Optional：IsFalseEnable knowledge graph memory update
         force = data.get('force', False)  # Optional：Force restart
+        language = data.get('language', 'en')
 
         # Verify max_rounds Parameters
         if max_rounds is not None:
@@ -1601,7 +1607,8 @@ def start_simulation():
             platform=platform,
             max_rounds=max_rounds,
             enable_graph_memory_update=enable_graph_memory_update,
-            graph_id=graph_id
+            graph_id=graph_id,
+            language=language,
         )
         
         # Update simulation status

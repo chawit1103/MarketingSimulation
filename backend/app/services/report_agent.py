@@ -19,7 +19,7 @@ from datetime import datetime
 from enum import Enum
 
 from ..config import Config
-from ..utils.llm_client import LLMClient
+from ..llm.provider_factory import LLMProviderFactory
 from ..utils.logger import get_logger
 from .graph_tools import (
     GraphToolsService,
@@ -888,8 +888,9 @@ class ReportAgent:
         graph_id: str,
         simulation_id: str,
         simulation_requirement: str,
-        llm_client: Optional[LLMClient] = None,
-        graph_tools: Optional[GraphToolsService] = None
+        llm_client: Optional[Any] = None,
+        graph_tools: Optional[GraphToolsService] = None,
+        language: str = 'en',
     ):
         """
         Initialize Report Agent
@@ -904,8 +905,9 @@ class ReportAgent:
         self.graph_id = graph_id
         self.simulation_id = simulation_id
         self.simulation_requirement = simulation_requirement
+        self.language = language
 
-        self.llm = llm_client or LLMClient()
+        self.llm = llm_client or LLMProviderFactory.get_provider('report')
         if graph_tools is None:
             raise ValueError(
                 "graph_tools (GraphToolsService) is required. "

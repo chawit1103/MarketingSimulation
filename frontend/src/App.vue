@@ -1,9 +1,50 @@
 <template>
-  <router-view />
+  <div class="app-wrapper">
+    <!-- Global Language Switcher -->
+    <div class="lang-switcher-bar">
+      <select v-model="currentLanguage" @change="changeLanguage" class="lang-select">
+        <option value="en">English</option>
+        <option value="zh-CN">中文</option>
+        <option value="th">ไทย</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+        <option value="ar">العربية</option>
+        <option value="pt">Português</option>
+        <option value="ru">Русский</option>
+        <option value="hi">हिन्दी</option>
+        <option value="bn">বাংলা</option>
+        <option value="ur">اردو</option>
+      </select>
+    </div>
+
+    <router-view />
+  </div>
 </template>
 
 <script setup>
-// Use Vue Router to manage pages
+import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { locale } = useI18n()
+
+// Initialize from localStorage if available
+const savedLang = localStorage.getItem('mirofish-lang')
+const currentLanguage = ref(savedLang || 'en')
+if (savedLang) {
+  locale.value = savedLang
+}
+
+function changeLanguage() {
+  locale.value = currentLanguage.value
+  localStorage.setItem('mirofish-lang', currentLanguage.value)
+}
+
+// Watch for locale changes from Settings page
+watch(locale, (newVal) => {
+  if (currentLanguage.value !== newVal) {
+    currentLanguage.value = newVal
+  }
+})
 </script>
 
 <style>
@@ -41,6 +82,33 @@
 
 button {
   font-family: inherit;
+}
+
+/* Language Switcher Bar */
+.lang-switcher-bar {
+  position: fixed;
+  top: 8px;
+  right: 16px;
+  z-index: 9999;
+}
+
+.lang-select {
+  background: #000;
+  color: #fff;
+  border: 1px solid #333;
+  padding: 4px 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  cursor: pointer;
+  outline: none;
+  border-radius: 2px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.lang-select:hover,
+.lang-select:focus {
+  opacity: 1;
 }
 
 /* ========== HOME PAGE STYLES ========== */
@@ -544,56 +612,40 @@ button {
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  transition: all 0.3s ease;
   letter-spacing: 1px;
-  position: relative;
-  overflow: hidden;
+  transition: background 0.2s;
 }
 
-.start-engine-btn:not(:disabled) {
-  background: #000000;
-  border: 1px solid #000000;
-  animation: pulse-border 2s infinite;
-}
-
-.start-engine-btn:hover:not(:disabled) {
-  background: #FF4500;
-  border-color: #FF4500;
-  transform: translateY(-2px);
-}
-
-.start-engine-btn:active:not(:disabled) {
-  transform: translateY(0);
+.start-engine-btn:hover {
+  background: #222222;
 }
 
 .start-engine-btn:disabled {
-  background: #E5E5E5;
-  color: #999;
+  opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
-  border: 1px solid #E5E5E5;
 }
 
-@keyframes pulse-border {
-  0% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2); }
-  70% { box-shadow: 0 0 0 6px rgba(0, 0, 0, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
-}
-
-@media (max-width: 1024px) {
-  .dashboard-section {
-    flex-direction: column;
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 30px 20px;
   }
   .hero-section {
     flex-direction: column;
+    margin-bottom: 40px;
   }
   .hero-left {
     padding-right: 0;
     margin-bottom: 40px;
   }
-  .hero-logo {
-    max-width: 200px;
-    margin-bottom: 20px;
+  .main-title {
+    font-size: 2.5rem;
+  }
+  .dashboard-section {
+    flex-direction: column;
+  }
+  .navbar {
+    padding: 0 20px;
   }
 }
 </style>

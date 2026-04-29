@@ -1,9 +1,31 @@
+# MiroFish MultiLang — Production Stack
+# =============================================================
+# Two modes of operation:
+#
+# 1. FULL LOCAL (Neo4j + Ollama + MiroFish):
+#      docker compose --profile local up -d
+#    Then pull models:
+#      docker exec mirofish-ollama ollama pull qwen2.5:7b
+#      docker exec mirofish-ollama ollama pull nomic-embed-text
+#
+# 2. CLOUD LLM ONLY (Neo4j + MiroFish, no Ollama):
+#      docker compose up -d
+#    Set LLM_PROVIDER and EMBEDDING_PROVIDER in .env to your
+#    cloud provider (openai, anthropic, google, deepseek, etc.)
+#
+# Ports:
+#   Frontend :3000
+#   Backend  :5001
+#   Neo4j    :7474 (browser), :7687 (bolt)
+#   Ollama   :11434 (only with --profile local)
+# =============================================================
+
 services:
   mirofish:
     build: .
     # Or use pre-built image (when available):
-    # image: ghcr.io/nikmcfly/mirofish-offline:latest
-    container_name: mirofish-offline
+    # image: ghcr.io/nikmcfly/mirofish-multilang:latest
+    container_name: mirofish-multilang
     env_file:
       - .env
     ports:
@@ -15,8 +37,6 @@ services:
     depends_on:
       neo4j:
         condition: service_healthy
-      ollama:
-        condition: service_started
 
   neo4j:
     image: neo4j:5.18-community
@@ -40,9 +60,12 @@ services:
       retries: 10
       start_period: 30s
 
+  # Ollama is OPTIONAL — only started with --profile local
+  # Use this when you want fully local LLM inference (no cloud APIs)
   ollama:
     image: ollama/ollama:latest
     container_name: mirofish-ollama
+    profiles: ["local"]
     ports:
       - "11434:11434"
     volumes:

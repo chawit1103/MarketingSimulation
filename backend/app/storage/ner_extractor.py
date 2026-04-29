@@ -2,41 +2,17 @@
 NER/RE Extractor — entity and relation extraction via local LLM
 
 Replaces Zep Cloud's built-in NER/RE pipeline.
-Uses LLMClient.chat_json() with a structured prompt to extract
+Uses LLMProviderFactory.get_provider('ner') with chat_json() to extract
 entities and relations from text chunks, guided by the graph's ontology.
 """
 
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 
-from ..utils.llm_client import LLMClient
+from ..llm.provider_factory import LLMProviderFactory
+from ..services.prompt_templates import PromptManager
 
 logger = logging.getLogger('mirofish.ner_extractor')
-
-# System prompt template for NER/RE extraction
-_SYSTEM_PROMPT = """You are a Named Entity Recognition and Relation Extraction system.
-Given a text and an ontology (entity types + relation types), extract all entities and relations.
-
-ONTOLOGY:
-{ontology_description}
-
-RULES:
-1. Only extract entity types and relation types defined in the ontology.
-2. Normalize entity names: strip whitespace, use canonical form (e.g., "Jack Ma" not "ma jack").
-3. Each entity must have: name, type (from ontology), and optional attributes.
-4. Each relation must have: source entity name, target entity name, type (from ontology), and a fact sentence describing the relationship.
-5. If no entities or relations are found, return empty lists.
-6. Be precise — only extract what is explicitly stated or strongly implied in the text.
-
-Return ONLY valid JSON in this exact format:
-{{
-  "entities": [
-    {{"name": "...", "type": "...", "attributes": {{"key": "value"}}}}
-  ],
-  "relations": [
-    {{"source": "...", "target": "...", "type": "...", "fact": "..."}}
-  ]
-}}"""
 
 _USER_PROMPT = """Extract entities and relations from the following text:
 
@@ -46,17 +22,18 @@ _USER_PROMPT = """Extract entities and relations from the following text:
 class NERExtractor:
     """Extract entities and relations from text using local LLM."""
 
-    def __init__(self, llm_client: Optional[LLMClient] = None, max_retries: int = 2):
-        self.llm = llm_client or LLMClient()
+    def __init__(self, llm_client = None, max_retries: int = 2):
+        self.llm = llm_client or LLMProviderFactory.get_provider('ner')
         self.max_retries = max_retries
 
-    def extract(self, text: str, ontology: Dict[str, Any]) -> Dict[str, Any]:
+    def extract(self, text: str, ontology: Dict[str, Any], language: str = 'en') -> Dict[str, Any]:
         """
         Extract entities and relations from text, guided by ontology.
 
         Args:
             text: Input text chunk
             ontology: Dict with 'entity_types' and 'relation_types' from graph
+            language: Language code for system prompt ('en', 'th', 'zh')
 
         Returns:
             Dict with 'entities' and 'relations' lists:
@@ -69,7 +46,7 @@ class NERExtractor:
             return {"entities": [], "relations": []}
 
         ontology_desc = self._format_ontology(ontology)
-        system_msg = _SYSTEM_PROMPT.format(ontology_description=ontology_desc)
+        system_msg = PromptManager.get_prompt('ner_system', language, ontology_description=ontology_desc)
         user_msg = _USER_PROMPT.format(text=text.strip())
 
         messages = [

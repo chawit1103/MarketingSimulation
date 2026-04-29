@@ -31,6 +31,7 @@ def generate_report():
             return jsonify({"success": False, "error": "Please provide simulation_id"}), 400
 
         force_regenerate = data.get('force_regenerate', False)
+        language = data.get('language', 'en')
         manager = SimulationManager()
         state = manager.get_simulation(simulation_id)
         if not state:
@@ -82,7 +83,8 @@ def generate_report():
                     graph_id=graph_id,
                     simulation_id=simulation_id,
                     simulation_requirement=simulation_requirement,
-                    graph_tools=graph_tools
+                    graph_tools=graph_tools,
+                    language=language,
                 )
                 def progress_callback(stage, progress, message):
                     task_manager.update_task(task_id, progress=progress, message=f"[{stage}] {message}")
@@ -228,6 +230,7 @@ def chat_with_report_agent():
         simulation_id = data.get('simulation_id')
         message = data.get('message')
         chat_history = data.get('chat_history', [])
+        language = data.get('language', 'en')
 
         if not simulation_id:
             return jsonify({"success": False, "error": "Please provide simulation_id"}), 400
@@ -258,7 +261,8 @@ def chat_with_report_agent():
             graph_id=graph_id,
             simulation_id=simulation_id,
             simulation_requirement=simulation_requirement,
-            graph_tools=graph_tools
+            graph_tools=graph_tools,
+            language=language,
         )
 
         result = agent.chat(message=message, chat_history=chat_history)
