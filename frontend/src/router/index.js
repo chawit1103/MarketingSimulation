@@ -7,8 +7,14 @@ import SimulationRunView from '../views/SimulationRunView.vue'
 import ReportView from '../views/ReportView.vue'
 import InteractionView from '../views/InteractionView.vue'
 import Dashboard from '../views/Dashboard.vue'
+import Campaigns from '../views/Campaigns.vue'
 
 const routes = [
+  {
+    path: '/campaigns',
+    name: 'Campaigns',
+    component: Campaigns
+  },
   {
     path: '/',
     name: 'Home',

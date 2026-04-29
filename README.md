@@ -70,12 +70,26 @@ Choose any AI model to power your simulations — local or cloud:
 | GLM, MiniMax, Kimi, DashScope | Cloud | Chinese/Asian markets |
 | HuggingFace, Bedrock, Vercel | Cloud | Custom endpoints |
 
-### 👥 Thai Persona Factory
-- **8 Consumer Archetypes**: Young Urban Professional, Family Mom, Rural Elder, Gen Z Student, SME Owner, Digital Nomad, Factory Worker
-- **7 Regional Profiles**: Bangkok, Central, North, Northeast, East, South, West
-- **10 Thai Value Dimensions**: เกรงใจ, รักษาหน้า, ครอบครัว, บุญคุณ, สนุกสนาน, ใจเย็น, ไม่เป็นไร, น้ำใจ, เคารพผู้อาวุโส
-- **Contextual Grounding**: Income, education, occupation, media habits, brand loyalty, price sensitivity
-- **LLM-Generated Backstories**: Each persona has a unique life story in Thai
+### 👥 Multi-Country Persona Factory
+Generate culturally-grounded synthetic consumers for **11 countries** — each with real names, regional profiles, and authentic consumer behavior:
+
+| Country | Language | Archetypes | Names | Currency |
+|---------|----------|------------|-------|----------|
+| 🇹🇭 Thailand | ไทย | 7 (urban professional, family mom, rural elder, Gen Z student, SME owner, digital nomad, factory worker) | Thai | THB |
+| 🇺🇸 US/UK | English | 6 (suburban mom, tech professional, midwest worker, Gen Z creator, Wall Street, retiree) | English | USD |
+| 🇨🇳 China | 中文 | 6 (一线白领, 小镇青年, 银发族, 宝妈, 大学生, 企业家) | Chinese | CNY |
+| 🇮🇳 India | हिन्दी | 6 (tech professional, small town aspirant, rural farmer, urban mom, student, business owner) | Hindi | INR |
+| 🇪🇸 Spain/LATAM | Español | 6 (urban professional, latino mom, student, business owner, creator, retired) | Spanish | EUR |
+| 🇫🇷 France | Français | 6 (parisian, artisan, intellectual, family, startup, retiree) | French | EUR |
+| 🇸🇦 Arab/MENA | العربية | 6 (professional, family, religious, entrepreneur, student, expat) | Arabic | SAR |
+| 🇧🇩 Bangladesh | বাংলা | 6 (garment worker, student, farmer, professional, trader, expat) | Bengali | BDT |
+| 🇧🇷 Brazil | Português | 6 (paulista, carioca, nordestino, student, business, influencer) | Portuguese | BRL |
+| 🇷🇺 Russia | Русский | 6 (moscow professional, worker, student, pensioner, IT, entrepreneur) | Cyrillic | RUB |
+| 🇵🇰 Pakistan | اردو | 6 (professional, farmer, student, housewife, trader, overseas) | Urdu | PKR |
+
+Each persona includes: demographics, psychographics, cultural values, media habits, brand loyalty score, price sensitivity, purchase decision style, and LLM-generated backstory.
+
+**10 Thai Value Dimensions**: เกรงใจ, รักษาหน้า, ครอบครัว, บุญคุณ, สนุกสนาน, ใจเย็น, ไม่เป็นไร, น้ำใจ, เคารพผู้อาวุโส — plus country-specific values for each market.
 
 ### 📊 Executive Dashboard (Think to Finish)
 - **7 Quantitative KPIs**: Overall Sentiment, Conversion Probability, Social Influence Index, Message Resonance, Crisis Risk, Brand Perception Shift, Opinion Polarization
@@ -227,8 +241,9 @@ Open `http://localhost:3000`.
 ### Personas
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/persona/archetypes` | 8 Thai consumer archetypes |
-| GET | `/api/persona/regions` | 7 regional profiles |
+| GET | `/api/persona/archetypes?lang=en` | Consumer archetypes (11 countries) |
+| GET | `/api/persona/regions?lang=th` | Regional profiles per country |
+| GET | `/api/persona/countries` | All 11 supported countries |
 | POST | `/api/persona/generate` | Generate personas for campaign |
 
 ### Dashboard

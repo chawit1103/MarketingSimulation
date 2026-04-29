@@ -86,6 +86,7 @@ def create_app(config_class=Config):
     from .api.settings import settings_bp
     from .api.auth import auth_bp
     from .api.persona import persona_bp
+    from .api.campaign import campaign_bp
     app.register_blueprint(graph_bp, url_prefix='/api/graph')
     app.register_blueprint(simulation_bp, url_prefix='/api/simulation')
     app.register_blueprint(report_bp, url_prefix='/api/report')
@@ -93,6 +94,7 @@ def create_app(config_class=Config):
     app.register_blueprint(settings_bp, url_prefix='/api/settings')
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(persona_bp, url_prefix='/api/persona')
+    app.register_blueprint(campaign_bp, url_prefix='/api/campaign')
 
     # Health check
     @app.route('/health')

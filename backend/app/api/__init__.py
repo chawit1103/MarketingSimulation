@@ -14,4 +14,5 @@ from . import simulation  # noqa: E402, F401
 from . import report  # noqa: E402, F401
 from . import auth  # noqa: E402, F401
 from . import dashboard  # noqa: E402, F401
+from . import campaign  # noqa: E402, F401
 

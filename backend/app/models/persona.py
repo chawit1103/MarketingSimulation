@@ -14,6 +14,20 @@ from datetime import datetime, timezone
 import uuid
 
 
+class Country(str, Enum):
+    TH = "th"
+    EN = "en"
+    ZH = "zh"
+    HI = "hi"
+    ES = "es"
+    FR = "fr"
+    AR = "ar"
+    BN = "bn"
+    PT = "pt"
+    RU = "ru"
+    UR = "ur"
+
+
 class ThaiRegion(str, Enum):
     BANGKOK = "bangkok"
     CENTRAL = "central"
@@ -80,6 +94,7 @@ class MediaChannel(str, Enum):
 
 class PersonaAttribute(BaseModel):
     """Structured persona attributes for simulation."""
+    country: Country = Country.TH
     age: int = 30
     gender: str = "female"
     region: ThaiRegion = ThaiRegion.BANGKOK
