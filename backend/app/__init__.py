@@ -60,6 +60,13 @@ def create_app(config_class=Config):
     if should_log_startup:
         logger.info("Simulation process cleanup function registered")
 
+    # --- Tenant Middleware (auth + org scoping) ---
+    # Must run BEFORE logging and blueprints so g.current_user is available
+    from .middleware.tenant_middleware import TenantMiddleware
+    TenantMiddleware(app)
+    if should_log_startup:
+        logger.info("Tenant middleware registered (JWT + API Key auth)")
+
     # Request logging middleware
     @app.before_request
     def log_request():
@@ -77,10 +84,12 @@ def create_app(config_class=Config):
     # Register blueprints
     from .api import graph_bp, simulation_bp, report_bp
     from .api.settings import settings_bp
+    from .api.auth import auth_bp
     app.register_blueprint(graph_bp, url_prefix='/api/graph')
     app.register_blueprint(simulation_bp, url_prefix='/api/simulation')
     app.register_blueprint(report_bp, url_prefix='/api/report')
     app.register_blueprint(settings_bp, url_prefix='/api/settings')
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
 
     # Health check
     @app.route('/health')
