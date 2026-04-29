@@ -6,6 +6,7 @@ import SimulationView from '../views/SimulationView.vue'
 import SimulationRunView from '../views/SimulationRunView.vue'
 import ReportView from '../views/ReportView.vue'
 import InteractionView from '../views/InteractionView.vue'
+import Dashboard from '../views/Dashboard.vue'
 
 const routes = [
   {
@@ -46,6 +47,12 @@ const routes = [
     path: '/interaction/:reportId',
     name: 'Interaction',
     component: InteractionView,
+    props: true
+  },
+  {
+    path: '/dashboard/:campaignId',
+    name: 'Dashboard',
+    component: Dashboard,
     props: true
   }
 ]

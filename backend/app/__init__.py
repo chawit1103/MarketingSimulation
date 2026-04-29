@@ -82,14 +82,17 @@ def create_app(config_class=Config):
         return response
 
     # Register blueprints
-    from .api import graph_bp, simulation_bp, report_bp
+    from .api import graph_bp, simulation_bp, report_bp, dashboard_bp
     from .api.settings import settings_bp
     from .api.auth import auth_bp
+    from .api.persona import persona_bp
     app.register_blueprint(graph_bp, url_prefix='/api/graph')
     app.register_blueprint(simulation_bp, url_prefix='/api/simulation')
     app.register_blueprint(report_bp, url_prefix='/api/report')
+    app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
     app.register_blueprint(settings_bp, url_prefix='/api/settings')
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(persona_bp, url_prefix='/api/persona')
 
     # Health check
     @app.route('/health')
