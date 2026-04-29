@@ -1,6 +1,6 @@
 <div align="center">
 
-<!<img src="./static/image/image.png" alt="MiroFish MultiLang" width="100%"/>>
+<!<img src="./static/image/image.png" alt="MiroFish MultiLang" width="30%"/>>
 
 # MarketingSimulation (MSaaS)
 
