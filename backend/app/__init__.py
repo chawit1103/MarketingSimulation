@@ -63,6 +63,11 @@ def create_app(config_class=Config):
 
     # --- Tenant Middleware (auth + org scoping) ---
     # Must run BEFORE logging and blueprints so g.current_user is available
+    from .middleware.rate_limit_middleware import RateLimitMiddleware
+    RateLimitMiddleware(app)
+    if should_log_startup:
+        logger.info("Rate limit middleware registered")
+
     from .middleware.tenant_middleware import TenantMiddleware
     TenantMiddleware(app)
     if should_log_startup:

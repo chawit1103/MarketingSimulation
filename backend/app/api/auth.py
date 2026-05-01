@@ -185,6 +185,12 @@ def login():
         if not User.verify_password(password, user.password_hash):
             raise ValueError('Invalid email or password')
 
+        if User.password_needs_rehash(user.password_hash):
+            logger.info("Rehashing legacy password hash for user %s", user.user_id)
+            refreshed = user_svc.update_user(user.org_id, user.user_id, {'password': password})
+            if refreshed is not None:
+                user = refreshed
+
         # 3. Check org is active
         org = org_svc.get_org(user.org_id)
         if not org or org.status.value != 'active':

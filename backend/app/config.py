@@ -39,6 +39,15 @@ class Config:
         or "development"
     ).lower()
 
+    # Lightweight in-memory rate limiting. Values are requests per window.
+    RATE_LIMIT_ENABLED = os.environ.get("RATE_LIMIT_ENABLED", "true").lower() == "true"
+    RATE_LIMIT_WINDOW_SECONDS = int(os.environ.get("RATE_LIMIT_WINDOW_SECONDS", "60"))
+    RATE_LIMIT_AUTH_PER_WINDOW = int(os.environ.get("RATE_LIMIT_AUTH_PER_WINDOW", "20"))
+    RATE_LIMIT_DEMO_PER_WINDOW = int(os.environ.get("RATE_LIMIT_DEMO_PER_WINDOW", "120"))
+    RATE_LIMIT_STATUS_PER_WINDOW = int(os.environ.get("RATE_LIMIT_STATUS_PER_WINDOW", "120"))
+    RATE_LIMIT_DECISION_PER_WINDOW = int(os.environ.get("RATE_LIMIT_DECISION_PER_WINDOW", "60"))
+    RATE_LIMIT_SIMULATION_PER_WINDOW = int(os.environ.get("RATE_LIMIT_SIMULATION_PER_WINDOW", "30"))
+
     # JSON configuration - disable ASCII escaping to display Chinese directly (not as \uXXXX)
     JSON_AS_ASCII = False
 
