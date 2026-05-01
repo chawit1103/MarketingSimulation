@@ -7,6 +7,19 @@ from typing import Any, List, Tuple
 
 
 SENSITIVE_ERROR_KEYS = {"traceback", "stacktrace", "stack"}
+SENSITIVE_VALUE_KEYS = {
+    "api_key",
+    "apikey",
+    "api-key",
+    "password",
+    "token",
+    "access_token",
+    "refresh_token",
+    "secret",
+    "credential",
+    "credentials",
+    "authorization",
+}
 TRACEBACK_MARKER = "Traceback (most recent call last)"
 SECRET_PATTERNS = (
     (re.compile(r"sk-[A-Za-z0-9_\-]{8,}"), "sk-***"),
@@ -49,3 +62,27 @@ def sanitize_api_payload(payload: Any) -> Tuple[Any, List[str]]:
         return value
 
     return _sanitize(payload), removed
+
+
+def redact_sensitive_payload(payload: Any) -> Any:
+    """Redact credential-like fields before writing request data to logs."""
+    def _redact(value: Any) -> Any:
+        if isinstance(value, dict):
+            clean = {}
+            for key, item in value.items():
+                normalized = str(key).replace("_", "").replace("-", "").lower()
+                if normalized in {k.replace("_", "").replace("-", "") for k in SENSITIVE_VALUE_KEYS}:
+                    clean[key] = "***" if item not in (None, "") else item
+                else:
+                    clean[key] = _redact(item)
+            return clean
+        if isinstance(value, list):
+            return [_redact(item) for item in value]
+        if isinstance(value, str):
+            redacted = value
+            for pattern, replacement in SECRET_PATTERNS:
+                redacted = pattern.sub(replacement, redacted)
+            return redacted
+        return value
+
+    return _redact(payload)

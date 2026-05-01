@@ -32,6 +32,17 @@ or Neo4j environment. Removing it from Git does not revoke the credential.
 CI blocks tracked local `.env*` files except `.env.example` and
 `.env.dev.example`, and scans for common provider-key patterns.
 
+Runtime Settings API responses must never return raw or masked secrets. Use
+presence flags such as `api_key_present` and `password_present` so the browser
+can display whether a credential exists without receiving it. Blank fields or
+masked placeholders from the browser should preserve existing stored secrets;
+explicit clear behavior must be opt-in and tested.
+
+Local/demo runtime settings may still be stored in `backend/uploads/settings.json`
+for developer convenience. Production deployments should provide provider keys,
+graph credentials, and auth secrets through environment variables or a managed
+secret store rather than relying on plaintext runtime files.
+
 ## Local Validation
 
 Run the checks that match your change:

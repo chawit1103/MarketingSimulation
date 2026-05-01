@@ -79,7 +79,8 @@ def create_app(config_class=Config):
         logger = get_logger('mirofish.request')
         logger.debug(f"Request: {request.method} {request.path}")
         if request.content_type and 'json' in request.content_type:
-            logger.debug(f"Request body: {request.get_json(silent=True)}")
+            from .utils.response_safety import redact_sensitive_payload
+            logger.debug(f"Request body: {redact_sensitive_payload(request.get_json(silent=True))}")
 
     @app.after_request
     def sanitize_client_errors(response):

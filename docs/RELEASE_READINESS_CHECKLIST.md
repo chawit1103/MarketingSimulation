@@ -55,6 +55,8 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] Raw traceback and stack fields are stripped from client-facing API JSON.
 - [x] Common secret-like strings are redacted from client-facing API JSON.
 - [x] Settings readiness checks do not echo API keys or graph passwords.
+- [x] SEC-002 settings read exposure is remediated: `GET /api/settings` returns only secret presence flags and never raw or masked API keys/passwords.
+- [x] Settings updates preserve existing secrets when blank fields, masked placeholders, or presence flags are submitted.
 - [ ] External pilot data-retention and deletion procedure is documented and approved.
 
 ## Automated Validation

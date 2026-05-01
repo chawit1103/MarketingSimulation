@@ -762,7 +762,10 @@
     "costEstimateDisclaimer": "Estimate only. Actual costs depend on provider pricing, tokens, retries, and prompt length.",
     "connectionNeedsAttention": "Configuration needs attention",
     "localSaveNeedsReadiness": "Saved locally. Complete readiness checks before updating backend runtime settings.",
-    "localSaveBackendFailed": "Saved locally, but backend settings update failed. Check auth and try again."
+    "localSaveBackendFailed": "Saved locally, but backend settings update failed. Check auth and try again.",
+    "secretStored": "Saved secret present. Leave blank to keep it.",
+    "secretNotStored": "No saved secret. Enter a value to save one.",
+    "secretPlaceholderStored": "Saved secret present"
   },
   "common": {
     "save": "Save",

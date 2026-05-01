@@ -762,7 +762,10 @@
     "costEstimateDisclaimer": "เป็น estimate เท่านั้น ค่าใช้จ่ายจริงขึ้นกับราคา provider, tokens, retries และ prompt length",
     "connectionNeedsAttention": "การตั้งค่ายังควรตรวจสอบ",
     "localSaveNeedsReadiness": "บันทึกในเครื่องแล้ว กรุณาตรวจ readiness ให้ครบก่อนอัปเดต backend runtime settings",
-    "localSaveBackendFailed": "บันทึกในเครื่องแล้ว แต่บันทึก backend settings ไม่สำเร็จ กรุณาตรวจ auth แล้วลองใหม่"
+    "localSaveBackendFailed": "บันทึกในเครื่องแล้ว แต่บันทึก backend settings ไม่สำเร็จ กรุณาตรวจ auth แล้วลองใหม่",
+    "secretStored": "มี secret ที่บันทึกไว้แล้ว เว้นว่างไว้เพื่อใช้ค่าเดิม",
+    "secretNotStored": "ยังไม่มี secret ที่บันทึกไว้ ใส่ค่าเพื่อบันทึกใหม่",
+    "secretPlaceholderStored": "มี secret ที่บันทึกไว้แล้ว"
   },
   "common": {
     "save": "บันทึก",

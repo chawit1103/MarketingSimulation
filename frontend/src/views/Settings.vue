@@ -183,7 +183,15 @@
           </div>
           <div class="form-group">
             <label>{{ $t('settings.apiKey') }}</label>
-            <input v-model="config.llm.apiKey" type="password" placeholder="sk-..." />
+            <input
+              v-model="config.llm.apiKey"
+              type="password"
+              :placeholder="secretPresence.llmApiKey ? $t('settings.secretPlaceholderStored') : 'sk-...'"
+              autocomplete="new-password"
+            />
+            <p class="secret-hint" :class="{ 'is-present': secretPresence.llmApiKey }">
+              {{ secretPresence.llmApiKey ? $t('settings.secretStored') : $t('settings.secretNotStored') }}
+            </p>
           </div>
           <div class="form-group">
             <label>{{ $t('settings.baseUrl') }}</label>
@@ -221,7 +229,15 @@
           </div>
           <div class="form-group">
             <label>{{ $t('settings.apiKey') }}</label>
-            <input v-model="config.embedding.apiKey" type="password" placeholder="sk-..." />
+            <input
+              v-model="config.embedding.apiKey"
+              type="password"
+              :placeholder="secretPresence.embeddingApiKey ? $t('settings.secretPlaceholderStored') : 'sk-...'"
+              autocomplete="new-password"
+            />
+            <p class="secret-hint" :class="{ 'is-present': secretPresence.embeddingApiKey }">
+              {{ secretPresence.embeddingApiKey ? $t('settings.secretStored') : $t('settings.secretNotStored') }}
+            </p>
           </div>
           <div class="form-group">
             <label>{{ $t('settings.baseUrl') }}</label>
@@ -274,7 +290,15 @@
           </div>
           <div class="form-group">
             <label>{{ $t('settings.graphPassword') }}</label>
-            <input v-model="config.graphdb.password" type="password" placeholder="password" />
+            <input
+              v-model="config.graphdb.password"
+              type="password"
+              :placeholder="secretPresence.graphPassword ? $t('settings.secretPlaceholderStored') : 'password'"
+              autocomplete="new-password"
+            />
+            <p class="secret-hint" :class="{ 'is-present': secretPresence.graphPassword }">
+              {{ secretPresence.graphPassword ? $t('settings.secretStored') : $t('settings.secretNotStored') }}
+            </p>
           </div>
         </div>
       </section>
@@ -324,7 +348,7 @@ import { computed, ref, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import TemplateImportDropZone from '@/components/TemplateImportDropZone.vue'
 import { getSystemStatus } from '@/api/status'
-import { checkSettingsReadiness, getProviders, testLLMConnection, updateSettings } from '@/api/settings'
+import { checkSettingsReadiness, getProviders, getSettings, testLLMConnection, updateSettings } from '@/api/settings'
 import { trackEvent } from '@/services/analytics'
 
 const { locale, t } = useI18n()
@@ -357,6 +381,12 @@ const config = reactive({
     user: 'neo4j',
     password: ''
   }
+})
+
+const secretPresence = reactive({
+  llmApiKey: false,
+  embeddingApiKey: false,
+  graphPassword: false,
 })
 
 const selectedLanguage = ref(locale.value)
@@ -417,11 +447,17 @@ async function saveSettings() {
       graphdb: { ...config.graphdb },
       language: selectedLanguage.value
     }
-    localStorage.setItem('3c-settings', JSON.stringify(settings))
+    localStorage.setItem('3c-settings', JSON.stringify(safeLocalSettings(settings)))
     message.value = t('settings.saveSuccess')
     messageType.value = 'success'
     if (wizardMode.value !== 'demo' && readiness.ready) {
-      await updateSettings(toBackendSettings(settings))
+      const backendPayload = toBackendSettings(settings)
+      await updateSettings(backendPayload)
+      if (backendPayload.llm.api_key) secretPresence.llmApiKey = true
+      if (backendPayload.embedding.api_key) secretPresence.embeddingApiKey = true
+      if (backendPayload.graph_db.password) secretPresence.graphPassword = true
+      clearSecretInputs()
+      localStorage.setItem('3c-settings', JSON.stringify(safeLocalSettings(settings)))
     } else if (wizardMode.value !== 'demo' && !readiness.ready) {
       message.value = t('settings.localSaveNeedsReadiness')
     }
@@ -596,19 +632,19 @@ function toReadinessPayload() {
       provider: backend.llm.provider,
       model: backend.llm.model,
       base_url: backend.llm.base_url,
-      api_key_present: Boolean(backend.llm.api_key),
+      api_key_present: Boolean(backend.llm.api_key || secretPresence.llmApiKey),
     },
     embedding: {
       provider: backend.embedding.provider,
       model: backend.embedding.model,
       base_url: backend.embedding.base_url,
-      api_key_present: Boolean(backend.embedding.api_key),
+      api_key_present: Boolean(backend.embedding.api_key || secretPresence.embeddingApiKey),
     },
     graph_db: {
       mode: backend.graph_db.mode,
       uri: backend.graph_db.uri,
       user: backend.graph_db.user,
-      password_present: Boolean(backend.graph_db.password),
+      password_present: Boolean(backend.graph_db.password || secretPresence.graphPassword),
     },
   }
 }
@@ -620,6 +656,7 @@ function toBackendSettings(settings) {
       provider: settings.llm?.provider || 'ollama',
       model: settings.llm?.model || 'qwen2.5:7b',
       api_key: unmaskedSecret(settings.llm?.apiKey),
+      api_key_present: Boolean(secretPresence.llmApiKey || unmaskedSecret(settings.llm?.apiKey)),
       base_url: settings.llm?.baseUrl || null,
       temperature: settings.llm?.temperature ?? 0.7,
       max_tokens: settings.llm?.maxTokens ?? 4096,
@@ -629,6 +666,7 @@ function toBackendSettings(settings) {
       provider: settings.embedding?.provider || 'ollama',
       model: settings.embedding?.model || 'nomic-embed-text',
       api_key: unmaskedSecret(settings.embedding?.apiKey),
+      api_key_present: Boolean(secretPresence.embeddingApiKey || unmaskedSecret(settings.embedding?.apiKey)),
       base_url: settings.embedding?.baseUrl || null,
     },
     graph_db: {
@@ -636,6 +674,7 @@ function toBackendSettings(settings) {
       uri: settings.graphdb?.uri || 'bolt://localhost:7687',
       user: settings.graphdb?.user || 'neo4j',
       password: unmaskedSecret(settings.graphdb?.password),
+      password_present: Boolean(secretPresence.graphPassword || unmaskedSecret(settings.graphdb?.password)),
     },
     task_llm: {},
   }
@@ -656,6 +695,61 @@ function safeClientError(error) {
   return raw.replace(/sk-[A-Za-z0-9_-]{8,}/g, 'sk-***').slice(0, 180) || t('settings.connectionFailed')
 }
 
+function clearSecretInputs() {
+  config.llm.apiKey = ''
+  config.embedding.apiKey = ''
+  config.graphdb.password = ''
+}
+
+function safeLocalSettings(settings) {
+  return {
+    ...settings,
+    llm: { ...(settings.llm || {}), apiKey: '' },
+    embedding: { ...(settings.embedding || {}), apiKey: '' },
+    graphdb: { ...(settings.graphdb || {}), password: '' },
+    secretPresence: { ...secretPresence },
+  }
+}
+
+function applyBackendSettings(settings) {
+  if (!settings) return
+  if (settings.language) {
+    selectedLanguage.value = settings.language
+    locale.value = settings.language
+  }
+  if (settings.llm) {
+    config.llm.provider = settings.llm.provider || config.llm.provider
+    config.llm.model = settings.llm.model || config.llm.model
+    config.llm.baseUrl = settings.llm.base_url || config.llm.baseUrl
+    config.llm.temperature = settings.llm.temperature ?? config.llm.temperature
+    config.llm.maxTokens = settings.llm.max_tokens ?? config.llm.maxTokens
+    config.llm.timeout = settings.llm.timeout ?? config.llm.timeout
+    secretPresence.llmApiKey = Boolean(settings.llm.api_key_present)
+  }
+  if (settings.embedding) {
+    config.embedding.provider = settings.embedding.provider || config.embedding.provider
+    config.embedding.model = settings.embedding.model || config.embedding.model
+    config.embedding.baseUrl = settings.embedding.base_url || config.embedding.baseUrl
+    secretPresence.embeddingApiKey = Boolean(settings.embedding.api_key_present)
+  }
+  if (settings.graph_db) {
+    config.graphdb.mode = normalizeGraphMode(settings.graph_db.mode)
+    config.graphdb.uri = settings.graph_db.uri || config.graphdb.uri
+    config.graphdb.user = settings.graph_db.user || config.graphdb.user
+    secretPresence.graphPassword = Boolean(settings.graph_db.password_present)
+  }
+  clearSecretInputs()
+}
+
+async function loadBackendSettings() {
+  try {
+    const res = await getSettings()
+    applyBackendSettings(res.settings || res.data?.settings)
+  } catch (e) {
+    // Settings reads require auth; unauthenticated demo users keep local defaults.
+  }
+}
+
 // Load saved settings on mount
 try {
   const saved = localStorage.getItem('3c-settings')
@@ -665,6 +759,15 @@ try {
     Object.assign(config.embedding, parsed.embedding || {})
     Object.assign(config.tasks, parsed.tasks || {})
     Object.assign(config.graphdb, parsed.graphdb || {})
+    Object.assign(secretPresence, parsed.secretPresence || {})
+    clearSecretInputs()
+    localStorage.setItem('3c-settings', JSON.stringify(safeLocalSettings({
+      llm: { ...config.llm },
+      embedding: { ...config.embedding },
+      tasks: { ...config.tasks },
+      graphdb: { ...config.graphdb },
+      language: parsed.language || selectedLanguage.value,
+    })))
     config.graphdb.mode = normalizeGraphMode(config.graphdb.mode)
     if (parsed.language) {
       selectedLanguage.value = parsed.language
@@ -675,8 +778,9 @@ try {
   // ignore parse errors
 }
 
-onMounted(() => {
+onMounted(async () => {
   loadProviderCatalog()
+  await loadBackendSettings()
   loadSystemStatus()
   runReadinessCheck()
 })
@@ -1087,6 +1191,17 @@ onMounted(() => {
 .form-group select:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-subtle);
+}
+
+.secret-hint {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.35;
+  color: var(--text-tertiary);
+}
+
+.secret-hint.is-present {
+  color: var(--success);
 }
 
 .action-row {

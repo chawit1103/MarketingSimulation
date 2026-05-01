@@ -10,7 +10,7 @@ This review did not make product-code changes. It records release blockers and f
 
 The repository has several good security foundations: password hashing now uses Werkzeug adaptive hashes, legacy password hashes are rehashed on login, production rejects known fallback auth secrets, public/demo routes are rate-limited, client-facing traceback payloads are sanitized, and demo/local/live/backend-verified source labels exist in the UI.
 
-However, the current repository is not production-ready for external customers. The main blockers are secret handling, tenant/object authorization gaps, settings exposure, role enforcement, and result-provenance accuracy.
+However, the current repository is not production-ready for external customers. The main blockers are tenant/object authorization gaps, role enforcement, plaintext runtime secret storage, debug logging defaults, and result-provenance accuracy.
 
 ## Critical Findings
 
@@ -26,10 +26,11 @@ However, the current repository is not production-ready for external customers. 
 ### SEC-002: Settings API can expose graph credentials to the browser
 
 - Severity: Critical
-- Status: Blocker
+- Status: Remediated in PR J for browser/API read exposure; RBAC remains covered by SEC-004
 - Evidence: `backend/app/api/settings.py` masks `llm.api_key` and `embedding.api_key`, but does not mask `graph_db.password` before returning settings. `backend/app/models/settings.py` stores `graph_db.password` in the persisted settings model.
 - Impact: Any authenticated browser session that can call `GET /api/settings` can receive the Neo4j password. Because role checks are not enforced on this route, this can expose graph credentials beyond administrators.
-- Recommended fix: Mask or omit `graph_db.password` in all read responses, return only `password_present: true/false`, and require re-entry for updates/tests.
+- Remediation: `GET /api/settings` now omits raw and masked credential fields and returns only `api_key_present` / `password_present` flags. Settings updates preserve existing saved secrets when the browser sends blank values, masked placeholders, or presence flags. New secrets can be accepted but are not echoed in API responses.
+- Remaining action: Add admin-only RBAC to settings read/update/test routes under SEC-004.
 
 ### SEC-003: Tenant isolation is incomplete for ID-addressed resources
 
@@ -75,18 +76,20 @@ However, the current repository is not production-ready for external customers. 
 ### SEC-007: Runtime settings are stored plaintext on local disk
 
 - Severity: High
-- Status: Blocker before multi-user/cloud deployment
+- Status: Partially mitigated in PR J; blocker before multi-user/cloud deployment
 - Evidence: `SettingsManager.save()` persists LLM API keys, embedding API keys, and graph passwords into `backend/uploads/settings.json`.
 - Impact: File-system compromise, backups, logs, or volume snapshots can expose provider credentials. The file is gitignored, which helps source control, but not production runtime security.
-- Recommended fix: Store secrets in environment variables or a secret manager. If file storage remains for local demo, encrypt at rest and keep permissions restricted. Never persist masked placeholder secrets as real values.
+- Mitigation: Browser reads no longer receive stored secret values, settings updates no longer persist masked placeholders as real values, and the Settings UI stores only presence metadata in local browser settings.
+- Recommended fix: Store production secrets in environment variables or a secret manager. If file storage remains for local demo, encrypt at rest and keep permissions restricted.
 
 ### SEC-008: Request body debug logging can record secrets and campaign briefs
 
 - Severity: High
-- Status: Blocker if debug logging is enabled outside local development
+- Status: Partially mitigated in PR J; blocker if debug logging is enabled outside local development
 - Evidence: `create_app()` logs JSON request bodies at debug level. `Config.DEBUG` defaults to true.
 - Impact: Login passwords, provider API keys, settings payloads, campaign briefs, and customer data can enter logs.
-- Recommended fix: Do not log request bodies by default. Add a redacting logger if request-body debugging is ever needed. Make production/default debug false.
+- Mitigation: Request JSON debug logs now redact credential-like fields before writing to logs.
+- Recommended fix: Do not log request bodies by default. Make production/default debug false and consider disabling body logging entirely outside local development.
 
 ## Medium Findings
 
@@ -189,9 +192,10 @@ Concerns:
    - Rotate any exposed provider/graph credentials. Still required outside the repo by the owner.
 
 2. Settings secrets PR:
-   - Mask/omit `graph_db.password` in GET responses.
-   - Return only presence flags for all secrets.
-   - Add tests proving secrets are not returned.
+   - Mask/omit `graph_db.password` in GET responses. Completed in PR J.
+   - Return only presence flags for all secrets. Completed in PR J.
+   - Preserve existing secrets when blank/masked browser values are submitted. Completed in PR J.
+   - Add tests proving secrets are not returned. Completed in PR J.
 
 3. Tenant isolation PR:
    - Add `org_id` metadata to simulation/report records.
