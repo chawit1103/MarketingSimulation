@@ -1,322 +1,519 @@
 <div align="center">
 
-<img src="./static/image/image.png" alt="MiroFish MultiLang" width="30%"/>
+<img src="./static/image/image.png" alt="3C Simulator" width="30%"/>
 
-# MarketingSimulation (MSaaS)
+# 3C Simulator
 
-**Marketing Simulation as a Service — B2B Multi-Agent Platform**
+**Decision Intelligence Platform for Campaign, Competitor, and Crisis Simulation**
 
-*Simulate marketing campaigns against hundreds of AI-generated Thai consumers. Predict sentiment, conversion, and social influence before spending a single baht on real ads.*
+Simulate public opinion before spending real budget. Test campaign messages, competitor moves, and crisis scenarios against synthetic consumer personas, then turn the result into executive-ready evidence.
 
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue?style=flat-square)](./LICENSE)
-[![Docker](https://img.shields.io/badge/Docker-Build-2496ED?style=flat-square&logo=docker&logoColor=white)](https://hub.docker.com/)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python)](https://python.org)
 [![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?style=flat-square&logo=vue.js)](https://vuejs.org)
+[![OASIS](https://img.shields.io/badge/Simulation-OASIS-orange?style=flat-square)](https://github.com/camel-ai/oasis)
 
 </div>
 
 ---
 
-## What is MarketingSimulation?
+## What It Is
 
-MarketingSimulation is a **B2B SaaS platform** that lets brands and agencies simulate marketing campaigns against synthetic consumer personas before launching in the real world.
+3C Simulator is a B2B SaaS-style platform for marketing managers, PR agencies, strategy teams, and crisis response teams.
 
-**Here's how it works:**
+It works like a **flight simulator for market decisions**:
 
-1. You upload a marketing brief, press release, or campaign plan
-2. The system generates **hundreds of AI-powered Thai consumer personas** grounded in real demographic and cultural data
-3. These personas debate, discuss, and react to your campaign on **simulated social media** (Twitter/X + Reddit)
-4. You get an **Executive Dashboard** with quantitative KPIs — sentiment score, conversion probability, crisis risk, and an action plan
+1. Define a campaign, audience, channel mix, competitor move, or crisis scenario.
+2. Generate culturally grounded synthetic personas.
+3. Run multi-agent social simulation through OASIS-style behavior models.
+4. Review KPIs, segment reactions, risk drivers, assumptions, and simulated quotes.
+5. Export the evidence into a boardroom-ready slide deck.
 
-**Think of it as a "flight simulator for marketing campaigns."**
+This is not positioned as an AI playground. It is a decision-support system for answering:
+
+- Which message should we launch?
+- Which segment will resist?
+- What risk could become a crisis?
+- How should we revise the campaign before spending real media budget?
+- What should we show leadership or a client?
 
 ---
 
-## Why MSaaS?
+## Try The Demo First
 
-| Traditional Approach | MSaaS Approach |
-|---|---|
-| Launch campaign → wait weeks → analyze results | Simulate first → predict results → launch with confidence |
-| Real consumers = real risk | Synthetic personas = zero risk |
-| One outcome per budget | Run 10 scenarios, compare A/B |
-| Gut feeling + past data | Quantitative KPIs + social dynamics modeling |
-| Panic when crisis hits | Simulate crisis scenarios before they happen |
+New users should be able to see value before configuring an LLM provider.
+
+The product includes a public no-key demo flow:
+
+- Demo campaign list: `GET /api/demo/campaigns`
+- Demo dashboard: `GET /api/demo/campaigns/demo-premium-water/dashboard`
+- Frontend sample route: `/dashboard/demo-premium-water`
+
+The sample dashboard includes:
+
+- campaign brief
+- 7 executive KPIs
+- confidence score
+- assumptions
+- why-this-score explanations
+- risk drivers
+- simulated persona quotes
+- priority recommended actions
+
+For local development:
+
+```bash
+cd frontend
+npm install
+npm run dev -- --host 127.0.0.1 --port 5174
+```
+
+Open:
+
+```text
+http://127.0.0.1:5174/dashboard/demo-premium-water
+```
+
+---
+
+## Core Product Pillars
+
+### 1. Campaign Simulation
+
+Create a campaign, define target audience, select campaign channels, and simulate likely public reaction.
+
+Supported campaign objectives:
+
+- message testing
+- product launch
+- brand perception
+- competitor response
+- crisis simulation
+
+### 2. Competitor War Room
+
+Model competitive dynamics across multiple brands. Simulate events such as price wars, first-mover launches, copycat moves, and scandals.
+
+### 3. Crisis Intelligence
+
+Stress-test sensitive narratives before they become real issues. Identify risk segments, likely objections, and message frames that reduce escalation.
 
 ---
 
 ## Key Features
 
-### 🏢 Multi-Tenant B2B Platform
-- Organization-based workspaces with isolated data
-- Role-based access (Admin, Analyst, Viewer)
-- JWT authentication + API key support
-- Tiered plans (Free / Pro / Enterprise)
+### No-Key Demo Mode
 
-### 🧠 17 LLM Providers
-Choose any AI model to power your simulations — local or cloud:
+Users can open a sample campaign and see a full executive dashboard without registering, creating an org, or entering an API key.
 
-| Provider | Type | Best For |
-|----------|------|----------|
-| Ollama | Local | Privacy-first, no API costs |
-| OpenAI | Cloud | GPT-4o, highest quality |
-| Anthropic | Cloud | Claude, nuanced analysis |
-| Google | Cloud | Gemini, large context |
-| DeepSeek | Cloud | Cost-effective, strong reasoning |
-| Groq | Cloud | Ultra-fast inference |
-| OpenRouter | Cloud | Access any model |
-| xAI | Cloud | Grok, real-time aware |
-| Mistral | Cloud | European, multilingual |
-| Together AI | Cloud | Open-source models |
-| GLM, MiniMax, Kimi, DashScope | Cloud | Chinese/Asian markets |
-| HuggingFace, Bedrock, Vercel | Cloud | Custom endpoints |
+### Industry Templates
 
-### 👥 Multi-Country Persona Factory
-Generate culturally-grounded synthetic consumers for **11 countries** — each with real names, regional profiles, and authentic consumer behavior:
+Start from industry-specific persona segments, crisis seeds, document seeds, and campaign defaults.
 
-| Country | Language | Archetypes | Names | Currency |
-|---------|----------|------------|-------|----------|
-| 🇹🇭 Thailand | ไทย | 7 (urban professional, family mom, rural elder, Gen Z student, SME owner, digital nomad, factory worker) | Thai | THB |
-| 🇺🇸 US/UK | English | 6 (suburban mom, tech professional, midwest worker, Gen Z creator, Wall Street, retiree) | English | USD |
-| 🇨🇳 China | 中文 | 6 (一线白领, 小镇青年, 银发族, 宝妈, 大学生, 企业家) | Chinese | CNY |
-| 🇮🇳 India | हिन्दी | 6 (tech professional, small town aspirant, rural farmer, urban mom, student, business owner) | Hindi | INR |
-| 🇪🇸 Spain/LATAM | Español | 6 (urban professional, latino mom, student, business owner, creator, retired) | Spanish | EUR |
-| 🇫🇷 France | Français | 6 (parisian, artisan, intellectual, family, startup, retiree) | French | EUR |
-| 🇸🇦 Arab/MENA | العربية | 6 (professional, family, religious, entrepreneur, student, expat) | Arabic | SAR |
-| 🇧🇩 Bangladesh | বাংলা | 6 (garment worker, student, farmer, professional, trader, expat) | Bengali | BDT |
-| 🇧🇷 Brazil | Português | 6 (paulista, carioca, nordestino, student, business, influencer) | Portuguese | BRL |
-| 🇷🇺 Russia | Русский | 6 (moscow professional, worker, student, pensioner, IT, entrepreneur) | Cyrillic | RUB |
-| 🇵🇰 Pakistan | اردو | 6 (professional, farmer, student, housewife, trader, overseas) | Urdu | PKR |
+Current and importable template areas include:
 
-Each persona includes: demographics, psychographics, cultural values, media habits, brand loyalty score, price sensitivity, purchase decision style, and LLM-generated backstory.
+- energy
+- finance
+- insurance / InsurTech
+- retail / ecommerce
+- real estate
+- healthcare
+- FMCG
 
-**10 Thai Value Dimensions**: เกรงใจ, รักษาหน้า, ครอบครัว, บุญคุณ, สนุกสนาน, ใจเย็น, ไม่เป็นไร, น้ำใจ, เคารพผู้อาวุโส — plus country-specific values for each market.
+### Audience Channels
 
-### 📊 Executive Dashboard (Think to Finish)
-- **7 Quantitative KPIs**: Overall Sentiment, Conversion Probability, Social Influence Index, Message Resonance, Crisis Risk, Brand Perception Shift, Opinion Polarization
-- **Sentiment Timeline**: Round-by-round tracking
-- **Segment Breakdown**: By region, age, income
-- **Top Influencers**: Most impactful agents identified
-- **Action Plan**: Winning strategy + risk areas + priority actions
-- **Thai Executive Summary**: บทสรุปผู้บริหาร
+The user can describe where the audience actually lives, beyond the native simulation engine:
 
-### 🌐 11-Language UI
-English, 简体中文, हिन्दी, Español, Français, العربية, বাংলা, Português, Русский, اردو, **ไทย**
+- Facebook
+- Instagram
+- TikTok
+- YouTube
+- LINE
+- Twitter/X
+- Reddit
+- LinkedIn
 
-### ⚙️ Runtime Settings
-Switch providers, models, and API keys from the Settings page — no restart required. Per-task model overrides (NER, Report, Simulation, Ontology).
+### OASIS Platform Presets
+
+OASIS remains the core simulation engine. Platform presets translate modern channel intent into supported behavior models:
+
+- auto
+- microblog
+- community forum
+- group chat
+- creator feed
+- commerce intent
+
+This keeps the backend compatible with the current OASIS runner while letting the product reflect real-world channel planning.
+
+### Executive Dashboard
+
+The dashboard is designed for business decisions, not only charts.
+
+It includes:
+
+- overall sentiment
+- conversion probability
+- social influence index
+- message resonance
+- crisis risk
+- brand perception shift
+- opinion polarization
+- sentiment timeline
+- segment breakdown
+- top influencers
+- action plan
+- Thai executive summary
+
+### Decision Evidence
+
+Every score should be explainable.
+
+The dashboard includes:
+
+- confidence score
+- assumptions
+- persona sample evidence
+- simulated quotes
+- why-this-score explanations
+- risk drivers
+- recommended actions with priorities
+
+Example insight:
+
+```text
+Crisis risk is medium because price-sensitive family personas reacted negatively
+to premium pricing, while health-focused urban buyers remained strongly positive.
+```
+
+### Export To Slide
+
+Export simulation output into client- or leadership-ready files:
+
+- PowerPoint `.pptx`
+- CSV `.csv`
+- browser-side quick download fallback
+
+Recommended deck structure:
+
+1. Executive Summary
+2. KPI Dashboard
+3. Segment Insight
+4. Risk & Crisis Drivers
+5. Recommended Action Plan
+
+### System Health
+
+Settings includes a system health view backed by `GET /api/status`.
+
+It checks:
+
+- backend API readiness
+- Neo4j availability
+- LLM provider configuration
+- embedding provider configuration
+- runtime storage
+- default model
+- rough cost estimate per 100 personas
+
+---
+
+## Workflow
+
+```text
+1. Pick template or demo campaign
+   Choose an industry template, import a template, or open sample data.
+
+2. Define campaign brief
+   Name, objective, target segment, regions, persona count, channels, and risk concerns.
+
+3. Select behavior model
+   Choose campaign channels and OASIS behavior preset.
+
+4. Run simulation
+   Personas react, post, debate, and shift sentiment across simulated rounds.
+
+5. Review decision evidence
+   Read KPIs, segment drivers, assumptions, persona quotes, and recommended actions.
+
+6. Export
+   Generate boardroom-ready slides or CSV evidence.
+```
 
 ---
 
 ## Quick Start
 
 ### Prerequisites
-- Docker & Docker Compose
-- (Optional) GPU for local LLM — not required when using cloud providers
 
-### Option A: Cloud LLM (Recommended — No GPU Needed)
+- Python 3.11+
+- Node.js 20+
+- Docker and Docker Compose
+- Neo4j 5.18 if running graph features locally
+- Optional: Ollama for local LLM / embedding
+
+### Frontend
 
 ```bash
-git clone https://github.com/chawit1103/MarketingSimulation.git
-cd MarketingSimulation
+cd frontend
+npm install
+npm run dev -- --host 127.0.0.1 --port 5174
+```
+
+### Backend
+
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+python run.py
+```
+
+By default the backend reads configuration from environment variables and `.env`.
+
+### Docker Dev Stack
+
+```bash
 cp .env.example .env
-
-# Edit .env with your cloud provider:
-#   LLM_PROVIDER=deepseek
-#   LLM_API_KEY=sk-your-key
-#   LLM_MODEL_NAME=deepseek-chat
-#   EMBEDDING_PROVIDER=openai
-#   EMBEDDING_API_KEY=sk-your-key
-
 docker compose -f docker-compose.dev.yml up -d --build
 ```
 
-Open `http://localhost:3001` → Settings → configure your LLM → start simulating.
-
-### Option B: Fully Local (Ollama)
+### Local Ollama Mode
 
 ```bash
-git clone https://github.com/chawit1103/MarketingSimulation.git
-cd MarketingSimulation
-cp .env.example .env
-
 docker compose --profile local up -d
 docker exec 3c-ollama ollama pull qwen2.5:7b
 docker exec 3c-ollama ollama pull nomic-embed-text
 ```
 
-Open `http://localhost:3000`.
-
-### Dev Stack Ports
-
-| Service | Dev | Prod |
-|---------|-----|------|
-| Frontend | `:3001` | `:3000` |
-| Backend | `:5002` | `:5001` |
-| Neo4j Browser | `:7475` | `:7474` |
-| Neo4j Bolt | `:7688` | `:7687` |
-
 ---
 
-## Architecture
+## Runtime Configuration
 
-```
-┌──────────────────────────────────────────────────────┐
-│                 Vue 3 Frontend                        │
-│  Home · Campaigns · Dashboard · Settings             │
-│  11 languages · i18n · Dark theme                    │
-└────────────────────┬─────────────────────────────────┘
-                     │ JWT / API Key
-┌────────────────────▼─────────────────────────────────┐
-│              Flask Backend (Python 3.11)              │
-│                                                       │
-│  ┌─────────┐ ┌──────────┐ ┌──────────────┐           │
-│  │ Auth    │ │ Tenant   │ │ Settings     │           │
-│  │ JWT+Key │ │ Middleware│ │ 17 Providers │           │
-│  └─────────┘ └──────────┘ └──────────────┘           │
-│                                                       │
-│  ┌──────────┐ ┌────────────┐ ┌─────────────────┐     │
-│  │ Persona  │ │ Dashboard  │ │ Campaign        │     │
-│  │ Factory  │ │ KPI Engine │ │ Pipeline        │     │
-│  └──────────┘ └────────────┘ └─────────────────┘     │
-│                                                       │
-│  ┌──────────────────────────────────────────────┐    │
-│  │ OASIS Multi-Agent Simulation Engine           │    │
-│  │ Twitter/X + Reddit · Multi-round · Emergent   │    │
-│  └──────────────────────────────────────────────┘    │
-│                                                       │
-│  Organization · User · Campaign · Persona (JSON)      │
-└────────────────────┬─────────────────────────────────┘
-                     │
-          ┌──────────▼──────────┐
-          │    Neo4j 5.18       │
-          │  Knowledge Graph    │
-          └─────────────────────┘
+Example `.env`:
+
+```bash
+LLM_PROVIDER=deepseek
+LLM_API_KEY=sk-your-key
+LLM_MODEL_NAME=deepseek-chat
+
+EMBEDDING_PROVIDER=openai
+EMBEDDING_API_KEY=sk-your-key
+
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USER=neo4j
+NEO4J_PASSWORD=password
 ```
 
-**Key Architecture Decisions:**
-- **GraphStorage** abstract interface — swap Neo4j for any graph DB
-- **LLMProviderFactory** — 17 providers, single interface, runtime switching
-- **Tenant Middleware** — auto-injects org_id into every request
-- **Pipeline Orchestrator** — 5-step persona→graph→sim→report flow
-- **Hybrid Search**: 0.7 × vector similarity + 0.3 × BM25
-
----
-
-## Workflow: Campaign Pipeline
-
-```
-1. CREATE CAMPAIGN         2. GENERATE PERSONAS
-   Set objective, target       PersonaFactory creates
-   audience, platform          100+ Thai consumers
-
-3. BUILD KNOWLEDGE GRAPH   4. RUN SIMULATION
-   Extract entities from      OASIS engine: agents
-   document → Neo4j           post, reply, debate
-
-5. EXECUTIVE DASHBOARD
-   KPIs + Action Plan
-   Sentiment · Conversion · Risk
-```
+The Settings page can manage runtime provider values, task-specific model overrides, language, and system health.
 
 ---
 
 ## API Reference
 
-### Authentication
+All product APIs are registered under `/api/*`.
+
+### Public APIs
+
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | Create organization + admin user |
-| POST | `/api/auth/login` | Get JWT token |
+|---|---|---|
+| GET | `/health` | Basic backend liveness |
+| GET | `/api/status` | System health and readiness |
+| GET | `/api/demo/campaigns` | No-key demo campaign list |
+| GET | `/api/demo/campaigns/{id}/dashboard` | No-key demo dashboard |
+| GET | `/api/industry/templates` | Public industry template list |
+
+### Auth
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/auth/register` | Create organization and admin user |
+| POST | `/api/auth/login` | Login and receive JWT |
 | GET | `/api/auth/me` | Current user profile |
+| POST | `/api/auth/api-key` | Generate API key |
 
 ### Campaigns
+
 | Method | Endpoint | Description |
-|--------|----------|-------------|
+|---|---|---|
 | POST | `/api/campaign` | Create campaign |
-| GET | `/api/campaign` | List organization's campaigns |
+| GET | `/api/campaign` | List organization campaigns |
 | GET | `/api/campaign/{id}` | Campaign details |
-| POST | `/api/campaign/{id}/pipeline/start` | Start simulation pipeline |
+| PUT | `/api/campaign/{id}` | Update campaign |
+| DELETE | `/api/campaign/{id}` | Delete campaign |
+| POST | `/api/campaign/{id}/pipeline/start` | Start campaign pipeline |
 | GET | `/api/campaign/{id}/pipeline/status` | Pipeline progress |
 
-### Personas
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/persona/archetypes?lang=en` | Consumer archetypes (11 countries) |
-| GET | `/api/persona/regions?lang=th` | Regional profiles per country |
-| GET | `/api/persona/countries` | All 11 supported countries |
-| POST | `/api/persona/generate` | Generate personas for campaign |
-
 ### Dashboard
+
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/dashboard/campaign/{id}/kpi` | 7 quantitative KPIs |
+|---|---|---|
+| GET | `/api/dashboard/campaign/{id}/kpi` | Executive KPIs |
 | GET | `/api/dashboard/campaign/{id}/report` | Full executive report |
 | GET | `/api/dashboard/campaign/{id}/timeline` | Sentiment timeline |
 | GET | `/api/dashboard/campaign/{id}/segments` | Segment breakdown |
 
-### Settings
+### Industry Templates
+
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/settings` | Current configuration |
-| PUT | `/api/settings` | Update runtime settings |
-| GET | `/api/settings/providers` | 17 LLM + 4 embedding providers |
+|---|---|---|
+| GET | `/api/industry/templates` | List templates |
+| POST | `/api/industry/templates/import` | Import template JSON |
+| POST | `/api/industry/templates/validate` | Validate template JSON |
+| DELETE | `/api/industry/templates/{id}` | Delete uploaded template |
+| GET | `/api/industry/templates/{id}/preset` | Campaign preset from template |
+| GET | `/api/industry/templates/{id}/personas` | Template persona segments |
+| GET | `/api/industry/templates/{id}/crises` | Template crisis scenarios |
+| GET | `/api/industry/templates/{id}/seeds` | Template document seeds |
+
+### Simulation
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/simulation/create` | Create simulation instance |
+| POST | `/api/simulation/prepare` | Prepare simulation assets |
+| POST | `/api/simulation/start` | Start simulation runner |
+| POST | `/api/simulation/stop` | Stop simulation runner |
+| GET | `/api/simulation/{id}/run-status` | Runtime status |
+| GET | `/api/simulation/{id}/run-status/detail` | Detailed runtime status |
+
+### Comparator, Impact, Competitor, Export
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/comparator/compare` | Compare 2-5 campaigns |
+| GET | `/api/comparator/metrics` | Comparator metric definitions |
+| POST | `/api/impact/calculate` | Business impact calculation |
+| GET | `/api/impact/scenarios/{sentiment}` | Quick impact scenario |
+| GET | `/api/competitor/scenarios` | War room scenario list |
+| POST | `/api/competitor/simulate` | Run competitor simulation |
+| POST | `/api/export/pptx` | Export PowerPoint deck |
+| POST | `/api/export/csv` | Export CSV data |
 
 ---
 
-## Use Cases
+## Architecture
 
-### For Brands
-- **Message Testing**: A/B test 3 campaign angles against 500 personas, pick the winner
-- **Crisis Simulation**: "What if our product recall goes viral?" — simulate 48 hours of social media reaction
-- **Product Launch**: Predict sentiment for a new product in Bangkok vs. Northeast Thailand
-- **Competitor Response**: "If competitor X drops prices 20%, how will our customers react?"
+```text
+Vue 3 Frontend
+  Home
+  Campaigns
+  Dashboard
+  Comparator
+  Impact Simulator
+  War Room
+  Settings / System Health
+        |
+        | JWT / API key / public demo APIs
+        v
+Flask Backend
+  Auth + Tenant Middleware
+  Campaign API
+  Persona Factory
+  Industry Templates
+  KPI Calculator
+  Demo API
+  Status API
+  Export Engine
+  OASIS Simulation Runner
+        |
+        v
+Neo4j + JSON tenant storage + LLM providers
+```
 
-### For Agencies
-- **Client Pitch**: Show predicted sentiment before the campaign launches
-- **Multi-Scenario Planning**: Compare optimistic, neutral, and pessimistic simulation runs
-- **Post-Campaign Analysis**: Compare simulated vs. real outcomes to calibrate the model
+Key decisions:
 
-### For Enterprises
-- **Brand Health Tracking**: Run monthly simulations to detect perception shifts
-- **Policy Testing**: Simulate employee reaction to new policies
-- **Market Entry**: Test brand perception in a new region before entering
+- **Tenant scoped by default**: authenticated APIs resolve `org_id` through middleware.
+- **Public demo path**: `/api/demo/*` lets users see value before setup.
+- **OASIS-native runner**: Twitter/X and Reddit remain the execution backend, with product-level channel presets layered on top.
+- **JSON templates**: industry templates are importable and versionable.
+- **Runtime provider switching**: 17 LLM providers and multiple embedding providers are available through a unified configuration layer.
+- **Decision evidence over black-box scores**: dashboard output includes assumptions and explanation panels.
 
 ---
 
-## Technical Stack
+## Technology Stack
 
 | Layer | Technology |
-|-------|-----------|
-| Frontend | Vue 3, Vite, vue-i18n, Vue Router |
-| Backend | Python 3.11, Flask, Pydantic |
-| Simulation | OASIS (CAMEL-AI), camel-oasis 0.2.5 |
-| Graph DB | Neo4j Community 5.18 |
-| LLM | 17 providers via OpenAI-compatible API |
-| Embeddings | 4 providers (Ollama, OpenAI, Google, Cohere) |
-| Auth | JWT (HMAC-SHA256), API Keys |
-| Storage | JSON file-based per tenant |
-| DevOps | Docker Compose, dev/prod profiles |
+|---|---|
+| Frontend | Vue 3, Vite, Vue Router, vue-i18n |
+| Backend | Flask, Pydantic, Python 3.11 |
+| Simulation | OASIS / CAMEL-AI |
+| Graph | Neo4j 5.18 |
+| LLM | Ollama, OpenAI, Anthropic, Google, DeepSeek, Groq, OpenRouter, xAI, Mistral, Together AI, GLM, MiniMax, Kimi, DashScope, Hugging Face, Bedrock, Vercel |
+| Embeddings | Ollama, OpenAI, Google, Cohere |
+| Export | python-pptx, CSV |
+| Auth | JWT and API keys |
+| Storage | Tenant-scoped JSON files plus Neo4j graph storage |
+
+---
+
+## Testing
+
+Backend contract tests:
+
+```bash
+./backend/.venv/bin/python -m pytest backend/tests/test_api_contract.py
+```
+
+Frontend production build:
+
+```bash
+cd frontend
+npm run build
+```
+
+Locale validation:
+
+```bash
+for f in frontend/src/locales/*.json; do python3 -m json.tool "$f" >/dev/null || exit 1; done
+```
+
+---
+
+## Product Roadmap
+
+Highest priority:
+
+- expand Thai industry templates for healthcare, restaurants, EV, FMCG, cosmetics, public policy, and agriculture
+- strengthen KPI calculation with real simulation traces rather than mock fallback where possible
+- improve PPTX export templates for agency/client deliverables
+- add broader backend tests for auth, campaign CRUD, template validation, KPI calculation, and export
+- deploy a public hosted demo
+
+Nice-to-have:
+
+- scenario comparison history
+- calibration from real post-campaign data
+- cost estimator by LLM provider and persona count
+- team collaboration and comments on reports
+- template marketplace / library
 
 ---
 
 ## Credits
 
-This project is built on:
-- [MiroFish](https://github.com/666ghj/MiroFish) by 666ghj (Shanda Group) — original multi-agent simulation engine
-- [OASIS](https://github.com/camel-ai/oasis) from CAMEL-AI — social media simulation framework
-- [MiroFish-Offline](https://github.com/nikmcfly/MiroFish-Offline) by nikmcfly — Neo4j + Ollama migration
+Built on and inspired by:
 
-**MSaaS extensions by [chawit1103](https://github.com/chawit1103):**
-- Multi-tenant B2B platform (Organization, User, Campaign, JWT auth)
-- Thai Persona Factory (8 archetypes, 7 regions, 10 cultural values)
-- Executive Dashboard (7 KPIs, Think→Finish action plan)
-- Campaign Pipeline Orchestrator (end-to-end automation)
-- 17 LLM providers (from 3), 4 embedding providers
-- 11-language UI (from 2)
-- Runtime settings API
+- [MiroFish](https://github.com/666ghj/MiroFish) by 666ghj / Shanda Group
+- [OASIS](https://github.com/camel-ai/oasis) by CAMEL-AI
+- [MiroFish-Offline](https://github.com/nikmcfly/MiroFish-Offline) by nikmcfly
+
+3C Simulator / MarketingSimulation extensions by [chawit1103](https://github.com/chawit1103):
+
+- multi-tenant SaaS foundation
+- campaign pipeline orchestration
+- 11-country persona factory
+- industry template system
+- executive KPI dashboard
+- decision evidence panel
+- no-key demo onboarding
+- export-to-slide workflow
+- 11-language UI
 
 ---
 
 ## License
 
-AGPL-3.0 — see [LICENSE](./LICENSE)
+AGPL-3.0. See [LICENSE](./LICENSE).
