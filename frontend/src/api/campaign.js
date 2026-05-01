@@ -27,3 +27,7 @@ export const startPipeline = (id) => {
 export const getPipelineStatus = (id) => {
   return service.get(`/api/campaign/${id}/pipeline/status`)
 }
+
+export const hasCampaignAuth = () => {
+  return Boolean(localStorage.getItem('3c-auth-token') || localStorage.getItem('3c-api-key'))
+}

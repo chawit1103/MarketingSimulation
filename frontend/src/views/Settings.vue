@@ -11,6 +11,45 @@
     <div class="settings-content">
       <h1 class="page-title">{{ $t('settings.title') }}</h1>
 
+      <!-- System Health -->
+      <section class="config-section system-health">
+        <div class="section-heading-row">
+          <div>
+            <h2 class="section-title">{{ $t('settings.systemHealth') }}</h2>
+            <p class="section-desc">{{ $t('settings.systemHealthDesc') }}</p>
+          </div>
+          <button class="btn-secondary compact" @click="loadSystemStatus" :disabled="statusLoading">
+            {{ statusLoading ? $t('common.loading') : $t('settings.refreshStatus') }}
+          </button>
+        </div>
+
+        <div class="health-summary">
+          <div>
+            <span>{{ $t('settings.overallStatus') }}</span>
+            <strong :class="statusClass(systemStatus.status)">{{ statusLabel(systemStatus.status) }}</strong>
+          </div>
+          <div>
+            <span>{{ $t('settings.costEstimate') }}</span>
+            <strong>${{ systemStatus.estimate?.cost_per_100_personas_usd ?? '—' }} / 100 personas</strong>
+          </div>
+          <div>
+            <span>{{ $t('settings.defaultModel') }}</span>
+            <strong>{{ systemStatus.estimate?.default_model || '—' }}</strong>
+          </div>
+        </div>
+
+        <div class="health-grid">
+          <article v-for="service in systemStatus.services" :key="service.key" class="health-card">
+            <div class="health-card-top">
+              <strong>{{ service.label }}</strong>
+              <span :class="['status-dot-label', statusClass(service.status)]">{{ statusLabel(service.status) }}</span>
+            </div>
+            <p>{{ service.detail }}</p>
+            <small v-if="service.meta?.free_gb !== undefined">Free disk: {{ service.meta.free_gb }} GB</small>
+          </article>
+        </div>
+      </section>
+
       <!-- LLM Configuration -->
       <section class="config-section">
         <h2 class="section-title">{{ $t('settings.llm') }}</h2>
@@ -167,9 +206,10 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import TemplateImportDropZone from '@/components/TemplateImportDropZone.vue'
+import { getSystemStatus } from '@/api/status'
 
 const { locale, t } = useI18n()
 
@@ -208,6 +248,12 @@ const saving = ref(false)
 const testing = ref(false)
 const message = ref('')
 const messageType = ref('success')
+const statusLoading = ref(false)
+const systemStatus = reactive({
+  status: 'degraded',
+  services: [],
+  estimate: {}
+})
 
 function changeLanguage() {
   locale.value = selectedLanguage.value
@@ -252,6 +298,39 @@ async function testConnection() {
   }
 }
 
+async function loadSystemStatus() {
+  statusLoading.value = true
+  try {
+    const res = await getSystemStatus()
+    const data = res.data || res
+    systemStatus.status = data.status || 'degraded'
+    systemStatus.services = data.services || []
+    systemStatus.estimate = data.estimate || {}
+  } catch (e) {
+    systemStatus.status = 'degraded'
+    systemStatus.services = [
+      { key: 'api', label: 'Backend API', status: 'warning', detail: e.message || 'Unable to reach status API' }
+    ]
+  } finally {
+    statusLoading.value = false
+  }
+}
+
+function statusLabel(status) {
+  const labels = {
+    ok: t('settings.statusOk'),
+    configured: t('settings.statusConfigured'),
+    warning: t('settings.statusWarning'),
+    degraded: t('settings.statusDegraded')
+  }
+  return labels[status] || status || t('settings.statusWarning')
+}
+
+function statusClass(status) {
+  if (status === 'ok' || status === 'configured') return 'is-ok'
+  return 'is-warning'
+}
+
 // Load saved settings on mount
 try {
   const saved = localStorage.getItem('3c-settings')
@@ -269,6 +348,10 @@ try {
 } catch (e) {
   // ignore parse errors
 }
+
+onMounted(() => {
+  loadSystemStatus()
+})
 </script>
 
 <style scoped>
@@ -353,6 +436,120 @@ try {
   font-weight: 700;
   margin-bottom: var(--space-5);
   color: var(--text-primary);
+}
+
+.section-heading-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.section-heading-row .section-title {
+  margin-bottom: var(--space-2);
+}
+
+.section-desc {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.health-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--border-subtle);
+  margin-bottom: var(--space-4);
+}
+
+.health-summary div {
+  min-width: 0;
+  padding: var(--space-4);
+  background: var(--bg-panel);
+}
+
+.health-summary span {
+  display: block;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.health-summary strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.health-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.health-card {
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+}
+
+.health-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.health-card-top strong {
+  color: var(--text-primary);
+}
+
+.status-dot-label {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.is-ok {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.is-warning {
+  color: var(--yellow);
+  background: var(--yellow-soft);
+}
+
+.health-card p,
+.health-card small {
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.health-card p {
+  margin: 10px 0 0;
+}
+
+.health-card small {
+  display: block;
+  margin-top: 8px;
 }
 
 .form-grid {
@@ -442,6 +639,11 @@ try {
   box-shadow: var(--shadow-sm);
 }
 
+.btn-secondary.compact {
+  flex: 0 0 auto;
+  padding: 9px 14px;
+}
+
 .btn-secondary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -469,6 +671,13 @@ try {
 
 @media (max-width: 600px) {
   .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .section-heading-row {
+    flex-direction: column;
+  }
+  .health-summary,
+  .health-grid {
     grid-template-columns: 1fr;
   }
   .settings-content {

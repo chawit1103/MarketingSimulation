@@ -486,10 +486,12 @@ import { useI18n } from 'vue-i18n'
 import IndustryTemplateSelector from '@/components/IndustryTemplateSelector.vue'
 import {
   createCampaign,
+  hasCampaignAuth,
   listCampaigns,
   startPipeline,
   getPipelineStatus
 } from '@/api/campaign'
+import { listDemoCampaigns } from '@/api/demo'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -995,7 +997,13 @@ async function loadCampaigns() {
   loading.value = true
   try {
     if (shouldUseDemoCampaigns()) {
-      campaigns.value = demoCampaigns()
+      try {
+        const demoRes = await listDemoCampaigns()
+        campaigns.value = demoRes.data || demoRes || demoCampaigns()
+      } catch (demoErr) {
+        console.warn('Demo campaign API unavailable, using local fallback:', demoErr.message)
+        campaigns.value = demoCampaigns()
+      }
       return
     }
 
@@ -1020,8 +1028,7 @@ async function loadCampaigns() {
 }
 
 function shouldUseDemoCampaigns() {
-  if (!import.meta.env.DEV) return false
-  return !localStorage.getItem('3c-auth-token') && !localStorage.getItem('3c-api-key')
+  return !hasCampaignAuth()
 }
 
 function demoCampaigns() {

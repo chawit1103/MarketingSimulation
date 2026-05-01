@@ -31,7 +31,16 @@ class TenantMiddleware:
     """
 
     # Paths that bypass authentication entirely
-    PUBLIC_PREFIXES = ("/health", "/api/auth/", "/api/persona/archetypes", "/api/persona/regions", "/api/persona/countries", "/api/industry/templates")
+    PUBLIC_PREFIXES = (
+        "/health",
+        "/api/status",
+        "/api/demo",
+        "/api/auth/",
+        "/api/persona/archetypes",
+        "/api/persona/regions",
+        "/api/persona/countries",
+        "/api/industry/templates",
+    )
     PUBLIC_METHODS = {"OPTIONS"}
 
     def __init__(self, app=None, auth_service=None, org_service=None):

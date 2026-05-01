@@ -57,6 +57,7 @@
     "heroPunch2": "ลดความเสี่ยงก่อนตัดสินใจ",
     "heroPunch3": "ชนะตลาด",
     "heroCopy": "ก่อนใช้งบแคมเปญ 100K ดอลลาร์ ทดสอบกับ AI persona 500 คนใน 11 ภาษา ดูว่าอะไรโดนใจ คาดการณ์อะไรจะย้อนกลับมา และนำเสนอด้วยข้อมูลจริง",
+    "sampleCta": "ลอง Sample Campaign",
     "primaryCta": "เริ่ม Campaign Simulator",
     "secondaryCta": "ดูเอกสารระบบ",
     "demoCta": "เปิด War Room Demo",
@@ -259,7 +260,14 @@
     "briefStatus": "สถานะ",
     "briefNotSpecified": "ไม่ได้ระบุ",
     "briefChannels": "Campaign Channels",
-    "briefPlatformMode": "Behavior Model"
+    "briefPlatformMode": "Behavior Model",
+    "decisionEvidence": "หลักฐานประกอบการตัดสินใจ",
+    "whyTrustThis": "ทำไมคะแนนนี้จึงน่าเชื่อถือ",
+    "confidenceScore": "ความมั่นใจ",
+    "whyThisScore": "คะแนนนี้มาจากอะไร?",
+    "riskDrivers": "ตัวขับเคลื่อนความเสี่ยง",
+    "assumptions": "สมมติฐาน",
+    "simulatedQuotes": "เสียงจาก Persona จำลอง"
   },
   "process": {
     "brand": "3C SIMULATOR",
@@ -565,7 +573,17 @@
     "saveSuccess": "บันทึกการตั้งค่าสำเร็จ",
     "saveFailed": "บันทึกการตั้งค่าล้มเหลว",
     "connectionSuccess": "เชื่อมต่อสำเร็จ",
-    "connectionFailed": "เชื่อมต่อล้มเหลว"
+    "connectionFailed": "เชื่อมต่อล้มเหลว",
+    "systemHealth": "สถานะระบบ",
+    "systemHealthDesc": "ความพร้อมของ API, graph storage, model provider และพื้นที่จัดเก็บ runtime",
+    "refreshStatus": "รีเฟรชสถานะ",
+    "overallStatus": "สถานะรวม",
+    "costEstimate": "ประมาณค่าใช้จ่าย",
+    "defaultModel": "โมเดลเริ่มต้น",
+    "statusOk": "พร้อม",
+    "statusWarning": "ควรตรวจสอบ",
+    "statusConfigured": "ตั้งค่าแล้ว",
+    "statusDegraded": "ทำงานแบบลดระดับ"
   },
   "common": {
     "save": "บันทึก",

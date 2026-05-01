@@ -57,6 +57,7 @@
     "heroPunch2": "De-risk Decisions.",
     "heroPunch3": "Win Markets.",
     "heroCopy": "Before you spend $100K on a campaign, test it on 500 AI personas in 11 languages. See what resonates. Predict what backfires. Present the data.",
+    "sampleCta": "Try Sample Campaign",
     "primaryCta": "Start Campaign Simulator",
     "secondaryCta": "View Documentation",
     "demoCta": "Open War Room Demo",
@@ -259,7 +260,14 @@
     "briefStatus": "Status",
     "briefNotSpecified": "Not specified",
     "briefChannels": "Campaign Channels",
-    "briefPlatformMode": "Behavior Model"
+    "briefPlatformMode": "Behavior Model",
+    "decisionEvidence": "Decision Evidence",
+    "whyTrustThis": "Why this score is credible",
+    "confidenceScore": "Confidence",
+    "whyThisScore": "Why this score?",
+    "riskDrivers": "Risk Drivers",
+    "assumptions": "Assumptions",
+    "simulatedQuotes": "Simulated Quotes"
   },
   "process": {
     "brand": "3C SIMULATOR",
@@ -565,7 +573,17 @@
     "saveSuccess": "Settings saved successfully",
     "saveFailed": "Failed to save settings",
     "connectionSuccess": "Connection successful",
-    "connectionFailed": "Connection failed"
+    "connectionFailed": "Connection failed",
+    "systemHealth": "System Health",
+    "systemHealthDesc": "Connection readiness for simulation, graph storage, model providers, and runtime storage.",
+    "refreshStatus": "Refresh Status",
+    "overallStatus": "Overall Status",
+    "costEstimate": "Cost Estimate",
+    "defaultModel": "Default Model",
+    "statusOk": "OK",
+    "statusWarning": "Needs attention",
+    "statusConfigured": "Configured",
+    "statusDegraded": "Degraded"
   },
   "common": {
     "save": "Save",

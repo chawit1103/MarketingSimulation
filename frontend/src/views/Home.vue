@@ -26,7 +26,11 @@
             <p class="hero-copy">{{ $t('home.heroCopy') }}</p>
 
             <div class="hero-actions">
-              <router-link to="/campaigns" class="btn-hero btn-primary">
+              <router-link to="/dashboard/demo-premium-water" class="btn-hero btn-primary">
+                <span>{{ $t('home.sampleCta') }}</span>
+                <span class="btn-arrow">→</span>
+              </router-link>
+              <router-link to="/campaigns" class="btn-hero btn-secondary">
                 <span>{{ $t('home.primaryCta') }}</span>
                 <span class="btn-arrow">→</span>
               </router-link>

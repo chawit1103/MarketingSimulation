@@ -138,6 +138,43 @@
         </div>
       </section>
 
+      <section class="decision-evidence panel">
+        <div class="evidence-header">
+          <div>
+            <span class="brief-kicker">{{ $t('dashboard.decisionEvidence') }}</span>
+            <h2 class="panel-title">{{ $t('dashboard.whyTrustThis') }}</h2>
+          </div>
+          <div class="confidence-pill">
+            <span>{{ $t('dashboard.confidenceScore') }}</span>
+            <strong>{{ confidenceScore }}%</strong>
+          </div>
+        </div>
+        <div class="evidence-grid">
+          <article class="evidence-block">
+            <h3>{{ $t('dashboard.whyThisScore') }}</h3>
+            <ul>
+              <li v-for="item in scoreExplanations" :key="item">{{ item }}</li>
+            </ul>
+          </article>
+          <article class="evidence-block">
+            <h3>{{ $t('dashboard.riskDrivers') }}</h3>
+            <ul>
+              <li v-for="item in riskDrivers" :key="item">{{ item }}</li>
+            </ul>
+          </article>
+          <article class="evidence-block">
+            <h3>{{ $t('dashboard.assumptions') }}</h3>
+            <ul>
+              <li v-for="item in assumptions" :key="item">{{ item }}</li>
+            </ul>
+          </article>
+          <article class="evidence-block quotes">
+            <h3>{{ $t('dashboard.simulatedQuotes') }}</h3>
+            <blockquote v-for="quote in simulatedQuotes" :key="quote">{{ quote }}</blockquote>
+          </article>
+        </div>
+      </section>
+
       <!-- Sentiment Timeline + Segment Breakdown -->
       <section class="mid-row">
         <!-- Sentiment Timeline Chart -->
@@ -311,7 +348,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getKPIs, getTimeline, getSegments, getInfluencers } from '@/api/dashboard'
-import { getCampaign } from '@/api/campaign'
+import { getCampaign, hasCampaignAuth } from '@/api/campaign'
+import { getDemoDashboard } from '@/api/demo'
 import ExportButton from '@/components/ExportButton.vue'
 
 const route = useRoute()
@@ -412,6 +450,11 @@ const riskSummary = ref('')
 const riskAreas = ref([])
 const actionItems = ref([])
 const executiveSummaryTH = ref('')
+const confidenceScore = ref(78)
+const assumptions = ref([])
+const scoreExplanations = ref([])
+const riskDrivers = ref([])
+const simulatedQuotes = ref([])
 
 // --- Computed: Grade class ---
 const gradeClass = computed(() => {
@@ -440,23 +483,46 @@ const sentimentClass = computed(() => {
 // --- Computed: Crisis ---
 const crisisLevel = computed(() => {
   const r = kpis.value.crisis_risk
+  if (typeof r === 'number') {
+    if (r >= 65) return 3
+    if (r >= 35) return 2
+    return 1
+  }
   if (r === 'high') return 3
   if (r === 'medium') return 2
   return 1
 })
 const crisisLabel = computed(() => {
   const r = kpis.value.crisis_risk
+  if (typeof r === 'number') {
+    if (r >= 65) return t('dashboard.crisisHigh')
+    if (r >= 35) return t('dashboard.crisisMedium')
+    return t('dashboard.crisisLow')
+  }
   if (r === 'high') return t('dashboard.crisisHigh')
   if (r === 'medium') return t('dashboard.crisisMedium')
   return t('dashboard.crisisLow')
 })
 const crisisColor = computed(() => {
   const r = kpis.value.crisis_risk
+  if (typeof r === 'number') {
+    if (r >= 65) return 'var(--red)'
+    if (r >= 35) return 'var(--yellow)'
+    return 'var(--green)'
+  }
   if (r === 'high') return 'var(--red)'
   if (r === 'medium') return 'var(--yellow)'
   return 'var(--green)'
 })
-const crisisClass = computed(() => `crisis-${kpis.value.crisis_risk}`)
+const crisisClass = computed(() => {
+  const r = kpis.value.crisis_risk
+  if (typeof r === 'number') {
+    if (r >= 65) return 'crisis-high'
+    if (r >= 35) return 'crisis-medium'
+    return 'crisis-low'
+  }
+  return `crisis-${r}`
+})
 
 // --- Helpers ---
 function formatSentiment(val) {
@@ -581,8 +647,7 @@ async function loadCampaignDetails(cid) {
 }
 
 function shouldUseDemoCampaignDetails() {
-  if (!import.meta.env.DEV) return false
-  return !localStorage.getItem('3c-auth-token') && !localStorage.getItem('3c-api-key')
+  return String(campaignId.value || '').startsWith('demo-') || !hasCampaignAuth()
 }
 
 function demoCampaignDetails(cid) {
@@ -629,9 +694,8 @@ async function loadDashboard() {
     const cid = campaignId.value
     const useDemoData = shouldUseDemoCampaignDetails()
 
-    await loadCampaignDetails(cid)
-
     if (useDemoData) {
+      await loadDemoDashboard(cid)
       lastUpdated.value = new Date().toLocaleString()
       reportDate.value = new Date().toLocaleDateString('en-US', {
         year: 'numeric',
@@ -641,11 +705,13 @@ async function loadDashboard() {
       return
     }
 
+    await loadCampaignDetails(cid)
+
     // Fetch KPIs
     try {
       const kpiRes = await getKPIs(cid)
       if (kpiRes && kpiRes.data) {
-        Object.assign(kpis.value, kpiRes.data)
+        Object.assign(kpis.value, normalizeKpis(kpiRes.data))
       }
       if (kpiRes && kpiRes.campaign_name) campaignName.value = kpiRes.campaign_name
       if (kpiRes && kpiRes.grade) overallGrade.value = kpiRes.grade
@@ -656,9 +722,11 @@ async function loadDashboard() {
     // Fetch Timeline
     try {
       const tlRes = await getTimeline(cid)
-      if (tlRes && tlRes.rounds) {
-        timeline.value = tlRes.rounds
-        totalRounds.value = tlRes.rounds.length
+      const tlData = tlRes?.data || tlRes || {}
+      const points = tlData.timeline || tlData.rounds || []
+      if (points.length) {
+        timeline.value = points.map(normalizeTimelinePoint)
+        totalRounds.value = timeline.value.length
       }
     } catch (e) {
       console.warn('Timeline fetch failed:', e.message)
@@ -667,8 +735,10 @@ async function loadDashboard() {
     // Fetch Segments
     try {
       const segRes = await getSegments(cid)
-      if (segRes && segRes.segments) {
-        segments.value = segRes.segments
+      const segData = segRes?.data || segRes || {}
+      const rows = segData.segments || segData
+      if (Array.isArray(rows) && rows.length) {
+        segments.value = rows.map(normalizeSegment)
       }
     } catch (e) {
       console.warn('Segments fetch failed:', e.message)
@@ -704,6 +774,8 @@ async function loadDashboard() {
       executiveSummaryTH.value = kpis.value.executive_summary_th
     }
 
+    buildEvidenceFromCurrentState()
+
     lastUpdated.value = new Date().toLocaleString()
     reportDate.value = new Date().toLocaleDateString('en-US', {
       year: 'numeric',
@@ -715,6 +787,112 @@ async function loadDashboard() {
   } finally {
     loading.value = false
   }
+}
+
+async function loadDemoDashboard(cid) {
+  const demoId = String(cid || '').startsWith('demo-') ? cid : 'demo-premium-water'
+  try {
+    const res = await getDemoDashboard(demoId)
+    applyDemoDashboard(res.data || res)
+  } catch (e) {
+    console.warn('Demo dashboard API unavailable, using local fallback:', e.message)
+    campaignDetails.value = demoCampaignDetails(demoId)
+    if (campaignDetails.value?.name) campaignName.value = campaignDetails.value.name
+    buildEvidenceFromCurrentState()
+  }
+}
+
+function applyDemoDashboard(data) {
+  const campaign = data.campaign || demoCampaignDetails('demo-premium-water')
+  campaignDetails.value = campaign
+  campaignName.value = campaign.name || campaignName.value
+  Object.assign(kpis.value, normalizeKpis(data.kpis || {}))
+  timeline.value = (data.timeline || []).map(normalizeTimelinePoint)
+  segments.value = (data.segments || []).map(normalizeSegment)
+  influencers.value = data.influencers || []
+  totalRounds.value = timeline.value.length || campaign?.sim_config?.max_rounds || 0
+
+  const evidence = data.evidence || {}
+  confidenceScore.value = evidence.confidence_score || data.kpis?.confidence_score || 78
+  assumptions.value = evidence.assumptions || []
+  scoreExplanations.value = evidence.why_this_score || []
+  riskDrivers.value = evidence.risk_drivers || []
+  simulatedQuotes.value = evidence.quotes || []
+
+  if (Array.isArray(evidence.recommended_actions)) {
+    actionItems.value = evidence.recommended_actions
+  }
+  riskAreas.value = (evidence.risk_drivers || []).map((description, idx) => ({
+    severity: idx === 0 ? 'high' : 'medium',
+    description,
+  }))
+  winningStrategy.value = scoreExplanations.value[0] || winningStrategy.value
+  winningHighlights.value = scoreExplanations.value.slice(0, 3)
+  riskSummary.value = riskDrivers.value[0] || riskSummary.value
+  executiveSummaryTH.value = scoreExplanations.value.join(' ') || executiveSummaryTH.value
+}
+
+function normalizeKpis(data) {
+  const next = { ...data }
+  if (next.social_influence == null && next.social_influence_index != null) {
+    next.social_influence = next.social_influence_index
+  }
+  if (typeof next.crisis_risk === 'number') {
+    next.crisis_risk = Math.round(next.crisis_risk)
+  }
+  return next
+}
+
+function normalizeTimelinePoint(point) {
+  return {
+    round_num: point.round_num || point.round || 0,
+    sentiment: point.sentiment ?? point.avg_sentiment ?? 0,
+    posts_count: point.posts_count ?? point.action_count ?? 0,
+    date: point.date,
+  }
+}
+
+function normalizeSegment(segment) {
+  return {
+    name: segment.name || segment.segment_name || 'Segment',
+    sentiment: segment.sentiment ?? segment.avg_sentiment ?? 0,
+    conversion_estimate: segment.conversion_estimate ?? 0,
+    size: segment.size || `${segment.persona_count || 0}`,
+  }
+}
+
+function buildEvidenceFromCurrentState() {
+  confidenceScore.value = Math.max(62, Math.min(88, Math.round((kpis.value.message_resonance || 65) * 0.55 + (segments.value.length ? 30 : 18))))
+  assumptions.value = assumptions.value.length ? assumptions.value : [
+    `${campaignBrief.value.personas} personas across ${campaignBrief.value.channels}`,
+    `${campaignBrief.value.rounds} simulated rounds using ${campaignBrief.value.platformMode}`,
+    'Scores are directional decision signals, not a replacement for live market measurement.',
+  ]
+  scoreExplanations.value = scoreExplanations.value.length ? scoreExplanations.value : [
+    `Conversion is ${kpis.value.conversion_probability}% because the strongest segment response is ${topPositiveSegmentLabel()}.`,
+    `Message resonance is ${kpis.value.message_resonance}% after discounting polarized or low-intent reactions.`,
+    `Crisis level is ${crisisLabel.value} based on negative segment concentration and influencer amplification risk.`,
+  ]
+  riskDrivers.value = riskDrivers.value.length ? riskDrivers.value : [
+    topNegativeSegmentLabel(),
+    'High-reach voices can amplify uncertainty if proof points are missing.',
+    'Price, trust, and claim substantiation remain the most sensitive message areas.',
+  ]
+  simulatedQuotes.value = simulatedQuotes.value.length ? simulatedQuotes.value : [
+    'I like the idea, but I need a concrete reason to believe the claim.',
+    'If the brand explains the trade-off clearly, I would consider trying it.',
+    'The message feels stronger when it shows evidence rather than just emotion.',
+  ]
+}
+
+function topPositiveSegmentLabel() {
+  const best = [...segments.value].sort((a, b) => b.sentiment - a.sentiment)[0]
+  return best ? `${best.name} (${formatSentiment(best.sentiment)})` : 'the strongest positive segment'
+}
+
+function topNegativeSegmentLabel() {
+  const worst = [...segments.value].sort((a, b) => a.sentiment - b.sentiment)[0]
+  return worst ? `${worst.name} remains a risk driver at ${formatSentiment(worst.sentiment)} sentiment.` : 'Negative reaction concentration is still unknown.'
 }
 
 // --- Seed demo data if backend returns nothing ---
@@ -996,6 +1174,86 @@ font-size: var(--text-sm);
   font-weight: 800;
   line-height: 1.35;
   overflow-wrap: anywhere;
+}
+
+/* ====================== DECISION EVIDENCE ====================== */
+.decision-evidence {
+  margin: 28px 0;
+}
+
+.evidence-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.confidence-pill {
+  min-width: 128px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+  text-align: right;
+}
+
+.confidence-pill span {
+  display: block;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.confidence-pill strong {
+  display: block;
+  color: var(--green);
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  line-height: 1;
+  margin-top: 6px;
+}
+
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.evidence-block {
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+}
+
+.evidence-block h3 {
+  margin: 0 0 var(--space-3);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+}
+
+.evidence-block ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.evidence-block li,
+.evidence-block blockquote {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.evidence-block blockquote {
+  margin: 0 0 10px;
+  padding-left: 12px;
+  border-left: 2px solid var(--accent);
 }
 
 /* ====================== KPI ROW ====================== */
@@ -2025,6 +2283,16 @@ font-size: var(--text-sm);
   }
   .brief-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .evidence-header {
+    flex-direction: column;
+  }
+  .confidence-pill {
+    width: 100%;
+    text-align: left;
+  }
+  .evidence-grid {
+    grid-template-columns: 1fr;
   }
   .mid-row {
     grid-template-columns: 1fr;

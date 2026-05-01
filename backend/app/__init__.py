@@ -92,6 +92,8 @@ def create_app(config_class=Config):
     from .api.impact import impact_bp
     from .api.competitor import competitor_bp
     from .api.export import export_bp
+    from .api.demo import demo_bp
+    from .api.status import status_bp
     app.register_blueprint(graph_bp, url_prefix='/api/graph')
     app.register_blueprint(simulation_bp, url_prefix='/api/simulation')
     app.register_blueprint(report_bp, url_prefix='/api/report')
@@ -105,6 +107,8 @@ def create_app(config_class=Config):
     app.register_blueprint(impact_bp, url_prefix='/api/impact')
     app.register_blueprint(competitor_bp, url_prefix='/api/competitor')
     app.register_blueprint(export_bp, url_prefix='/api/export')
+    app.register_blueprint(demo_bp, url_prefix='/api/demo')
+    app.register_blueprint(status_bp, url_prefix='/api/status')
 
     # Health check
     @app.route('/health')
