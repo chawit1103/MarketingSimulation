@@ -29,15 +29,26 @@ class Config:
         "secret",
     }
 
-    # Flask configuration
-    SECRET_KEY = os.environ.get('SECRET_KEY', '3c-simulator-secret-key')
-    DEBUG = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
     ENVIRONMENT = (
         os.environ.get("APP_ENV")
         or os.environ.get("FLASK_ENV")
         or os.environ.get("ENV")
         or "development"
     ).lower()
+    IS_PRODUCTION_ENV = ENVIRONMENT in {"prod", "production"}
+
+    # Flask configuration. Debug/body logging are opt-in so production and
+    # shared development environments do not accidentally log sensitive briefs.
+    SECRET_KEY = os.environ.get('SECRET_KEY', '3c-simulator-secret-key')
+    DEBUG = os.environ.get('FLASK_DEBUG', 'false').lower() in {"1", "true", "yes", "on"}
+    REQUEST_BODY_LOGGING_ENABLED = (
+        os.environ.get('REQUEST_BODY_LOGGING_ENABLED', 'false').lower() in {"1", "true", "yes", "on"}
+    )
+    CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "").strip()
+    SETTINGS_PERSIST_SECRETS = (
+        os.environ.get("SETTINGS_PERSIST_SECRETS", "false" if IS_PRODUCTION_ENV else "true").lower()
+        in {"1", "true", "yes", "on"}
+    )
 
     # Lightweight in-memory rate limiting. Values are requests per window.
     RATE_LIMIT_ENABLED = os.environ.get("RATE_LIMIT_ENABLED", "true").lower() == "true"
@@ -62,6 +73,7 @@ class Config:
     NEO4J_PASSWORD = os.environ.get('NEO4J_PASSWORD', '3c-simulator')
 
     # Embedding configuration
+    EMBEDDING_API_KEY = os.environ.get('EMBEDDING_API_KEY')
     EMBEDDING_MODEL = os.environ.get('EMBEDDING_MODEL', 'nomic-embed-text')
     EMBEDDING_BASE_URL = os.environ.get('EMBEDDING_BASE_URL', 'http://localhost:11434')
 
@@ -111,6 +123,20 @@ class Config:
         return cls.ENVIRONMENT in {"prod", "production"}
 
     @classmethod
+    def get_cors_origins(cls):
+        """Return configured CORS origins.
+
+        Development preserves easy local testing with '*'. Production never
+        defaults to wildcard; operators must set CORS_ALLOWED_ORIGINS.
+        """
+        configured = getattr(cls, "CORS_ALLOWED_ORIGINS", "")
+        if configured:
+            return [item.strip() for item in configured.split(",") if item.strip()]
+        if cls.is_production():
+            return []
+        return "*"
+
+    @classmethod
     def validate_security(cls, logger=None):
         """Validate production-sensitive security configuration.
 
@@ -118,15 +144,24 @@ class Config:
         local demo flow, but production must provide a real SECRET_KEY.
         """
         logger = logger or logging.getLogger("mirofish.config")
-        has_env_secret = bool(os.environ.get("SECRET_KEY"))
         uses_known_secret = cls.SECRET_KEY in cls.KNOWN_FALLBACK_SECRET_KEYS
+        has_non_default_secret = bool(cls.SECRET_KEY) and not uses_known_secret
 
-        if cls.is_production() and (not has_env_secret or uses_known_secret):
+        if cls.is_production() and not has_non_default_secret:
             raise RuntimeError(
                 "Production requires SECRET_KEY to be set to a non-default value."
+            )
+        if cls.is_production() and cls.get_cors_origins() == "*":
+            raise RuntimeError(
+                "Production requires CORS_ALLOWED_ORIGINS to be set to explicit trusted origins."
             )
 
         if not cls.is_production() and uses_known_secret:
             logger.warning(
                 "Development is using the default SECRET_KEY. Set SECRET_KEY before production."
+            )
+        if cls.is_production() and getattr(cls, "REQUEST_BODY_LOGGING_ENABLED", False):
+            logger.warning(
+                "REQUEST_BODY_LOGGING_ENABLED is enabled in production. Redaction is applied, "
+                "but request body logging should remain disabled unless temporarily debugging."
             )

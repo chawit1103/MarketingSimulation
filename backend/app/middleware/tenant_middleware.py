@@ -3,7 +3,6 @@
 Extracts authentication from:
   - Authorization: Bearer <token>
   - X-Api-Key: <api-key>
-  - ?api_key=<api-key> query parameter
 
 Injects g.current_user and g.current_org (Organization dict) on success.
 Returns 401/403 JSON on failure.
@@ -98,11 +97,6 @@ class TenantMiddleware:
 
         # 2) X-Api-Key header
         api_key = request.headers.get("X-Api-Key")
-        if api_key:
-            return api_key
-
-        # 3) ?api_key= query param
-        api_key = request.args.get("api_key")
         if api_key:
             return api_key
 

@@ -61,6 +61,10 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] SEC-006 auth route exposure is partially remediated: only auth login/register remain public, `/me` is authenticated, API-key generation is admin-only, and broken org switching returns a safe disabled response.
 - [x] SEC-003 tenant isolation for ID-addressed resources is remediated for the current local JSON architecture: campaign pipeline status, dashboard KPI/report/timeline/segment routes, simulation reads/status/actions, reports, projects, graphs, and graph tasks are scoped to the authenticated organization.
 - [x] SEC-005 dashboard provenance is remediated: fallback/mock KPI output is labeled `local_estimate`, demo fixtures are labeled `demo_mode`, and `backend_verified` is reserved for explicit persisted real simulation KPI metrics.
+- [x] SEC-008/010/011/013 production hardening baseline is remediated: debug/body logging are opt-in, query-parameter API keys are rejected, production CORS requires explicit trusted origins, and 5xx API errors return stable client-safe messages.
+- [x] SEC-007 local settings storage is partially remediated: masked placeholders are not persisted as secrets, settings files use restrictive permissions where supported, and `SETTINGS_PERSIST_SECRETS=false` omits runtime secrets from JSON storage.
+- [ ] SEC-009 production rate limiting uses an edge/API-gateway or shared Redis-backed limiter; the built-in limiter remains in-memory and local/demo oriented.
+- [ ] Production secrets are provided via environment variables or an external secret manager rather than local JSON settings.
 - [ ] Legacy local JSON simulation/report/project/task records without `org_id` are reviewed, backfilled, or re-created before production use.
 - [ ] External pilot data-retention and deletion procedure is documented and approved.
 

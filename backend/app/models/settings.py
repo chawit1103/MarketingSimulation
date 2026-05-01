@@ -4,6 +4,10 @@ from pydantic import BaseModel, Field
 from enum import Enum
 
 
+def _is_masked_secret(value: Any) -> bool:
+    return isinstance(value, str) and ("••••" in value or "****" in value)
+
+
 class ProviderType(str, Enum):
     OLLAMA = "ollama"
     OPENAI = "openai"
@@ -124,6 +128,7 @@ class SettingsManager:
             with open(settings_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             self._settings = AppSettings(**data)
+            self._apply_env_secret_fallbacks()
         else:
             # First run — initialize from .env / defaults
             self._settings = AppSettings(
@@ -136,6 +141,7 @@ class SettingsManager:
                 embedding=EmbeddingSettings(
                     provider=EmbeddingProviderType.OLLAMA,
                     model=Config.EMBEDDING_MODEL,
+                    api_key=Config.EMBEDDING_API_KEY or "",
                     base_url=Config.EMBEDDING_BASE_URL,
                 ),
                 graph_db=GraphDBSettings(
@@ -146,6 +152,17 @@ class SettingsManager:
             )
             self.save()
 
+    def _apply_env_secret_fallbacks(self):
+        """Fill missing local settings secrets from environment/config values."""
+        from ..config import Config
+
+        if not self._settings.llm.api_key and Config.LLM_API_KEY:
+            self._settings.llm.api_key = Config.LLM_API_KEY
+        if not self._settings.embedding.api_key and Config.EMBEDDING_API_KEY:
+            self._settings.embedding.api_key = Config.EMBEDDING_API_KEY
+        if not self._settings.graph_db.password and Config.NEO4J_PASSWORD:
+            self._settings.graph_db.password = Config.NEO4J_PASSWORD
+
     def save(self):
         """Persist current settings to settings.json."""
         import json
@@ -154,14 +171,32 @@ class SettingsManager:
 
         settings_path = os.path.join(Config.UPLOAD_FOLDER, 'settings.json')
         os.makedirs(os.path.dirname(settings_path), exist_ok=True)
+        data = self._settings.model_dump()
+        if not Config.SETTINGS_PERSIST_SECRETS:
+            data["llm"]["api_key"] = ""
+            data["embedding"]["api_key"] = ""
+            data["graph_db"]["password"] = ""
+
         with open(settings_path, 'w', encoding='utf-8') as f:
-            json.dump(self._settings.model_dump(), f, indent=2, ensure_ascii=False)
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        try:
+            os.chmod(settings_path, 0o600)
+        except OSError:
+            pass
 
     def get(self) -> AppSettings:
         return self._settings
 
     def update(self, data: Dict[str, Any]):
         """Update settings from dict — validates, saves, invalidates caches."""
+        existing = self._settings.model_dump()
+        for section, field in (("llm", "api_key"), ("embedding", "api_key"), ("graph_db", "password")):
+            incoming_section = data.get(section)
+            if not isinstance(incoming_section, dict):
+                continue
+            if _is_masked_secret(incoming_section.get(field)):
+                incoming_section[field] = (existing.get(section) or {}).get(field, "")
+
         self._settings = AppSettings(**data)
         self.save()
         # Signal provider reinitialization (lazy import to avoid circular)

@@ -64,7 +64,7 @@ def test_api_response_sanitizer_strips_traceback_from_client_payload(app):
     payload = response.get_json()
 
     assert response.status_code == 500
-    assert payload == {"success": False, "error": "boom"}
+    assert payload == {"success": False, "error": "Internal server error", "code": "internal_error"}
 
 
 def test_production_rejects_known_fallback_secret():

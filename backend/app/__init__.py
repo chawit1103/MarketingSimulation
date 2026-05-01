@@ -40,8 +40,8 @@ def create_app(config_class=Config):
         logger.info("3C Simulator Backend starting...")
         logger.info("=" * 50)
 
-    # Enable CORS
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    # Enable CORS. Production must opt in to explicit trusted origins.
+    CORS(app, resources={r"/api/*": {"origins": config_class.get_cors_origins()}})
 
     # --- Initialize Neo4jStorage singleton (DI via app.extensions) ---
     from .storage import Neo4jStorage
@@ -78,7 +78,11 @@ def create_app(config_class=Config):
     def log_request():
         logger = get_logger('mirofish.request')
         logger.debug(f"Request: {request.method} {request.path}")
-        if request.content_type and 'json' in request.content_type:
+        if (
+            app.config.get("REQUEST_BODY_LOGGING_ENABLED", False)
+            and request.content_type
+            and 'json' in request.content_type
+        ):
             from .utils.response_safety import redact_sensitive_payload
             logger.debug(f"Request body: {redact_sensitive_payload(request.get_json(silent=True))}")
 
@@ -93,13 +97,13 @@ def create_app(config_class=Config):
             return response
 
         from .utils.response_safety import sanitize_api_payload
-        sanitized, removed = sanitize_api_payload(payload)
+        sanitized, removed = sanitize_api_payload(payload, status_code=response.status_code)
         if not removed:
             return response
 
         for details in removed:
             logger.error(
-                "Stripped raw traceback from client response for %s %s:\n%s",
+                "Sanitized client response for %s %s:\n%s",
                 request.method,
                 request.path,
                 details,

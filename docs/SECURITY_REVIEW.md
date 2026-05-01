@@ -80,27 +80,26 @@ However, the current repository is not production-ready for external customers. 
 ### SEC-007: Runtime settings are stored plaintext on local disk
 
 - Severity: High
-- Status: Partially mitigated in PR J; blocker before multi-user/cloud deployment
+- Status: Partially remediated in PR N; local JSON settings remain demo/local storage only
 - Evidence: `SettingsManager.save()` persists LLM API keys, embedding API keys, and graph passwords into `backend/uploads/settings.json`.
 - Impact: File-system compromise, backups, logs, or volume snapshots can expose provider credentials. The file is gitignored, which helps source control, but not production runtime security.
-- Mitigation: Browser reads no longer receive stored secret values, settings updates no longer persist masked placeholders as real values, and the Settings UI stores only presence metadata in local browser settings.
-- Recommended fix: Store production secrets in environment variables or a secret manager. If file storage remains for local demo, encrypt at rest and keep permissions restricted.
+- Mitigation: Browser reads no longer receive stored secret values, settings updates no longer persist masked placeholders as real values, the Settings UI stores only presence metadata in local browser settings, `settings.json` is written with restrictive `0600` permissions where supported, and `SETTINGS_PERSIST_SECRETS=false` omits provider/graph secrets from the runtime file. Production should use environment variables or a secret manager.
+- Remaining action: A real secret-manager/database-backed settings design is still required for multi-user production deployments.
 
 ### SEC-008: Request body debug logging can record secrets and campaign briefs
 
 - Severity: High
-- Status: Partially mitigated in PR J; blocker if debug logging is enabled outside local development
-- Evidence: `create_app()` logs JSON request bodies at debug level. `Config.DEBUG` defaults to true.
+- Status: Remediated in PR N for default behavior; development logging remains opt-in and redacted
+- Evidence: Prior to PR N, `create_app()` logged JSON request bodies at debug level and `Config.DEBUG` defaulted to true.
 - Impact: Login passwords, provider API keys, settings payloads, campaign briefs, and customer data can enter logs.
-- Mitigation: Request JSON debug logs now redact credential-like fields before writing to logs.
-- Recommended fix: Do not log request bodies by default. Make production/default debug false and consider disabling body logging entirely outside local development.
+- Remediation: `FLASK_DEBUG` defaults to false, request body logging is disabled unless `REQUEST_BODY_LOGGING_ENABLED=true`, and redaction covers passwords, API keys, tokens, secrets, graph passwords, and campaign brief/simulation requirement text.
 
 ## Medium Findings
 
 ### SEC-009: In-memory rate limiting is not sufficient for production
 
 - Severity: Medium
-- Status: Non-blocking for local demos; blocker for public internet exposure without edge controls
+- Status: Documented limitation in PR N; blocker for public internet exposure without edge controls
 - Evidence: `RateLimitMiddleware` is per-process, memory-backed, and keys on `X-Forwarded-For` when present.
 - Impact: Multi-worker deployments do not share counters, restarts reset limits, and spoofed forwarding headers can bypass limits unless a trusted proxy overwrites them.
 - Recommended fix: Keep the current limiter for local/demo mode, but add edge/API-gateway or Redis-backed rate limiting for production. Only trust `X-Forwarded-For` from configured proxies.
@@ -108,18 +107,18 @@ However, the current repository is not production-ready for external customers. 
 ### SEC-010: API keys are accepted in query parameters
 
 - Severity: Medium
-- Status: Non-blocking improvement
-- Evidence: `TenantMiddleware._extract_token()` accepts `?api_key=...`.
+- Status: Remediated in PR N
+- Evidence: Prior to PR N, `TenantMiddleware._extract_token()` accepted `?api_key=...`.
 - Impact: Query tokens are commonly captured in access logs, browser history, analytics, referrers, and screenshots.
-- Recommended fix: Remove query-parameter API-key auth. Require `Authorization: Bearer` or `X-Api-Key` headers only.
+- Remediation: Query-parameter API keys are no longer accepted. Auth credentials must be sent through `Authorization: Bearer` or `X-Api-Key`.
 
 ### SEC-011: CORS is wide open for all API routes
 
 - Severity: Medium
-- Status: Non-blocking for local demos; production hardening required
-- Evidence: `CORS(app, resources={r"/api/*": {"origins": "*"}})`.
+- Status: Remediated in PR N for production defaults
+- Evidence: Prior to PR N, `create_app()` configured `CORS(app, resources={r"/api/*": {"origins": "*"}})`.
 - Impact: The app uses Authorization headers rather than cookies, so this is not a classic cookie CSRF issue. Still, broad CORS weakens browser-origin boundaries and should not be the production default.
-- Recommended fix: Make allowed origins configurable and restrict production to trusted frontend origins.
+- Remediation: CORS origins are configurable via `CORS_ALLOWED_ORIGINS`. Local development defaults to `*`; production defaults to no origins unless explicit trusted origins are configured.
 
 ### SEC-012: Frontend stores auth tokens/API keys in localStorage
 
@@ -132,10 +131,10 @@ However, the current repository is not production-ready for external customers. 
 ### SEC-013: Error handling strips tracebacks but still returns raw exception strings in many handlers
 
 - Severity: Medium
-- Status: Non-blocking improvement
+- Status: Partially remediated in PR N
 - Evidence: Many API handlers return `error: str(e)`; the global sanitizer removes traceback keys and redacts some common secret patterns.
 - Impact: Non-traceback exception strings can still reveal internal paths, provider details, object IDs, or unrecognized secret formats.
-- Recommended fix: Return stable client-safe error codes/messages from handlers and keep detailed exceptions only in server logs.
+- Remediation: The global API response sanitizer now replaces 5xx client-facing `error` strings with `Internal server error` plus `code=internal_error`, while logging details server-side. Route-level cleanup should continue for 4xx validation messages and long-tail handlers.
 
 ## Positive Controls Observed
 
@@ -218,11 +217,11 @@ Concerns:
    - Label any deterministic fallback as `local_estimate` or `demo_mode`. Completed in PR M.
 
 6. Production hardening PR:
-   - Set debug false by default.
-   - Disable request body logging or redact it.
-   - Restrict CORS by environment.
-   - Remove query-parameter API-key auth.
-   - Document required edge/shared rate limiting.
+   - Set debug false by default. Completed in PR N.
+   - Disable request body logging or redact it. Completed in PR N.
+   - Restrict CORS by environment. Completed in PR N.
+   - Remove query-parameter API-key auth. Completed in PR N.
+   - Document required edge/shared rate limiting. Completed in PR N; implementation remains deployment responsibility.
 
 ## Release Decision
 
