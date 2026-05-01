@@ -14,6 +14,7 @@ Updated: 2026-05-01
 - New user passwords are stored with Werkzeug adaptive password hashing instead of custom salted SHA256.
 - Legacy salted SHA256 password hashes are temporarily accepted and rehashed on successful login.
 - In-memory rate limiting protects auth login/register, demo, status, decision, and simulation endpoint groups.
+- Deterministic Brief Quality Score is available at `POST /api/brief/quality` and does not require an LLM.
 - Frontend source badges identify result provenance: Demo Mode, Local Estimate, Live Backend, Backend Verified, or Unknown Source.
 
 ## Demo / Prototype
@@ -34,11 +35,14 @@ Updated: 2026-05-01
 - Password hashing moved from custom salted SHA256 to Werkzeug password hashes.
 - Legacy password hashes are migrated lazily on successful login.
 - Rate limits are configurable with `RATE_LIMIT_*` environment variables, including per-window limits for auth, demo, status, decision, and simulation groups.
+- Brief Quality Score checks objective, target audience, market/region, duration, budget, KPI, channel mix, competitor context, brand constraints, and risk/legal notes before simulation.
+- Dashboard now includes a Confidence & Evidence panel with source mode, run ID when available, persona count, brief completeness, safe provider/model display, limitations, and next validation step.
 
 ## Remaining Gaps
 
 - Rate limiting is in-memory and per-process; production should still use an edge/API-gateway limiter for multi-worker deployments.
 - Legacy SHA256 password support should be removed after a migration window.
+- Brief Quality Score is deterministic completeness scoring only; it does not validate factual accuracy or calibrate confidence against real-world outcomes.
 - War Room should be connected to backend campaign, competitor, and OASIS simulation records before being treated as a live simulation.
 - Comparator fallback should eventually be replaced by backend-provided demo comparator fixtures.
 - Demo dashboards should be expanded for every demo campaign instead of relying on one premium-water sample shape.

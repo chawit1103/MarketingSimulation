@@ -86,6 +86,8 @@ def create_campaign():
             objective=data.get('objective', 'message_testing'),
             target=target,
             sim_config=sim_config,
+            brief_quality=data.get('brief_quality') if isinstance(data.get('brief_quality'), dict) else None,
+            brief_metadata=data.get('brief_metadata') if isinstance(data.get('brief_metadata'), dict) else None,
             created_by=_get_user_id(),
         )
 

@@ -23,6 +23,7 @@ class RateLimitMiddleware:
         ("demo", ("/api/demo",), "RATE_LIMIT_DEMO_PER_WINDOW"),
         ("status", ("/api/status",), "RATE_LIMIT_STATUS_PER_WINDOW"),
         ("decision", ("/api/decision",), "RATE_LIMIT_DECISION_PER_WINDOW"),
+        ("brief", ("/api/brief",), "RATE_LIMIT_DECISION_PER_WINDOW"),
         ("simulation", ("/api/simulation",), "RATE_LIMIT_SIMULATION_PER_WINDOW"),
     )
 

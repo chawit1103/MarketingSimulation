@@ -17,6 +17,7 @@ def test_product_blueprints_are_registered_under_api_prefix():
         "/api/demo",
         "/api/status",
         "/api/decision",
+        "/api/brief",
     ]
 
     for prefix in expected_prefixes:
@@ -28,4 +29,5 @@ def test_demo_and_status_are_public_for_no_key_onboarding():
     assert '"/api/demo"' in source
     assert '"/api/status"' in source
     assert '"/api/decision"' in source
+    assert '"/api/brief"' in source
     assert '"/api/impact/scenarios"' in source

@@ -91,4 +91,5 @@ def test_rate_limited_endpoint_groups_are_configured():
     assert "/api/demo" in configured_prefixes
     assert "/api/status" in configured_prefixes
     assert "/api/decision" in configured_prefixes
+    assert "/api/brief" in configured_prefixes
     assert "/api/simulation" in configured_prefixes

@@ -153,6 +153,45 @@
         </div>
       </section>
 
+      <section class="confidence-evidence panel">
+        <div class="evidence-header">
+          <div>
+            <span class="brief-kicker">{{ $t('dashboard.confidenceEvidence') }}</span>
+            <h2 class="panel-title">{{ $t('dashboard.confidenceEvidenceTitle') }}</h2>
+          </div>
+          <ResultSourceBadge :source="trustPanel.sourceType" :warning="trustPanel.sourceWarning" />
+        </div>
+        <div class="trust-grid">
+          <div class="brief-item">
+            <span>{{ $t('dashboard.trustRunId') }}</span>
+            <strong>{{ trustPanel.runId }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.trustPersonaCount') }}</span>
+            <strong>{{ trustPanel.personaCount }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.trustBriefCompleteness') }}</span>
+            <strong>{{ trustPanel.briefCompleteness }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.trustProviderModel') }}</span>
+            <strong>{{ trustPanel.providerModel }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.trustConfidenceLevel') }}</span>
+            <strong>{{ trustPanel.confidenceLevel }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.trustNextValidation') }}</span>
+            <strong>{{ trustPanel.nextValidationStep }}</strong>
+          </div>
+        </div>
+        <ul class="trust-limitations">
+          <li v-for="item in trustPanel.knownLimitations" :key="item">{{ item }}</li>
+        </ul>
+      </section>
+
       <!-- KPI Cards Row -->
       <section class="kpi-row">
         <div class="kpi-card sentiment-card">
@@ -439,6 +478,7 @@ import { getCampaign, hasCampaignAuth } from '@/api/campaign'
 import { getDemoDashboard } from '@/api/demo'
 import { analyzeDecision, runWhatIf } from '@/api/decision'
 import ExportButton from '@/components/ExportButton.vue'
+import ResultSourceBadge from '@/components/ResultSourceBadge.vue'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -452,6 +492,7 @@ const loading = ref(true)
 const showSummary = ref(false)
 const lastUpdated = ref('')
 const campaignDetails = ref(null)
+const resultSource = ref({ type: 'unknown', warning: '' })
 
 // Export data (computed from current state)
 const exportData = computed(() => ({
@@ -510,6 +551,35 @@ const campaignBrief = computed(() => {
     personas: target.persona_count || campaign.persona_count || '—',
     rounds: simConfig.max_rounds || campaign.max_rounds || totalRounds.value || '—',
     status: formatStatus(campaign.status),
+  }
+})
+
+const trustPanel = computed(() => {
+  const campaign = campaignDetails.value || {}
+  const simConfig = campaign.sim_config || {}
+  const briefQuality = campaign.brief_quality || {}
+  const completeness = briefQuality?.brief_completeness?.percent ?? briefQuality?.score
+  const provider = simConfig.llm_provider || simConfig.provider || campaign.llm_provider
+  const model = simConfig.llm_model || simConfig.model || campaign.llm_model
+  const sourceType = resultSource.value?.type || 'unknown'
+  const sourceWarning = resultSource.value?.warning || ''
+  const limitations = [
+    ...(briefQuality.known_limitations || []),
+    ...(assumptions.value || []),
+  ].filter(Boolean).slice(0, 4)
+
+  return {
+    sourceType,
+    sourceWarning,
+    runId: campaign.simulation_id || campaign.report_id || campaign.campaign_id || campaign.id || t('dashboard.trustNotAvailable'),
+    personaCount: campaignBrief.value.personas || t('dashboard.trustNotAvailable'),
+    briefCompleteness: completeness != null ? `${completeness}%` : t('dashboard.trustUnknown'),
+    providerModel: provider || model ? [provider, model].filter(Boolean).join(' / ') : t('dashboard.trustNotAvailable'),
+    confidenceLevel: confidenceScore.value ? `${confidenceScore.value}%` : t('dashboard.trustUnknown'),
+    knownLimitations: limitations.length ? limitations : [t('dashboard.trustNoLimitationsAvailable')],
+    nextValidationStep: briefQuality.score != null && briefQuality.score < 80
+      ? t('dashboard.trustValidateBrief')
+      : t('dashboard.trustValidateLiveMarket'),
   }
 })
 
@@ -879,6 +949,7 @@ async function loadDashboard() {
     }
 
     await loadCampaignDetails(cid)
+    resultSource.value = { type: 'backend_verified', warning: t('dashboard.sourceBackendVerified') }
 
     // Fetch KPIs
     try {
@@ -970,6 +1041,7 @@ async function loadDemoDashboard(cid) {
     applyDemoDashboard(res.data || res)
   } catch (e) {
     console.warn('Demo dashboard API unavailable, using local fallback:', e.message)
+    resultSource.value = { type: 'local_estimate', warning: t('dashboard.sourceLocalFallback') }
     campaignDetails.value = demoCampaignDetails(demoId)
     if (campaignDetails.value?.name) campaignName.value = campaignDetails.value.name
     buildEvidenceFromCurrentState()
@@ -978,6 +1050,7 @@ async function loadDemoDashboard(cid) {
 
 function applyDemoDashboard(data) {
   const campaign = data.campaign || demoCampaignDetails('demo-premium-water')
+  resultSource.value = data.source || { type: 'demo_mode', warning: t('dashboard.sourceDemoMode') }
   campaignDetails.value = campaign
   campaignName.value = campaign.name || campaignName.value
   Object.assign(kpis.value, normalizeKpis(data.kpis || {}))
@@ -1616,6 +1689,28 @@ font-size: var(--text-sm);
   font-weight: 800;
   line-height: 1.35;
   overflow-wrap: anywhere;
+}
+
+.confidence-evidence {
+  margin-bottom: 28px;
+}
+
+.trust-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--border-subtle);
+}
+
+.trust-limitations {
+  margin: var(--space-4) 0 0;
+  padding-left: var(--space-5);
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1.7;
 }
 
 /* ====================== DECISION EVIDENCE ====================== */
