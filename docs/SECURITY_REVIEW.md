@@ -10,7 +10,7 @@ This review did not make product-code changes. It records release blockers, reme
 
 The repository has several good security foundations: password hashing now uses Werkzeug adaptive hashes, legacy password hashes are rehashed on login, production rejects known fallback auth secrets, public/demo routes are rate-limited, client-facing traceback payloads are sanitized, settings secrets are masked from browser reads, ID-addressed resources are scoped to the authenticated organization in the current local JSON architecture, and demo/local/live/backend-verified source labels exist in the UI.
 
-However, the current repository is not production-ready for external customers. The remaining blockers are manual rotation of previously committed secret-like values, incomplete production-grade secret management, partial RBAC/org-switching maturity, in-memory rate limiting, and local/demo storage architecture limitations.
+However, the current repository is not production-ready for external customers. The remaining blockers are manual rotation of previously committed secret-like values, partial RBAC/org-switching maturity, in-memory rate limiting, browser token storage, and local/demo storage architecture limitations.
 
 ## Remediation Status Table
 
@@ -22,7 +22,7 @@ However, the current repository is not production-ready for external customers. 
 | SEC-004 | Critical | partially fixed | `backend/app/middleware/tenant.py`, `backend/app/api/auth.py`, `backend/app/api/settings.py`, `backend/app/api/campaign.py`, `backend/tests/test_rbac.py` | Baseline role guards are in place, but every newly added route still requires explicit RBAC review; full enterprise authorization policy/audit remains future work. |
 | SEC-005 | High | fixed | `backend/app/services/kpi_calculator.py`, `backend/app/api/dashboard.py`, `frontend/src/components/ResultSourceBadge.vue`, `backend/tests/test_dashboard_provenance.py` | Expand real KPI extraction when the simulation runner emits a stable KPI schema; do not mark raw runner output as backend verified. |
 | SEC-006 | High | partially fixed | `backend/app/api/auth.py`, `backend/app/middleware/tenant.py`, `backend/tests/test_rbac.py` | Login/register are the only public auth routes and broken privileged paths are safe, but real multi-org membership and org switching remain unimplemented. |
-| SEC-007 | High | partially fixed | `backend/app/models/settings.py`, `backend/app/config.py`, `backend/tests/test_production_hardening.py`, `docs/KNOWN_LIMITATIONS.md` | Local JSON settings are demo/local only. Production must use environment variables or a managed secret store and should avoid persisting provider credentials on disk. |
+| SEC-007 | High | fixed for production file persistence | `backend/app/models/settings.py`, `backend/app/config.py`, `backend/tests/test_production_hardening.py`, `docs/DEPLOYMENT.md` | Production resolves provider/graph secrets from environment variables and writes blank secret fields to local JSON. A managed secret store is still recommended for mature deployments. |
 | SEC-008 | High | fixed | `backend/app/__init__.py`, `backend/app/utils/response_safety.py`, `backend/app/config.py`, `backend/tests/test_production_hardening.py` | Keep request body logging opt-in and redacted; review new logs for campaign brief or secret leakage. |
 | SEC-009 | Medium | accepted risk | `backend/app/middleware/rate_limit.py`, `docs/KNOWN_LIMITATIONS.md`, `docs/RELEASE_READINESS_CHECKLIST.md` | Built-in limiter is acceptable for local/demo use only. Public internet deployments need edge/API-gateway or shared Redis-backed rate limiting. |
 | SEC-010 | Medium | fixed | `backend/app/middleware/tenant.py`, `backend/tests/test_production_hardening.py` | Tokens/API keys must stay in `Authorization: Bearer` or `X-Api-Key`; do not reintroduce query-token auth. |
@@ -98,11 +98,11 @@ However, the current repository is not production-ready for external customers. 
 ### SEC-007: Runtime settings are stored plaintext on local disk
 
 - Severity: High
-- Status: Partially remediated in PR N; local JSON settings remain demo/local storage only
+- Status: Fixed for production file persistence in PR P; local JSON secret persistence remains allowed only for local/demo mode
 - Evidence: `SettingsManager.save()` persists LLM API keys, embedding API keys, and graph passwords into `backend/uploads/settings.json`.
 - Impact: File-system compromise, backups, logs, or volume snapshots can expose provider credentials. The file is gitignored, which helps source control, but not production runtime security.
-- Mitigation: Browser reads no longer receive stored secret values, settings updates no longer persist masked placeholders as real values, the Settings UI stores only presence metadata in local browser settings, `settings.json` is written with restrictive `0600` permissions where supported, and `SETTINGS_PERSIST_SECRETS=false` omits provider/graph secrets from the runtime file. Production should use environment variables or a secret manager.
-- Remaining action: A real secret-manager/database-backed settings design is still required for multi-user production deployments.
+- Remediation: Browser reads no longer receive stored secret values, settings updates no longer persist masked placeholders as real values, and the Settings UI stores only presence metadata in local browser settings. In production, `SettingsManager` ignores secret values from `settings.json`, resolves LLM/embedding/graph secrets from environment variables, writes blank secret fields to the runtime settings file even if `SETTINGS_PERSIST_SECRETS=true`, and applies restrictive permissions to the local settings file where supported.
+- Remaining action: A managed secret store is still recommended for mature multi-user production deployments, but plaintext local JSON is no longer the production source of provider or graph secrets.
 
 ### SEC-008: Request body debug logging can record secrets and campaign briefs
 
@@ -195,7 +195,7 @@ Concerns:
 - Campaigns and users are stored as JSON files under per-org folders.
 - User JSON files include email/name plus `password_hash`, `api_key_hash`, and `api_key_prefix`; `to_dict(safe=True)` removes sensitive hashes from normal responses.
 - API keys are stored as SHA256 hashes. Because generated keys are high entropy, this is acceptable for local/demo use, but a keyed HMAC/pepper would reduce risk if storage is stolen.
-- Settings can still persist provider and graph secrets in plaintext local JSON for demo/local workflows. `SETTINGS_PERSIST_SECRETS=false` omits those secrets from runtime JSON, and production should use environment variables or a managed secret store.
+- Settings can still persist provider and graph secrets in plaintext local JSON for demo/local workflows only. Production ignores local JSON secret fields, uses environment variables for runtime secrets, and writes blank secret fields to `settings.json`.
 - Simulation, report, project, pipeline, graph, and graph-task routes now carry or enforce organization ownership in the current local JSON architecture. Legacy records without ownership metadata need backfill or re-creation before production use.
 
 ## Frontend Exposure Review
@@ -247,4 +247,4 @@ For controlled local demos, the current repository is acceptable if no real secr
 
 For a controlled private pilot, the repository is conditionally acceptable only with trusted users, rotated credentials, no confidential customer briefs, explicit source labels, environment-provided secrets, and deployment controls around rate limiting/CORS/logging. This is not a production-readiness claim.
 
-For a public pilot, public internet exposure, or customer production deployment, the release is not ready while SEC-001, SEC-004, SEC-006, and SEC-007 remain partially fixed and SEC-009/SEC-012 remain accepted risks.
+For a public pilot, public internet exposure, or customer production deployment, the release is not ready while manual SEC-001 credential rotation lacks evidence, SEC-004/SEC-006 remain partially fixed, and SEC-009/SEC-012 remain accepted risks.

@@ -146,3 +146,128 @@ def test_runtime_settings_file_omits_secrets_when_persistence_is_disabled(tmp_pa
     assert persisted["embedding"]["api_key"] == ""
     assert persisted["graph_db"]["password"] == ""
     assert mode == 0o600
+
+
+def test_production_settings_ignore_file_secrets_and_never_persist_plaintext(tmp_path, monkeypatch):
+    monkeypatch.setattr(Config, "UPLOAD_FOLDER", str(tmp_path))
+    monkeypatch.setattr(Config, "ENVIRONMENT", "production")
+    monkeypatch.setattr(Config, "SETTINGS_PERSIST_SECRETS", True)
+    monkeypatch.setenv("LLM_API_KEY", "env-llm-secret")
+    monkeypatch.setenv("EMBEDDING_API_KEY", "env-embedding-secret")
+    monkeypatch.setenv("NEO4J_PASSWORD", "env-graph-secret")
+    SettingsManager.invalidate()
+
+    settings_path = tmp_path / "settings.json"
+    settings_path.write_text(
+        json.dumps(
+            {
+                "language": "en",
+                "llm": {
+                    "provider": "openai",
+                    "model": "gpt-4o-mini",
+                    "api_key": "file-llm-secret",
+                    "base_url": None,
+                    "temperature": 0.7,
+                    "max_tokens": 4096,
+                    "timeout": 120,
+                },
+                "embedding": {
+                    "provider": "openai",
+                    "model": "text-embedding-3-small",
+                    "api_key": "file-embedding-secret",
+                    "base_url": None,
+                },
+                "graph_db": {
+                    "mode": "cloud",
+                    "uri": "neo4j+s://example.databases.neo4j.io",
+                    "user": "neo4j",
+                    "password": "file-graph-secret",
+                },
+                "task_llm": {},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    loaded = SettingsManager().get()
+    assert loaded.llm.api_key == "env-llm-secret"
+    assert loaded.embedding.api_key == "env-embedding-secret"
+    assert loaded.graph_db.password == "env-graph-secret"
+
+    SettingsManager().update(
+        {
+            "language": "en",
+            "llm": {
+                "provider": "openai",
+                "model": "gpt-4o",
+                "api_key": "incoming-llm-secret",
+                "base_url": None,
+                "temperature": 0.7,
+                "max_tokens": 4096,
+                "timeout": 120,
+            },
+            "embedding": {
+                "provider": "openai",
+                "model": "text-embedding-3-large",
+                "api_key": "incoming-embedding-secret",
+                "base_url": None,
+            },
+            "graph_db": {
+                "mode": "cloud",
+                "uri": "neo4j+s://example.databases.neo4j.io",
+                "user": "neo4j",
+                "password": "incoming-graph-secret",
+            },
+            "task_llm": {},
+        }
+    )
+
+    persisted = json.loads(settings_path.read_text(encoding="utf-8"))
+    rendered = json.dumps(persisted)
+    assert persisted["llm"]["api_key"] == ""
+    assert persisted["embedding"]["api_key"] == ""
+    assert persisted["graph_db"]["password"] == ""
+    assert "file-llm-secret" not in rendered
+    assert "incoming-llm-secret" not in rendered
+    assert "env-llm-secret" not in rendered
+    assert stat.S_IMODE(settings_path.stat().st_mode) == 0o600
+
+
+def test_local_demo_settings_can_persist_secrets_when_explicitly_allowed(tmp_path, monkeypatch):
+    monkeypatch.setattr(Config, "UPLOAD_FOLDER", str(tmp_path))
+    monkeypatch.setattr(Config, "ENVIRONMENT", "development")
+    monkeypatch.setattr(Config, "SETTINGS_PERSIST_SECRETS", True)
+    SettingsManager.invalidate()
+
+    SettingsManager().update(
+        {
+            "language": "en",
+            "llm": {
+                "provider": "openai",
+                "model": "gpt-4o-mini",
+                "api_key": "local-llm-secret",
+                "base_url": None,
+                "temperature": 0.7,
+                "max_tokens": 4096,
+                "timeout": 120,
+            },
+            "embedding": {
+                "provider": "openai",
+                "model": "text-embedding-3-small",
+                "api_key": "local-embedding-secret",
+                "base_url": None,
+            },
+            "graph_db": {
+                "mode": "cloud",
+                "uri": "neo4j+s://example.databases.neo4j.io",
+                "user": "neo4j",
+                "password": "local-graph-secret",
+            },
+            "task_llm": {},
+        }
+    )
+
+    persisted = json.loads((tmp_path / "settings.json").read_text(encoding="utf-8"))
+    assert persisted["llm"]["api_key"] == "local-llm-secret"
+    assert persisted["embedding"]["api_key"] == "local-embedding-secret"
+    assert persisted["graph_db"]["password"] == "local-graph-secret"

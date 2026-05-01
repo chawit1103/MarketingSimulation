@@ -63,24 +63,27 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] SEC-003 tenant isolation for ID-addressed resources is remediated for the current local JSON architecture: campaign pipeline status, dashboard KPI/report/timeline/segment routes, simulation reads/status/actions, reports, projects, graphs, and graph tasks are scoped to the authenticated organization.
 - [x] SEC-005 dashboard provenance is remediated: fallback/mock KPI output is labeled `local_estimate`, demo fixtures are labeled `demo_mode`, and `backend_verified` is reserved for explicit persisted real simulation KPI metrics.
 - [x] SEC-008/010/011/013 production hardening baseline is remediated: debug/body logging are opt-in, query-parameter API keys are rejected, production CORS requires explicit trusted origins, and 5xx API errors return stable client-safe messages.
-- [x] SEC-007 local settings storage is partially remediated: masked placeholders are not persisted as secrets, settings files use restrictive permissions where supported, and `SETTINGS_PERSIST_SECRETS=false` omits runtime secrets from JSON storage.
+- [x] SEC-007 production settings secret persistence is remediated for local files: production resolves LLM/embedding/graph secrets from environment variables, ignores local JSON secret fields, writes blank secret fields to `settings.json`, and keeps restrictive settings-file permissions where supported.
+- [x] Local demo settings can still persist secrets only when explicitly allowed outside production.
 - [ ] SEC-009 production rate limiting uses an edge/API-gateway or shared Redis-backed limiter; the built-in limiter remains in-memory and local/demo oriented.
 - [ ] SEC-012 production auth storage avoids long-lived tokens/API keys in browser `localStorage`, or the residual risk is explicitly accepted for the deployment.
 - [ ] SEC-013 long-tail route handlers have been reviewed so route-level validation/errors do not reveal internal paths, object IDs, provider details, or unrecognized secrets.
-- [ ] Production secrets are provided via environment variables or an external secret manager rather than local JSON settings.
+- [x] Code supports production secrets through environment variables rather than local JSON settings.
+- [ ] Deployment environment provides real production secrets through environment variables or an external secret manager.
 - [ ] Legacy local JSON simulation/report/project/task records without `org_id` are reviewed, backfilled, or re-created before production use.
 - [ ] External pilot data-retention and deletion procedure is documented and approved.
 
 ## Security Remediation Gate
 
 - [x] SEC-002, SEC-003, SEC-005, SEC-008, SEC-010, and SEC-011 are fixed for the current architecture.
-- [x] SEC-001, SEC-004, SEC-006, SEC-007, and SEC-013 are tracked as partially fixed with remaining actions.
+- [x] SEC-001, SEC-004, SEC-006, and SEC-013 are tracked as partially fixed with remaining actions.
+- [x] SEC-007 is fixed for production local-file secret persistence; managed secret-store adoption remains recommended.
 - [x] SEC-009 and SEC-012 are documented accepted risks for local/demo and controlled private pilot contexts only.
 - [x] Local demo readiness: acceptable when demo data is used, no real secrets are entered, and source-mode labels remain visible.
 - [x] Controlled private pilot readiness: conditionally acceptable with trusted users, rotated credentials, environment-provided secrets, no confidential briefs, explicit source labels, and deployment-level rate limiting/CORS/log controls.
-- [ ] Public pilot readiness: blocked because at least one SEC-001 through SEC-008 item remains partially fixed.
-- [ ] Public internet exposure readiness: blocked until production rate limiting, secret management, auth storage, and deployment controls are complete.
-- [ ] Production customer deployment readiness: blocked until manual credential rotation, secret-manager strategy, full RBAC/org-switching maturity, shared rate limiting, data-retention policy, and storage architecture decisions are complete.
+- [ ] Public pilot readiness: blocked until manual credential rotation is evidenced and SEC-004/SEC-006 role/org gaps are closed or explicitly accepted for the pilot.
+- [ ] Public internet exposure readiness: blocked until production rate limiting, auth storage, and deployment controls are complete.
+- [ ] Production customer deployment readiness: blocked until manual credential rotation, full RBAC/org-switching maturity, shared rate limiting, data-retention policy, and storage architecture decisions are complete.
 
 ## Automated Validation
 
@@ -97,6 +100,14 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] CI-equivalent secret hygiene scan passed on 2026-05-01.
 - [x] `git diff --check` passed on 2026-05-01.
 - [ ] Frontend build was not rerun for PR O because this PR changes documentation only.
+
+### PR P Verification Run
+
+- [x] `backend/.venv/bin/python -m pytest backend/tests/test_production_hardening.py backend/tests/test_settings_readiness.py -q` passed on 2026-05-01: 14 passed, 5 warnings.
+- [x] `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-01: 49 passed, 27 warnings.
+- [x] CI-equivalent secret hygiene scan passed on 2026-05-01.
+- [x] `git diff --check` passed on 2026-05-01.
+- [ ] Frontend build was not rerun for PR P because no frontend files were changed.
 
 ## Manual Demo Flow Checks
 
