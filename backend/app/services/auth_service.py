@@ -1,7 +1,8 @@
 """AuthService — JWT-style token creation and validation.
 
 Uses PyJWT if available; falls back to HMAC+SHA256+Base64 simple tokens.
-Secret comes from env AUTH_SECRET_KEY, or a hard-coded fallback.
+Secret comes from AUTH_SECRET_KEY/SECRET_KEY. Production refuses known fallback
+secrets; development keeps running so local demo mode remains easy to use.
 """
 
 import os
@@ -10,6 +11,7 @@ import time
 import hmac
 import hashlib
 import base64
+import logging
 from typing import Optional, Dict, Any
 
 from ..config import Config
@@ -29,7 +31,16 @@ except ImportError:
 
 def _get_secret() -> str:
     """Return the auth secret, preferring AUTH_SECRET_KEY env var."""
-    return os.environ.get("AUTH_SECRET_KEY", Config.SECRET_KEY or "3c-simulator-auth-fallback")
+    secret = os.environ.get("AUTH_SECRET_KEY") or os.environ.get("SECRET_KEY") or Config.SECRET_KEY
+    if Config.is_production() and secret in Config.KNOWN_FALLBACK_SECRET_KEYS:
+        raise RuntimeError(
+            "Production requires AUTH_SECRET_KEY or SECRET_KEY to be set to a non-default value."
+        )
+    if not Config.is_production() and secret in Config.KNOWN_FALLBACK_SECRET_KEYS:
+        logging.getLogger("mirofish.auth").warning(
+            "Development is using a default auth secret. Set AUTH_SECRET_KEY before production."
+        )
+    return secret
 
 
 # ---------------------------------------------------------------------------

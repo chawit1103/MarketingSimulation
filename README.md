@@ -37,6 +37,8 @@ This is not positioned as an AI playground. It is a decision-support system for 
 - How should we revise the campaign before spending real media budget?
 - What should we show leadership or a client?
 
+For the current production/demo readiness matrix, see [docs/STATUS.md](docs/STATUS.md).
+
 ---
 
 ## Try The Demo First

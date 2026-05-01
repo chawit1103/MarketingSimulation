@@ -28,6 +28,7 @@ def create_app(config_class=Config):
 
     # Setup logging
     logger = setup_logger('mirofish')
+    config_class.validate_security(logger)
 
     # Only print startup info in reloader subprocess (avoid printing twice in debug mode)
     is_reloader_process = os.environ.get('WERKZEUG_RUN_MAIN') == 'true'
@@ -74,6 +75,32 @@ def create_app(config_class=Config):
         logger.debug(f"Request: {request.method} {request.path}")
         if request.content_type and 'json' in request.content_type:
             logger.debug(f"Request body: {request.get_json(silent=True)}")
+
+    @app.after_request
+    def sanitize_client_errors(response):
+        """Strip raw traceback/stack data from API JSON responses."""
+        if not request.path.startswith("/api/") or not response.is_json:
+            return response
+
+        payload = response.get_json(silent=True)
+        if payload is None:
+            return response
+
+        from .utils.response_safety import sanitize_api_payload
+        sanitized, removed = sanitize_api_payload(payload)
+        if not removed:
+            return response
+
+        for details in removed:
+            logger.error(
+                "Stripped raw traceback from client response for %s %s:\n%s",
+                request.method,
+                request.path,
+                details,
+            )
+        response.set_data(app.json.dumps(sanitized))
+        response.content_length = len(response.get_data())
+        return response
 
     @app.after_request
     def log_response(response):

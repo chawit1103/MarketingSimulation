@@ -144,6 +144,11 @@ def _dashboard_for(demo_id: str) -> dict:
     dashboard = DEMO_DASHBOARDS.get(demo_id, DEMO_DASHBOARDS["demo-premium-water"])
     return {
         "campaign": campaign,
+        "source": {
+            "type": "demo_mode",
+            "label": "Demo Mode",
+            "warning": "Synthetic demo data for product exploration; not a live simulation result.",
+        },
         **dashboard,
     }
 
@@ -156,4 +161,3 @@ def list_demo_campaigns():
 @demo_bp.route("/campaigns/<demo_id>/dashboard", methods=["GET"])
 def get_demo_dashboard(demo_id: str):
     return jsonify({"success": True, "data": _dashboard_for(demo_id)})
-

@@ -4,6 +4,7 @@ Loads configuration from .env file in project root directory
 """
 
 import os
+import logging
 from dotenv import load_dotenv
 
 # Load .env file from project root
@@ -20,9 +21,23 @@ else:
 class Config:
     """Flask configuration class"""
 
+    KNOWN_FALLBACK_SECRET_KEYS = {
+        "3c-simulator-secret-key",
+        "3c-simulator-auth-fallback",
+        "change-me",
+        "changeme",
+        "secret",
+    }
+
     # Flask configuration
     SECRET_KEY = os.environ.get('SECRET_KEY', '3c-simulator-secret-key')
     DEBUG = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
+    ENVIRONMENT = (
+        os.environ.get("APP_ENV")
+        or os.environ.get("FLASK_ENV")
+        or os.environ.get("ENV")
+        or "development"
+    ).lower()
 
     # JSON configuration - disable ASCII escaping to display Chinese directly (not as \uXXXX)
     JSON_AS_ASCII = False
@@ -80,3 +95,29 @@ class Config:
         if not cls.NEO4J_PASSWORD:
             errors.append("NEO4J_PASSWORD not configured")
         return errors
+
+    @classmethod
+    def is_production(cls) -> bool:
+        """Return True when the app is running in a production environment."""
+        return cls.ENVIRONMENT in {"prod", "production"}
+
+    @classmethod
+    def validate_security(cls, logger=None):
+        """Validate production-sensitive security configuration.
+
+        Development can run with the historical fallback secret to preserve the
+        local demo flow, but production must provide a real SECRET_KEY.
+        """
+        logger = logger or logging.getLogger("mirofish.config")
+        has_env_secret = bool(os.environ.get("SECRET_KEY"))
+        uses_known_secret = cls.SECRET_KEY in cls.KNOWN_FALLBACK_SECRET_KEYS
+
+        if cls.is_production() and (not has_env_secret or uses_known_secret):
+            raise RuntimeError(
+                "Production requires SECRET_KEY to be set to a non-default value."
+            )
+
+        if not cls.is_production() and uses_known_secret:
+            logger.warning(
+                "Development is using the default SECRET_KEY. Set SECRET_KEY before production."
+            )

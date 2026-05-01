@@ -28,3 +28,4 @@ def test_demo_and_status_are_public_for_no_key_onboarding():
     assert '"/api/demo"' in source
     assert '"/api/status"' in source
     assert '"/api/decision"' in source
+    assert '"/api/impact/scenarios"' in source

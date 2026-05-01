@@ -18,6 +18,11 @@
         <h3>{{ $t('comparator.selectPrompt') }}</h3>
         <p>{{ $t('comparator.selectHint') }}</p>
       </div>
+      <ResultSourceBadge
+        v-if="campaignListSource.source !== 'live_backend'"
+        :source="campaignListSource.source"
+        :warning="campaignListSource.warning"
+      />
 
       <div class="campaign-picker">
         <div
@@ -49,6 +54,10 @@
 
     <!-- Results -->
     <div v-if="comparisonResult" class="results-section">
+      <ResultSourceBadge
+        :source="resultSource.source"
+        :warning="resultSource.warning"
+      />
       <!-- Overall Winner Banner -->
       <div class="winner-banner">
         <div class="winner-icon">A/B</div>
@@ -122,6 +131,7 @@ import { useI18n } from 'vue-i18n'
 import { listCampaigns } from '@/api/campaign'
 import { compareCampaigns } from '@/api/comparator'
 import ExportButton from '@/components/ExportButton.vue'
+import ResultSourceBadge from '@/components/ResultSourceBadge.vue'
 
 const { t } = useI18n()
 
@@ -130,6 +140,8 @@ const selectedIds = ref([])
 const comparisonResult = ref(null)
 const loading = ref(false)
 const error = ref('')
+const campaignListSource = ref({ source: 'unknown', warning: '' })
+const resultSource = ref({ source: 'unknown', warning: '' })
 
 const exportData = computed(() => ({
   slide_type: 'comparison',
@@ -143,16 +155,24 @@ onMounted(async () => {
   try {
     if (shouldUseDemoCampaigns()) {
       availableCampaigns.value = demoCampaigns()
+      campaignListSource.value = {
+        source: 'demo_mode',
+        warning: t('comparator.demoCampaignWarning'),
+      }
       return
     }
 
     const res = await listCampaigns()
     const campaigns = res.data || res || []
     availableCampaigns.value = Array.isArray(campaigns) ? campaigns : campaigns.campaigns || []
+    campaignListSource.value = { source: 'live_backend', warning: '' }
   } catch (e) {
     console.warn('Failed to load campaigns for comparator, using demo:', e.message)
-    // Fallback to demo campaigns for comparison testing
     availableCampaigns.value = demoCampaigns()
+    campaignListSource.value = {
+      source: 'demo_mode',
+      warning: t('comparator.demoCampaignWarning'),
+    }
   }
 })
 
@@ -187,10 +207,17 @@ async function runComparison() {
     const res = await compareCampaigns(selectedIds.value)
     const data = res.data || res
     comparisonResult.value = data
+    resultSource.value = {
+      source: 'backend_verified',
+      warning: t('comparator.backendVerifiedWarning'),
+    }
   } catch (e) {
     console.error('Comparison failed:', e)
-    // For demo — if backend fails, show comparison with default data
     comparisonResult.value = generateDemoComparison()
+    resultSource.value = {
+      source: 'local_estimate',
+      warning: t('comparator.localEstimateWarning'),
+    }
   } finally {
     loading.value = false
   }
@@ -218,6 +245,10 @@ function generateDemoComparison() {
 
   return {
     campaign_count: ids.length,
+    source: {
+      type: 'local_estimate',
+      warning: t('comparator.localEstimateWarning'),
+    },
     metrics_comparison: [
       { key: 'overall_sentiment', label: t('comparator.metricOverallSentiment'), unit: '', higher_is_better: true,
         values: ids.map((id, i) => ({ campaign_id: id, value: [42, 28, 55][i] || 35 })),

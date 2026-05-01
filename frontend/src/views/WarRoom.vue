@@ -27,6 +27,11 @@
             </option>
           </select>
         </label>
+        <ResultSourceBadge
+          v-if="campaignListSource.source !== 'live_backend'"
+          :source="campaignListSource.source"
+          :warning="campaignListSource.warning"
+        />
 
         <div class="scenario-grid">
           <button
@@ -104,6 +109,10 @@
 
     <section v-if="result" class="decision-console">
       <div>
+        <ResultSourceBadge
+          :source="result.source.type"
+          :warning="result.source.warning"
+        />
         <span class="section-label">{{ $t('warRoom.decisionConsole') }}</span>
         <h2>{{ result.decision.headline }}</h2>
         <p>{{ result.decision.rationale }}</p>
@@ -215,6 +224,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExportButton from '@/components/ExportButton.vue'
+import ResultSourceBadge from '@/components/ResultSourceBadge.vue'
 import { listCampaigns } from '@/api/campaign'
 
 const { t } = useI18n()
@@ -326,6 +336,7 @@ const competitorIntensity = ref(70)
 const ourBudget = ref(80)
 const result = ref(null)
 const loading = ref(false)
+const campaignListSource = ref({ source: 'unknown', warning: '' })
 
 const activeScenarioData = computed(() => scenarios.find(s => s.id === activeScenario.value) || scenarios[0])
 const activeStrategyData = computed(() => strategies.find(s => s.id === selectedStrategy.value) || strategies[0])
@@ -361,9 +372,19 @@ async function loadCampaignOptions() {
         objective: item.objective || 'competitor_response',
       }))
       selectedCampaignId.value = campaignOptions.value[0].id
+      campaignListSource.value = { source: 'live_backend', warning: '' }
+      return
+    }
+    campaignListSource.value = {
+      source: 'demo_mode',
+      warning: t('warRoom.demoCampaignWarning'),
     }
   } catch (error) {
     campaignOptions.value = fallbackCampaigns()
+    campaignListSource.value = {
+      source: 'demo_mode',
+      warning: t('warRoom.demoCampaignWarning'),
+    }
   }
 }
 
@@ -464,6 +485,10 @@ function runWarGame() {
     key_events: eventRows,
     playbook,
     business,
+    source: {
+      type: 'local_estimate',
+      warning: t('warRoom.localEstimateWarning'),
+    },
     decision: decisionReadout(ourBrand, winner, ourShift, finalRisk, confidence, business),
     recommendation: recommendationReadout(ourBrand, winner, ourShift, finalRisk),
   }

@@ -4,6 +4,13 @@
     "settings": "การตั้งค่า",
     "github": "เยี่ยมชม Github ของเรา"
   },
+  "resultSource": {
+    "demoMode": "Demo Mode",
+    "localEstimate": "Local Estimate",
+    "liveBackend": "Live Backend",
+    "backendVerified": "Backend Verified",
+    "unknownSource": "Unknown Source"
+  },
   "home": {
     "brand": "3C SIMULATOR",
     "tag": "หลายภาษา · หลายผู้ให้บริการ · การจำลองหลายเอเจนต์",
@@ -699,7 +706,10 @@
     "metricMessageResonance": "พลังของข้อความ",
     "metricCrisisRisk": "ความเสี่ยงวิกฤต",
     "metricBrandPerceptionShift": "การเปลี่ยนภาพลักษณ์แบรนด์",
-    "metricOpinionPolarization": "ความแตกแยกของความคิดเห็น"
+    "metricOpinionPolarization": "ความแตกแยกของความคิดเห็น",
+    "demoCampaignWarning": "กำลังแสดง campaign ตัวอย่าง เพราะยังไม่มี backend campaign session ที่ใช้ได้",
+    "localEstimateWarning": "ผลเปรียบเทียบนี้คำนวณใน browser เพื่อให้ demo ใช้งานต่อได้ ยังไม่ใช่ผล simulation ที่ backend verified",
+    "backendVerifiedWarning": "ผลลัพธ์นี้มาจาก Comparator API โดยใช้ KPI record ของ campaign"
   },
   "impact": {
     "kicker": "โมเดลผลกระทบธุรกิจ",
@@ -855,7 +865,9 @@
     "actionSegmentOffer": "ทำ offer เฉพาะ segment แทนการลดราคาทั้งตลาด",
     "actionPrepareCounter": "เตรียม competitor counter-brief สำหรับรอบ simulation ถัดไป",
     "untitledCampaign": "แคมเปญไม่มีชื่อ",
-    "ourBrand": "แบรนด์ของเรา"
+    "ourBrand": "แบรนด์ของเรา",
+    "demoCampaignWarning": "กำลังแสดง campaign ตัวอย่าง เพราะโหลด campaign จริงไม่ได้",
+    "localEstimateWarning": "ผล War Room นี้เป็น deterministic browser-side strategy estimate ยังไม่ใช่ live OASIS simulation result"
   },
   "industry": {
     "chooseTemplate": "เลือก Industry Template",

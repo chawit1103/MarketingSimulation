@@ -4,6 +4,13 @@
     "settings": "Settings",
     "github": "View on Github"
   },
+  "resultSource": {
+    "demoMode": "Demo Mode",
+    "localEstimate": "Local Estimate",
+    "liveBackend": "Live Backend",
+    "backendVerified": "Backend Verified",
+    "unknownSource": "Unknown Source"
+  },
   "home": {
     "brand": "3C SIMULATOR",
     "tag": "Multi-Language · Multi-Provider · Multi-Agent Simulation",
@@ -714,7 +721,10 @@
     "metricMessageResonance": "Message Resonance",
     "metricCrisisRisk": "Crisis Risk",
     "metricBrandPerceptionShift": "Brand Perception Shift",
-    "metricOpinionPolarization": "Opinion Polarization"
+    "metricOpinionPolarization": "Opinion Polarization",
+    "demoCampaignWarning": "Demo campaign options are being shown because no backend campaign session is available.",
+    "localEstimateWarning": "These comparison results are generated in the browser for demo continuity. They are not backend-verified simulation results.",
+    "backendVerifiedWarning": "These results came from the comparator API using campaign KPI records."
   },
   "steps": {
     "graphBuild": "Graph Build",
@@ -877,7 +887,9 @@
     "actionSegmentOffer": "Create a segment-specific offer instead of a market-wide discount.",
     "actionPrepareCounter": "Prepare a competitor counter-brief for the next simulated round.",
     "untitledCampaign": "Untitled campaign",
-    "ourBrand": "Our Brand"
+    "ourBrand": "Our Brand",
+    "demoCampaignWarning": "Demo campaign options are being shown because live campaigns could not be loaded.",
+    "localEstimateWarning": "This War Room output is a deterministic browser-side strategy estimate. It is not a live OASIS simulation result."
   },
   "regions": {
     "thailand": "Thailand",
