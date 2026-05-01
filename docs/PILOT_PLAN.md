@@ -149,6 +149,8 @@ PR T did not change visible UI/security labels, so screenshots do not need recap
 
 Confirm every result screenshot shows the correct source label and that settings screenshots do not show API keys, passwords, auth tokens, private URLs, or customer data.
 
+PR U review kept all current curated screenshots and replaced none because no visible UI/security wording changed after PR T. This does not remove the public-demo requirement to re-check screenshots immediately before sharing.
+
 ## Follow-Up
 
 After each pilot:

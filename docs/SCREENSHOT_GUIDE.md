@@ -4,6 +4,15 @@ Updated: 2026-05-01
 
 Curated screenshots already live in `docs/screenshots/`, but capture is not fully automated. Use this guide when refreshing README/demo images.
 
+## PR U Review Status
+
+Reviewed after PR T/PR U security hardening:
+
+- Kept: all existing curated screenshots.
+- Replaced: none.
+- Reason: PR T/PR U did not change visible UI/security label wording. Existing result screenshots already show Demo Mode or Live Backend labels, and Settings Wizard does not show secrets.
+- Readiness wording: screenshots support local demo and controlled pilot discussion only. They must not be used to claim public-pilot or production readiness.
+
 ## Safety Rules
 
 - Use only synthetic demo data or approved non-confidential briefs.
@@ -57,3 +66,19 @@ Before committing screenshots:
 2. Confirm the image is useful for docs, not a transient test artifact.
 3. Keep file sizes reasonable.
 4. Update README image links only if filenames changed.
+
+## PR U Screenshot Inventory
+
+Kept:
+
+- `docs/screenshots/home-landing.png`
+- `docs/screenshots/demo-dashboard-overview.png`
+- `docs/screenshots/brief-quality-score.png`
+- `docs/screenshots/simulation-dashboard-kpis.png`
+- `docs/screenshots/war-room.png`
+- `docs/screenshots/action-plan.png`
+- `docs/screenshots/settings-wizard.png`
+
+Replaced:
+
+- None.

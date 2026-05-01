@@ -35,3 +35,20 @@ This verification pass adds no product features. It records the current release 
 ### Screenshot Note
 
 No UI/security label text changed in PR T itself. Existing screenshots should still be re-reviewed before any public demo to confirm visible Demo Mode, Local Estimate, Live Backend, or Backend Verified labels and to ensure no secrets, tokens, private URLs, or customer data are visible.
+
+## PR U: Screenshot And Demo Package Review
+
+This pass reviewed the existing curated screenshots and demo package after PR S/PR T security hardening. It adds no product code and does not fabricate or recapture screenshots.
+
+### Screenshot Decision
+
+- Kept: `home-landing.png`, `demo-dashboard-overview.png`, `brief-quality-score.png`, `simulation-dashboard-kpis.png`, `war-room.png`, `action-plan.png`, and `settings-wizard.png`.
+- Replaced: none.
+- Reason: no visible UI/security wording changed after PR T, result screenshots already show source labels, and the Settings Wizard screenshot does not expose secrets.
+
+### Demo Readiness Wording
+
+- Local demo: go with synthetic data and no real secrets.
+- Controlled private pilot: conditional go only after credential rotation evidence, environment-provided secrets, trusted users, and deployment controls.
+- Public pilot / public internet exposure: no-go.
+- Production customer deployment: no-go.

@@ -120,7 +120,7 @@ Screenshot: `docs/screenshots/settings-wizard.png`
 
 Close with:
 
-> The current release is ready for controlled demos and pilot discovery. The next product milestone is calibration against real campaign outcomes and broader QA/deployment hardening.
+> The current release is ready for local demos with synthetic data. Controlled private pilots are conditional on credential rotation evidence and deployment controls. Public pilot and production customer deployment remain blocked until the release checklist is green.
 
 Optional handoff:
 

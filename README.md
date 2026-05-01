@@ -95,7 +95,7 @@ http://127.0.0.1:5174/dashboard/demo-premium-water
 
 ## Product Walkthrough
 
-Screenshots below were captured from the local demo flow with no auth token, API key, or real customer data.
+Screenshots below were reviewed after the PR T security-readiness pass and use the local demo flow with no auth token, API key, or real customer data. They show product workflow only; they do not claim public-pilot or production readiness.
 
 ### 1. Start From The Landing Page
 
