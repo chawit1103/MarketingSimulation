@@ -84,6 +84,56 @@ http://127.0.0.1:5174/dashboard/demo-premium-water
 
 ---
 
+## Product Walkthrough
+
+Screenshots below were captured from the local demo flow with no auth token, API key, or real customer data.
+
+### 1. Start From The Landing Page
+
+The first screen positions 3C Simulator as a decision-intelligence product, not an AI playground.
+
+![Home landing page](docs/screenshots/home-landing.png)
+
+### 2. Open The Demo Dashboard
+
+The no-key demo shows source-labeled synthetic demo data, decision context, confidence/evidence, KPI cards, and recommended validation steps.
+
+![Demo dashboard with source label](docs/screenshots/demo-dashboard-overview.png)
+
+### 3. Check Brief Quality Before Simulation
+
+Before spending simulation time, the Brief Quality Score checks objective, audience, market, budget, KPI, channels, competitor context, constraints, and risk/legal notes.
+
+![Brief Quality Score](docs/screenshots/brief-quality-score.png)
+
+### 4. Review Simulation Evidence
+
+The dashboard keeps result-source labeling visible and separates assumptions, confidence, KPI evidence, and next validation steps.
+
+![Simulation dashboard evidence](docs/screenshots/simulation-dashboard-kpis.png)
+
+### 5. Stress-Test Competitive Scenarios
+
+War Room defaults to backend deterministic simulation and labels the output as Live Backend. Local estimates are only shown as explicit fallback.
+
+![Competitor War Room](docs/screenshots/war-room.png)
+
+### 6. Turn Results Into Action
+
+The Action Plan translates results into creative adjustment, channel allocation, crisis prevention, and validation guidance while preserving the result source.
+
+![Structured Action Plan](docs/screenshots/action-plan.png)
+
+### 7. Configure Demo, Local, Or Cloud Mode
+
+The Settings Wizard checks readiness for demo-only, local model, and cloud API setups without exposing API keys or graph passwords.
+
+![Settings Wizard](docs/screenshots/settings-wizard.png)
+
+For a presenter-friendly run-through, see [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md). For a first-time user path, see [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md).
+
+---
+
 ## Core Product Pillars
 
 ### 1. Campaign Simulation
