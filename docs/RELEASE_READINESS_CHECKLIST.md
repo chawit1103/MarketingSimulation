@@ -67,7 +67,9 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] Local demo settings can still persist secrets only when explicitly allowed outside production.
 - [x] SEC-009 limiter spoofing hardening is in place: `X-Forwarded-For` is trusted only from configured `RATE_LIMIT_TRUSTED_PROXIES`.
 - [ ] SEC-009 production rate limiting uses an edge/API-gateway or shared Redis-backed limiter; the built-in limiter remains in-memory and local/demo oriented.
-- [ ] SEC-012 production auth storage avoids long-lived tokens/API keys in browser `localStorage`, or the residual risk is explicitly accepted for the deployment.
+- [x] SEC-012 browser token persistence is reduced: auth tokens use `sessionStorage`, legacy `localStorage` auth tokens are migrated then removed, and browser API keys are not kept in persistent storage for normal UI sessions.
+- [x] SEC-012 CSP/security headers are emitted by the Flask app for API responses.
+- [ ] SEC-012 production auth uses secure HttpOnly cookies, a refresh-token flow, or an equivalent hardened browser-auth strategy.
 - [ ] SEC-013 long-tail route handlers have been reviewed so route-level validation/errors do not reveal internal paths, object IDs, provider details, or unrecognized secrets.
 - [x] Code supports production secrets through environment variables rather than local JSON settings.
 - [ ] Deployment environment provides real production secrets through environment variables or an external secret manager.
@@ -126,6 +128,14 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] CI-equivalent secret hygiene scan passed on 2026-05-01.
 - [x] `git diff --check` passed on 2026-05-01.
 - [ ] Frontend build was not rerun for PR R because no frontend files were changed.
+
+### PR S Verification Run
+
+- [x] `backend/.venv/bin/python -m pytest backend/tests/test_production_hardening.py -q` passed on 2026-05-01: 10 passed, warnings only.
+- [x] `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-01: 56 passed, 39 warnings.
+- [x] `cd frontend && npm run build` passed on 2026-05-01.
+- [x] CI-equivalent secret hygiene scan passed on 2026-05-01.
+- [x] `git diff --check` passed on 2026-05-01.
 
 ## Manual Demo Flow Checks
 

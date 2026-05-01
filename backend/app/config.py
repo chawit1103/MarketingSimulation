@@ -45,6 +45,29 @@ class Config:
         os.environ.get('REQUEST_BODY_LOGGING_ENABLED', 'false').lower() in {"1", "true", "yes", "on"}
     )
     CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "").strip()
+    SECURITY_HEADERS_ENABLED = os.environ.get("SECURITY_HEADERS_ENABLED", "true").lower() in {
+        "1", "true", "yes", "on"
+    }
+    CONTENT_SECURITY_POLICY = os.environ.get(
+        "CONTENT_SECURITY_POLICY",
+        "default-src 'self'; "
+        "base-uri 'self'; "
+        "object-src 'none'; "
+        "frame-ancestors 'none'; "
+        "script-src 'self'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: blob:; "
+        "font-src 'self' data:; "
+        "connect-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*; "
+        "form-action 'self'; "
+        "upgrade-insecure-requests"
+    )
+    AUTH_TOKEN_EXPIRY_SECONDS = int(
+        os.environ.get(
+            "AUTH_TOKEN_EXPIRY_SECONDS",
+            "28800" if IS_PRODUCTION_ENV else "86400",
+        )
+    )
     SETTINGS_PERSIST_SECRETS = (
         os.environ.get("SETTINGS_PERSIST_SECRETS", "false" if IS_PRODUCTION_ENV else "true").lower()
         in {"1", "true", "yes", "on"}

@@ -42,7 +42,8 @@ This document separates what the system currently does from what should not yet 
 - Historical secret-like values may have been committed before repository secret hygiene was added. The repository cannot prove external credential rotation; owners must rotate any affected provider/API/graph credentials manually outside Codex.
 - RBAC is enforced for the current route set, but newly added routes still need explicit role and tenant review before release.
 - Organization switching is safely disabled and cannot issue cross-org tokens until a real multi-organization membership model exists.
-- Browser `localStorage` token/API-key storage remains an accepted local/demo risk and should be replaced before public or production exposure.
+- Browser auth tokens now use `sessionStorage` and legacy `localStorage` auth/API-key entries are removed, but the token is still readable by JavaScript if an XSS bug exists. Public or customer production deployments should use HttpOnly cookies, short-lived access tokens with refresh flow, or an equivalent hardened auth design.
+- Browser API keys are treated as ephemeral session-only credentials for explicit admin/API workflows. Normal users should not store provider keys or API keys in the browser.
 - 5xx API responses are sanitized globally, but long-tail route-specific validation/error messages should continue to be reviewed for internal-detail leakage.
 
 ## Testing

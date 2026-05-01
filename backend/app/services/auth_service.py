@@ -104,8 +104,6 @@ def _simple_validate_token(token: str, secret: str) -> Optional[Dict[str, Any]]:
 class AuthService:
     """Authentication and token management service."""
 
-    TOKEN_EXPIRY_SECONDS = 24 * 60 * 60  # 24 hours
-
     def __init__(self, secret: Optional[str] = None):
         self.secret = secret or _get_secret()
 
@@ -123,7 +121,7 @@ class AuthService:
             "org": user.org_id,
             "role": user.role.value if hasattr(user.role, "value") else str(user.role),
             "iat": now,
-            "exp": now + self.TOKEN_EXPIRY_SECONDS,
+            "exp": now + int(getattr(Config, "AUTH_TOKEN_EXPIRY_SECONDS", 24 * 60 * 60)),
         }
 
         if _HAS_PYJWT:

@@ -129,6 +129,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { listCampaigns } from '@/api/campaign'
+import { hasBrowserAuth } from '@/api/authStorage'
 import { compareCampaigns } from '@/api/comparator'
 import ExportButton from '@/components/ExportButton.vue'
 import ResultSourceBadge from '@/components/ResultSourceBadge.vue'
@@ -178,7 +179,7 @@ onMounted(async () => {
 
 function shouldUseDemoCampaigns() {
   if (!import.meta.env.DEV) return false
-  return !localStorage.getItem('3c-auth-token') && !localStorage.getItem('3c-api-key')
+  return !hasBrowserAuth()
 }
 
 function demoCampaigns() {

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getAuthToken, getEphemeralApiKey } from './authStorage'
 
 // Create axios instance
 const service = axios.create({
@@ -12,8 +13,8 @@ const service = axios.create({
 // Request interceptor
 service.interceptors.request.use(
   config => {
-    const token = localStorage.getItem('3c-auth-token')
-    const apiKey = localStorage.getItem('3c-api-key')
+    const token = getAuthToken()
+    const apiKey = getEphemeralApiKey()
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     } else if (apiKey) {

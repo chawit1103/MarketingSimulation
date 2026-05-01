@@ -1,6 +1,7 @@
 import json
 import stat
 import sys
+import base64
 from pathlib import Path
 
 import pytest
@@ -13,7 +14,7 @@ if str(BACKEND_DIR) not in sys.path:
 from app import create_app  # noqa: E402
 from app.config import Config  # noqa: E402
 from app.models.settings import SettingsManager  # noqa: E402
-from app.models.user import UserRole  # noqa: E402
+from app.models.user import User, UserRole  # noqa: E402
 from app.services.auth_service import AuthService  # noqa: E402
 from app.services.organization_service import OrganizationService  # noqa: E402
 from app.services.user_service import UserService  # noqa: E402
@@ -114,6 +115,41 @@ def test_production_cors_requires_origins_at_startup():
 
     with pytest.raises(RuntimeError, match="CORS_ALLOWED_ORIGINS"):
         create_app(ProductionCorsConfig)
+
+
+def test_security_headers_are_added_to_api_responses():
+    class SecurityHeaderConfig(Config):
+        RATE_LIMIT_ENABLED = False
+
+    app = create_app(SecurityHeaderConfig)
+    response = app.test_client().get("/api/status")
+
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+    assert response.headers["Referrer-Policy"] == "strict-origin-when-cross-origin"
+    assert response.headers["X-Frame-Options"] == "DENY"
+    assert "frame-ancestors 'none'" in response.headers["Content-Security-Policy"]
+    assert "object-src 'none'" in response.headers["Content-Security-Policy"]
+    assert "camera=()" in response.headers["Permissions-Policy"]
+
+
+def test_auth_token_expiry_uses_configured_lifetime(monkeypatch):
+    monkeypatch.setattr(Config, "AUTH_TOKEN_EXPIRY_SECONDS", 60)
+    user = User(
+        user_id="usr_expiry",
+        org_id="org_expiry",
+        email="expiry@example.com",
+        name="Expiry",
+        role=UserRole.VIEWER,
+    )
+
+    service = AuthService(secret="unit-test-secret")
+    token = service.create_token(user)
+    payload_segment = token.split(".")[1] if token.count(".") == 2 else token.split(".")[0]
+    padding = "=" * (-len(payload_segment) % 4)
+    payload = json.loads(base64.urlsafe_b64decode(payload_segment + padding).decode("utf-8"))
+
+    assert payload is not None
+    assert 55 <= payload["exp"] - payload["iat"] <= 60
 
 
 def test_runtime_settings_file_omits_secrets_when_persistence_is_disabled(tmp_path, monkeypatch):

@@ -113,6 +113,19 @@ def create_app(config_class=Config):
         return response
 
     @app.after_request
+    def add_security_headers(response):
+        """Add browser hardening headers without changing local demo flows."""
+        if not app.config.get("SECURITY_HEADERS_ENABLED", True):
+            return response
+
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+        response.headers.setdefault("X-Frame-Options", "DENY")
+        response.headers.setdefault("Content-Security-Policy", app.config.get("CONTENT_SECURITY_POLICY", ""))
+        response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+        return response
+
+    @app.after_request
     def log_response(response):
         logger = get_logger('mirofish.request')
         logger.debug(f"Response: {response.status_code}")

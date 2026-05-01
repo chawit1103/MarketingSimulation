@@ -75,6 +75,24 @@ Authenticated API requests must send credentials through one of these headers:
 
 Query-parameter credentials such as `?api_key=...` are not accepted.
 
+## Browser Auth Storage And Security Headers
+
+The frontend now stores browser auth tokens in `sessionStorage`, not persistent `localStorage`. On load, legacy `3c-auth-token` values are migrated into `sessionStorage` and removed from `localStorage`; legacy `3c-api-key` values are removed from `localStorage` and are not persisted for normal UI sessions.
+
+This reduces persistence risk, but it is not a complete production auth hardening. Session storage is still readable by JavaScript if an XSS vulnerability exists. Before customer production deployment, prefer secure HttpOnly cookies, a short-lived access-token plus refresh-token flow, or an equivalent hardened browser-auth strategy.
+
+The Flask app emits these browser hardening headers by default:
+
+- `Content-Security-Policy`
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `X-Frame-Options: DENY`
+- `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+
+Deployment operators can override the CSP with `CONTENT_SECURITY_POLICY` or disable these headers with `SECURITY_HEADERS_ENABLED=false` for troubleshooting. If the frontend is served by a CDN, reverse proxy, or static host rather than Flask, configure equivalent headers there too.
+
+Production token lifetime defaults to 8 hours and can be changed with `AUTH_TOKEN_EXPIRY_SECONDS`. Local/demo mode keeps the historical 24-hour default unless overridden.
+
 ## Manual Credential Rotation
 
 Repository secret hygiene has been improved, but the repository cannot prove whether historical provider/API/graph credentials were real or whether they have been rotated.
