@@ -5,6 +5,7 @@ from typing import Any
 
 from flask import Blueprint, request, jsonify
 from ..models.settings import SettingsManager, ProviderType, EmbeddingProviderType, GraphDBMode
+from ..authz import ADMIN_ROLES, role_required
 
 settings_bp = Blueprint('settings', __name__)
 
@@ -238,6 +239,7 @@ def _readiness_payload(data: dict) -> dict:
 
 
 @settings_bp.route('', methods=['GET'])
+@role_required(*ADMIN_ROLES)
 def get_settings():
     """Get current settings with secret presence flags only."""
     mgr = SettingsManager()
@@ -248,6 +250,7 @@ def get_settings():
 
 
 @settings_bp.route('', methods=['PUT'])
+@role_required(*ADMIN_ROLES)
 def update_settings():
     """Update runtime settings. Triggers provider reinitialization."""
     data = request.get_json()
@@ -517,6 +520,7 @@ def check_readiness():
 
 
 @settings_bp.route('/test-llm', methods=['POST'])
+@role_required(*ADMIN_ROLES)
 def test_llm_connection():
     """Test LLM provider connection with a simple ping message."""
     data = request.get_json()

@@ -46,10 +46,11 @@ However, the current repository is not production-ready for external customers. 
 ### SEC-004: Role-based authorization is mostly absent
 
 - Severity: Critical
-- Status: Blocker
+- Status: Partially remediated in PR K; route ownership isolation remains PR L
 - Evidence: `UserRole` exists, but protected routes generally only require authentication. Sensitive routes such as settings update, campaign deletion, report deletion, API-key generation, and simulation lifecycle operations do not consistently enforce admin/analyst/viewer permissions.
 - Impact: A viewer or low-privilege user may be able to mutate settings, delete data, start/stop simulations, or access privileged operational flows.
-- Recommended fix: Add a centralized `role_required()` guard and enforce route-level RBAC. Start with settings, auth API key, destructive campaign/report routes, simulation start/stop/cleanup, and provider live tests.
+- Remediation: A centralized `role_required()` guard now enforces admin-only settings/API-key/destructive operations, analyst-or-admin campaign/report/simulation generation flows, and viewer read-only behavior on the covered routes.
+- Remaining action: PR L still needs object ownership checks for ID-addressed resources, plus any route-specific RBAC gaps discovered during tenant isolation work.
 
 ## High Findings
 
@@ -64,14 +65,15 @@ However, the current repository is not production-ready for external customers. 
 ### SEC-006: Auth routes bypass centralized tenant middleware and contain broken privileged paths
 
 - Severity: High
-- Status: Blocker for auth/API-key flows
+- Status: Partially remediated in PR K
 - Evidence:
   - `TenantMiddleware.PUBLIC_PREFIXES` marks all `/api/auth/` routes as public.
   - `auth_required()` reimplements token checks, does not reject `None` payload before `.get()`, loads users globally, and allows downstream execution when user/org lookup fails.
   - `/api/auth/api-key` calls `UserService.generate_and_store_api_key()`, which is not implemented.
   - `/api/auth/switch-org` calls `AuthService.switch_org()`, which is not implemented.
 - Impact: Protected auth routes are inconsistent with the main auth/tenant control. API-key and org-switch flows fail, and token/user/org state checks are weaker than the main middleware.
-- Recommended fix: Make only `/api/auth/login` and `/api/auth/register` public. Protect `/me`, `/api-key`, and `/switch-org` with the same tenant middleware and explicit role checks. Fix or remove broken API-key/org-switch implementations.
+- Remediation: Only `/api/auth/login` and `/api/auth/register` remain public. `/me`, `/api-key`, and `/switch-org` now use tenant middleware plus explicit role guards. API-key generation uses the existing `UserService.generate_api_key()` path. Organization switching is disabled with a client-safe `501` until a tenant-membership model is implemented.
+- Remaining action: Implement real multi-organization membership and safe org switching, or remove the route entirely before production.
 
 ### SEC-007: Runtime settings are stored plaintext on local disk
 
@@ -159,14 +161,15 @@ Public by design:
 - `/api/persona/archetypes`
 - `/api/persona/regions`
 - `/api/persona/countries`
-- `/api/industry/templates*`
-- `/api/auth/*`
+- `GET /api/industry/templates*`
+- `/api/auth/login`
+- `/api/auth/register`
 
 Concerns:
 
-- `/api/auth/*` is too broad. Only login/register should be public.
+- `/api/auth/*` broad public access was narrowed in PR K. Only login/register should remain public.
 - `/api/decision`, `/api/brief`, and `/api/competitor` are deterministic and currently acceptable for demo mode, but need payload-size, rate-limit, and abuse monitoring before public exposure.
-- `/api/industry/templates/import`, `/validate`, and DELETE routes inherit the `/api/industry/templates` public prefix because prefix matching is broad. This should be narrowed so only safe read/catalog routes are public.
+- `/api/industry/templates/import`, `/validate`, and DELETE are no longer covered by a broad public prefix; only GET template catalog reads are public.
 
 ## Storage Review
 
@@ -203,9 +206,9 @@ Concerns:
    - Add cross-tenant denial tests.
 
 4. RBAC PR:
-   - Add centralized route role guards.
-   - Enforce admin-only settings/API-key/org management and analyst-only simulation mutation.
-   - Ensure viewers are read-only.
+   - Add centralized route role guards. Completed in PR K.
+   - Enforce admin-only settings/API-key/org management and analyst-only simulation mutation. Partially completed in PR K for critical routes.
+   - Ensure viewers are read-only. Covered by PR K tests for campaign/settings/API-key/destructive operations.
 
 5. Provenance labeling PR:
    - Stop returning mock KPI data as `backend_verified`.

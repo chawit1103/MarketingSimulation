@@ -13,6 +13,7 @@ from ..services.entity_reader import EntityReader
 from ..services.oasis_profile_generator import OasisProfileGenerator
 from ..services.simulation_manager import SimulationManager, SimulationStatus
 from ..services.simulation_runner import SimulationRunner, RunnerStatus
+from ..authz import ANALYST_ROLES, role_required
 from ..utils.logger import get_logger
 from ..models.project import ProjectManager
 
@@ -153,6 +154,7 @@ def get_entities_by_type(graph_id: str, entity_type: str):
 # ============== Simulation management interface ==============
 
 @simulation_bp.route('/create', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def create_simulation():
     """
     Create new simulation
@@ -353,6 +355,7 @@ def _check_simulation_prepared(simulation_id: str) -> tuple:
 
 
 @simulation_bp.route('/prepare', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def prepare_simulation():
     """
     Prepare simulation environment (async task with LLM intelligent configuration generation).
@@ -1375,6 +1378,7 @@ def download_simulation_script(script_name: str):
 # ============== ProfileGeneration interface（StandaloneUse） ==============
 
 @simulation_bp.route('/generate-profiles', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def generate_profiles():
     """
     Generate directly from knowledge graphOASIS Agent Profile（Do not createSimulation）
@@ -1452,6 +1456,7 @@ def generate_profiles():
 # ============== Simulation execution control interface ==============
 
 @simulation_bp.route('/start', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def start_simulation():
     """
     Start running simulation
@@ -1647,6 +1652,7 @@ def start_simulation():
 
 
 @simulation_bp.route('/stop', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def stop_simulation():
     """
     Stop simulation
@@ -2145,6 +2151,7 @@ def get_simulation_comments(simulation_id: str):
 # ============== Interview Interview interface ==============
 
 @simulation_bp.route('/interview', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def interview_agent():
     """
     Interview individualAgent
@@ -2274,6 +2281,7 @@ def interview_agent():
 
 
 @simulation_bp.route('/interview/batch', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def interview_agents_batch():
     """
     Batch interview multipleAgent
@@ -2412,6 +2420,7 @@ def interview_agents_batch():
 
 
 @simulation_bp.route('/interview/all', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def interview_all_agents():
     """
     Global interview - UseInterview all with same questionAgent
@@ -2652,6 +2661,7 @@ def get_env_status():
 
 
 @simulation_bp.route('/close-env', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def close_simulation_env():
     """
     Close simulation environment

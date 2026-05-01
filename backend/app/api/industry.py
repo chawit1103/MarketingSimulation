@@ -2,6 +2,7 @@
 
 from flask import Blueprint, request, jsonify
 
+from ..authz import ADMIN_ROLES, role_required
 from ..services.industry_templates import IndustryTemplateLoader, TemplateValidationError
 
 industry_bp = Blueprint("industry", __name__)
@@ -24,6 +25,7 @@ def list_templates():
 # ── Import template JSON ──────────────────────────────────
 
 @industry_bp.route("/templates/import", methods=["POST"])
+@role_required(*ADMIN_ROLES)
 def import_template():
     """POST /api/industry/templates/import — upload a JSON template file or raw JSON body.
 
@@ -65,6 +67,7 @@ def import_template():
 # ── Validate template JSON (without saving) ───────────────
 
 @industry_bp.route("/templates/validate", methods=["POST"])
+@role_required(*ADMIN_ROLES)
 def validate_template():
     """POST /api/industry/templates/validate — validate template JSON without importing."""
     if not request.is_json:
@@ -81,6 +84,7 @@ def validate_template():
 # ── Delete user-uploaded template ─────────────────────────
 
 @industry_bp.route("/templates/<template_id>", methods=["DELETE"])
+@role_required(*ADMIN_ROLES)
 def delete_template(template_id: str):
     """DELETE /api/industry/templates/{id} — remove a user-uploaded template."""
     # Prevent deleting built-in templates

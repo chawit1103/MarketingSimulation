@@ -15,6 +15,7 @@ from ..services.simulation_manager import SimulationManager
 from ..models.project import ProjectManager
 from ..models.task import TaskManager, TaskStatus
 from ..services.graph_tools import GraphToolsService
+from ..authz import ADMIN_ROLES, ANALYST_ROLES, role_required
 from ..utils.logger import get_logger
 
 logger = get_logger('mirofish.api.report')
@@ -23,6 +24,7 @@ logger = get_logger('mirofish.api.report')
 # ============== Report Generation Interface ==============
 
 @report_bp.route('/generate', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def generate_report():
     try:
         data = request.get_json() or {}
@@ -210,6 +212,7 @@ def download_report(report_id: str):
 
 
 @report_bp.route('/<report_id>', methods=['DELETE'])
+@role_required(*ADMIN_ROLES)
 def delete_report(report_id: str):
     try:
         success = ReportManager.delete_report(report_id)
@@ -224,6 +227,7 @@ def delete_report(report_id: str):
 # ============== Report Agent Chat Interface ==============
 
 @report_bp.route('/chat', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def chat_with_report_agent():
     try:
         data = request.get_json() or {}
@@ -389,6 +393,7 @@ def stream_console_log(report_id: str):
 # ============== Tool Call Interface (For Debugging) ==============
 
 @report_bp.route('/tools/search', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def search_graph_tool():
     try:
         data = request.get_json() or {}
@@ -409,6 +414,7 @@ def search_graph_tool():
 
 
 @report_bp.route('/tools/statistics', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def get_graph_statistics_tool():
     try:
         data = request.get_json() or {}

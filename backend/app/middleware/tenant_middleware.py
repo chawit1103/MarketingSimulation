@@ -7,7 +7,8 @@ Extracts authentication from:
 
 Injects g.current_user and g.current_org (Organization dict) on success.
 Returns 401/403 JSON on failure.
-Skips auth for: /health, /api/auth/*, OPTIONS requests.
+Skips auth for public demo/status/catalog routes, /api/auth/login,
+/api/auth/register, and OPTIONS requests.
 """
 
 from typing import Optional, Dict, Any
@@ -31,6 +32,11 @@ class TenantMiddleware:
     """
 
     # Paths that bypass authentication entirely
+    PUBLIC_PATHS = (
+        "/health",
+        "/api/auth/login",
+        "/api/auth/register",
+    )
     PUBLIC_PREFIXES = (
         "/health",
         "/api/status",
@@ -41,10 +47,11 @@ class TenantMiddleware:
         "/api/settings/providers",
         "/api/settings/readiness",
         "/api/impact/scenarios",
-        "/api/auth/",
         "/api/persona/archetypes",
         "/api/persona/regions",
         "/api/persona/countries",
+    )
+    PUBLIC_GET_PREFIXES = (
         "/api/industry/templates",
     )
     PUBLIC_METHODS = {"OPTIONS"}
@@ -76,6 +83,10 @@ class TenantMiddleware:
         if request.method in self.PUBLIC_METHODS:
             return True
         path = request.path
+        if path in self.PUBLIC_PATHS:
+            return True
+        if request.method == "GET" and any(path.startswith(p) for p in self.PUBLIC_GET_PREFIXES):
+            return True
         return any(path.startswith(p) for p in self.PUBLIC_PREFIXES)
 
     def _extract_token(self) -> Optional[str]:
@@ -146,6 +157,9 @@ class TenantMiddleware:
             return self._abort(401, "Organization not found")
 
         # Inject into Flask g
+        g.current_user_id = user_id
+        g.current_org_id = org_id
+        g.current_user_role = role
         g.current_user = {
             "user_id": user_id,
             "org_id": org_id,

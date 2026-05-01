@@ -14,6 +14,7 @@ from ..services.ontology_generator import OntologyGenerator
 from ..services.graph_builder import GraphBuilderService
 from ..services.text_processor import TextProcessor
 from ..utils.file_parser import FileParser
+from ..authz import ADMIN_ROLES, ANALYST_ROLES, role_required
 from ..utils.logger import get_logger
 from ..models.task import TaskManager, TaskStatus
 from ..models.project import ProjectManager, ProjectStatus
@@ -75,6 +76,7 @@ def list_projects():
 
 
 @graph_bp.route('/project/<project_id>', methods=['DELETE'])
+@role_required(*ADMIN_ROLES)
 def delete_project(project_id: str):
     """
     Delete project
@@ -94,6 +96,7 @@ def delete_project(project_id: str):
 
 
 @graph_bp.route('/project/<project_id>/reset', methods=['POST'])
+@role_required(*ADMIN_ROLES)
 def reset_project(project_id: str):
     """
     Reset project status (for rebuilding graph)
@@ -127,6 +130,7 @@ def reset_project(project_id: str):
 # ============== Interface 1: Upload Files and Generate Ontology ==============
 
 @graph_bp.route('/ontology/generate', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def generate_ontology():
     """
     Interface 1: Upload files and analyze to generate ontology definition
@@ -267,6 +271,7 @@ def generate_ontology():
 # ============== Interface 2: Build Graph ==============
 
 @graph_bp.route('/build', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def build_graph():
     """
     Interface 2: Build graph based on project_id
@@ -577,6 +582,7 @@ def get_graph_data(graph_id: str):
 
 
 @graph_bp.route('/delete/<graph_id>', methods=['DELETE'])
+@role_required(*ADMIN_ROLES)
 def delete_graph(graph_id: str):
     """
     Delete graph

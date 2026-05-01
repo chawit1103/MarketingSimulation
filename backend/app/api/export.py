@@ -4,6 +4,7 @@ from flask import Blueprint, request, jsonify, send_file
 import io
 
 from ..services.export_engine import PPTXGenerator
+from ..authz import ANALYST_ROLES, role_required
 from ..utils.logger import get_logger
 
 logger = get_logger("mirofish.api.export")
@@ -12,6 +13,7 @@ export_bp = Blueprint("export", __name__)
 
 
 @export_bp.route("/pptx", methods=["POST"])
+@role_required(*ANALYST_ROLES)
 def export_pptx():
     """POST /api/export/pptx — generate and download a PPTX deck.
 
@@ -37,6 +39,7 @@ def export_pptx():
 
 
 @export_bp.route("/csv", methods=["POST"])
+@role_required(*ANALYST_ROLES)
 def export_csv():
     """POST /api/export/csv — lightweight CSV export as fallback."""
     import csv

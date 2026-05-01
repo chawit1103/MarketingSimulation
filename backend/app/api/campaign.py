@@ -10,6 +10,7 @@ from ..services.campaign_service import CampaignService
 from ..services.pipeline_orchestrator import PipelineOrchestrator
 from ..services.oasis_platform_presets import resolve_preset
 from ..models.campaign import CampaignStatus
+from ..authz import ADMIN_ROLES, ANALYST_ROLES, role_required
 from ..utils.logger import get_logger
 
 logger = get_logger('mirofish.api.campaign')
@@ -56,6 +57,7 @@ def _get_user_id() -> str:
 # POST /api/campaign — Create campaign
 # ──────────────────────────────────────────────────────────────────────
 @campaign_bp.route('', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def create_campaign():
     """Create a new campaign for the current org.
 
@@ -219,6 +221,7 @@ def get_campaign(campaign_id: str):
 # PUT /api/campaign/<campaign_id> — Update campaign
 # ──────────────────────────────────────────────────────────────────────
 @campaign_bp.route('/<campaign_id>', methods=['PUT'])
+@role_required(*ANALYST_ROLES)
 def update_campaign(campaign_id: str):
     """Update campaign fields.
 
@@ -250,6 +253,7 @@ def update_campaign(campaign_id: str):
 # DELETE /api/campaign/<campaign_id> — Delete campaign
 # ──────────────────────────────────────────────────────────────────────
 @campaign_bp.route('/<campaign_id>', methods=['DELETE'])
+@role_required(*ADMIN_ROLES)
 def delete_campaign(campaign_id: str):
     """Delete a campaign (hard delete)."""
     try:
@@ -276,6 +280,7 @@ def delete_campaign(campaign_id: str):
 # POST /api/campaign/<campaign_id>/pipeline/start — Start pipeline
 # ──────────────────────────────────────────────────────────────────────
 @campaign_bp.route('/<campaign_id>/pipeline/start', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def start_pipeline(campaign_id: str):
     """Start the full simulation pipeline for a campaign.
 

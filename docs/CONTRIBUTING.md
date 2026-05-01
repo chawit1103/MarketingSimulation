@@ -81,3 +81,15 @@ Treat these as high-priority regressions:
 - screenshots or docs that include private customer data.
 
 When in doubt, prefer a visible `Unknown Source` or `Local Estimate` label over implying backend verification.
+
+## Role-Based Access
+
+Use the centralized `role_required()` guard for protected mutations:
+
+- `admin`: organization/settings/API-key/user-management and destructive operations.
+- `analyst`: create/update campaigns, run simulations, generate reports, and export/generated analysis flows.
+- `viewer`: read-only access to allowed organization resources.
+
+Do not make an endpoint public by adding a broad prefix unless every method below
+that prefix is safe for anonymous users. Auth routes should keep only login and
+register public.

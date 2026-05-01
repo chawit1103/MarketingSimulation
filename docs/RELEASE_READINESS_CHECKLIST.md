@@ -57,6 +57,8 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] Settings readiness checks do not echo API keys or graph passwords.
 - [x] SEC-002 settings read exposure is remediated: `GET /api/settings` returns only secret presence flags and never raw or masked API keys/passwords.
 - [x] Settings updates preserve existing secrets when blank fields, masked placeholders, or presence flags are submitted.
+- [x] SEC-004 RBAC baseline is partially remediated: centralized role guards protect settings/API-key/destructive/admin operations and analyst/admin mutation flows.
+- [x] SEC-006 auth route exposure is partially remediated: only auth login/register remain public, `/me` is authenticated, API-key generation is admin-only, and broken org switching returns a safe disabled response.
 - [ ] External pilot data-retention and deletion procedure is documented and approved.
 
 ## Automated Validation
