@@ -15,12 +15,14 @@ Updated: 2026-05-01
 - Legacy salted SHA256 password hashes are temporarily accepted and rehashed on successful login.
 - In-memory rate limiting protects auth login/register, demo, status, decision, and simulation endpoint groups.
 - Deterministic Brief Quality Score is available at `POST /api/brief/quality` and does not require an LLM.
+- War Room now defaults to the backend deterministic competitor simulation API at `POST /api/competitor/simulate`.
 - Frontend source badges identify result provenance: Demo Mode, Local Estimate, Live Backend, Backend Verified, or Unknown Source.
 
 ## Demo / Prototype
 
 - Demo campaign dashboards use deterministic sample data and are labeled as Demo Mode.
-- War Room output is currently a browser-side deterministic strategy estimate, not a live OASIS run.
+- War Room backend output is deterministic scenario planning, not a calibrated live OASIS or social-listening run.
+- War Room browser-side output remains available only as an explicit Local Estimate fallback after backend failure.
 - Comparator can fall back to browser-side sample output for demo continuity; fallback output is visibly labeled as Local Estimate.
 - Quick impact scenarios are deterministic business estimates based on sentiment and supplied business inputs.
 
@@ -37,13 +39,16 @@ Updated: 2026-05-01
 - Rate limits are configurable with `RATE_LIMIT_*` environment variables, including per-window limits for auth, demo, status, decision, and simulation groups.
 - Brief Quality Score checks objective, target audience, market/region, duration, budget, KPI, channel mix, competitor context, brand constraints, and risk/legal notes before simulation.
 - Dashboard now includes a Confidence & Evidence panel with source mode, run ID when available, persona count, brief completeness, safe provider/model display, limitations, and next validation step.
+- War Room calls the backend competitor API by default, exposes Local Estimate only as an explicit fallback, and labels fallback/backend source state visibly.
+- War Room scenario templates now include price war, influencer backlash, product recall, regulatory issue, ESG controversy, fake news/rumor amplification, and competitor launch.
+- War Room backend responses include expected sentiment movement, affected segments, amplification channels, key drivers, recommended response, and first 2h/24h/72h playbooks.
 
 ## Remaining Gaps
 
 - Rate limiting is in-memory and per-process; production should still use an edge/API-gateway limiter for multi-worker deployments.
 - Legacy SHA256 password support should be removed after a migration window.
 - Brief Quality Score is deterministic completeness scoring only; it does not validate factual accuracy or calibrate confidence against real-world outcomes.
-- War Room should be connected to backend campaign, competitor, and OASIS simulation records before being treated as a live simulation.
+- War Room should still be connected to full OASIS simulation records and real campaign calibration before being treated as measured market prediction.
 - Comparator fallback should eventually be replaced by backend-provided demo comparator fixtures.
 - Demo dashboards should be expanded for every demo campaign instead of relying on one premium-water sample shape.
 - Production deployment still needs environment-specific secret rotation, TLS, backup, observability, and CI gates.
