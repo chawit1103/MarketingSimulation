@@ -43,6 +43,7 @@ For demo, release validation, known limitations, and recommended next actions, s
 - [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)
 - [docs/DEMO_DATA.md](docs/DEMO_DATA.md)
 - [docs/FAQ.md](docs/FAQ.md)
+- [docs/ANALYTICS.md](docs/ANALYTICS.md)
 - [docs/SCREENSHOT_GUIDE.md](docs/SCREENSHOT_GUIDE.md)
 - [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md)
 - [docs/RELEASE_READINESS_CHECKLIST.md](docs/RELEASE_READINESS_CHECKLIST.md)

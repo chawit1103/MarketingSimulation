@@ -11,6 +11,25 @@
     "backendVerified": "Backend Verified",
     "unknownSource": "Unknown Source"
   },
+  "feedback": {
+    "trigger": "Feedback",
+    "kicker": "Product Feedback",
+    "title": "Was this useful?",
+    "copy": "Rate the current flow and flag confusing areas. Do not enter campaign content or private data.",
+    "ratingLabel": "Usefulness rating",
+    "confusionLabel": "What was confusing?",
+    "none": "Nothing confusing",
+    "sourceLabels": "Source labels",
+    "briefQuality": "Brief Quality Score",
+    "dashboard": "Dashboard evidence",
+    "warRoom": "War Room",
+    "settings": "Settings Wizard",
+    "export": "Export",
+    "other": "Other",
+    "submit": "Send feedback",
+    "thanksTitle": "Thanks",
+    "thanksCopy": "Feedback was sent to the local analytics provider hook."
+  },
   "home": {
     "brand": "3C SIMULATOR",
     "tag": "Multi-Language · Multi-Provider · Multi-Agent Simulation",

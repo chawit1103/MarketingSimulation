@@ -43,6 +43,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { sourceModeFromValue, trackEvent } from '@/services/analytics'
 
 const props = defineProps({
   label: { type: String, default: 'Export' },
@@ -61,6 +62,7 @@ function toggleMenu() {
 async function download(format) {
   isExporting.value = true
   showMenu.value = false
+  trackExport(format)
 
   try {
     const controller = new AbortController()
@@ -84,14 +86,15 @@ async function download(format) {
     a.click()
     URL.revokeObjectURL(url)
   } catch (e) {
-    downloadClientSide()
+    downloadClientSide('fallback_csv')
   } finally {
     isExporting.value = false
   }
 }
 
-function downloadClientSide() {
+function downloadClientSide(format = 'client_csv') {
   showMenu.value = false
+  trackExport(format)
 
   const rows = []
   rows.push([`MSaaS Report: ${props.data.title || 'Untitled'}`])
@@ -141,6 +144,14 @@ function downloadClientSide() {
   a.download = `${props.filename}.csv`
   a.click()
   URL.revokeObjectURL(url)
+}
+
+function trackExport(format) {
+  trackEvent('export_clicked', {
+    format,
+    slide_type: props.data?.slide_type || 'unknown',
+    source_mode: sourceModeFromValue(props.data?.action_plan?.source?.type || props.data?.source?.type),
+  })
 }
 </script>
 

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { routeBucket, trackEvent } from '@/services/analytics'
 
 const Home = () => import('../views/Home.vue')
 const Process = () => import('../views/MainView.vue')
@@ -85,6 +86,23 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+router.afterEach((to) => {
+  if (to.name === 'Dashboard') {
+    const isDemo = String(to.params.campaignId || '').startsWith('demo-')
+    trackEvent('dashboard_viewed', {
+      route_bucket: routeBucket(to),
+      is_demo: isDemo,
+      source_mode: isDemo ? 'demo_mode' : 'unknown',
+    })
+    if (isDemo) {
+      trackEvent('demo_dashboard_opened', {
+        route_bucket: routeBucket(to),
+        source_mode: 'demo_mode',
+      })
+    }
+  }
 })
 
 export default router

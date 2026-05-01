@@ -396,7 +396,7 @@
       </section>
 
       <!-- Action Plan: Think to Finish -->
-      <section class="action-plan">
+      <section ref="actionPlanSection" class="action-plan">
         <div class="action-plan-head">
           <div>
             <h2 class="panel-title">{{ $t('dashboard.actionPlan') }}</h2>
@@ -517,7 +517,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getKPIs, getTimeline, getSegments, getInfluencers } from '@/api/dashboard'
@@ -526,6 +526,7 @@ import { getDemoDashboard } from '@/api/demo'
 import { analyzeDecision, runWhatIf } from '@/api/decision'
 import ExportButton from '@/components/ExportButton.vue'
 import ResultSourceBadge from '@/components/ResultSourceBadge.vue'
+import { sourceModeFromValue, trackEvent } from '@/services/analytics'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -670,6 +671,9 @@ const primaryRisk = ref({})
 const whatIfResult = ref(null)
 const whatIfLoading = ref(false)
 const activeScenario = ref('')
+const actionPlanSection = ref(null)
+let actionPlanObserver = null
+let actionPlanViewedTracked = false
 
 const whatIfScenarios = [
   {
@@ -1488,9 +1492,34 @@ function seedDemoData() {
   }
 }
 
+function observeActionPlan() {
+  if (!actionPlanSection.value || actionPlanViewedTracked || typeof IntersectionObserver === 'undefined') return
+  actionPlanObserver = new IntersectionObserver((entries) => {
+    if (entries.some(entry => entry.isIntersecting)) {
+      actionPlanViewedTracked = true
+      trackEvent('action_plan_viewed', {
+        source_mode: sourceModeFromValue(displayActionPlan.value?.source?.type),
+        section_count: actionPlanSections.value.length,
+        has_structured_plan: Boolean(structuredActionPlan.value),
+      })
+      actionPlanObserver?.disconnect()
+      actionPlanObserver = null
+    }
+  }, { threshold: 0.35 })
+  actionPlanObserver.observe(actionPlanSection.value)
+}
+
 onMounted(async () => {
   await loadDashboard()
   seedDemoData()
+  observeActionPlan()
+})
+
+onUnmounted(() => {
+  if (actionPlanObserver) {
+    actionPlanObserver.disconnect()
+    actionPlanObserver = null
+  }
 })
 </script>
 

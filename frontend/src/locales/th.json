@@ -11,6 +11,25 @@
     "backendVerified": "Backend Verified",
     "unknownSource": "Unknown Source"
   },
+  "feedback": {
+    "trigger": "Feedback",
+    "kicker": "Product Feedback",
+    "title": "หน้านี้มีประโยชน์ไหม",
+    "copy": "ให้คะแนน flow นี้และบอกส่วนที่สับสนโดยไม่ใส่เนื้อหาแคมเปญหรือข้อมูลส่วนตัว",
+    "ratingLabel": "คะแนนความมีประโยชน์",
+    "confusionLabel": "ส่วนไหนที่สับสน",
+    "none": "ไม่มีส่วนที่สับสน",
+    "sourceLabels": "Source labels",
+    "briefQuality": "Brief Quality Score",
+    "dashboard": "Dashboard evidence",
+    "warRoom": "War Room",
+    "settings": "Settings Wizard",
+    "export": "Export",
+    "other": "อื่น ๆ",
+    "submit": "ส่ง feedback",
+    "thanksTitle": "ขอบคุณครับ",
+    "thanksCopy": "ส่ง feedback ไปยัง local analytics provider hook แล้ว"
+  },
   "home": {
     "brand": "3C SIMULATOR",
     "tag": "หลายภาษา · หลายผู้ให้บริการ · การจำลองหลายเอเจนต์",

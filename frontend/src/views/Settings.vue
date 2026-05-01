@@ -325,6 +325,7 @@ import { useI18n } from 'vue-i18n'
 import TemplateImportDropZone from '@/components/TemplateImportDropZone.vue'
 import { getSystemStatus } from '@/api/status'
 import { checkSettingsReadiness, getProviders, testLLMConnection, updateSettings } from '@/api/settings'
+import { trackEvent } from '@/services/analytics'
 
 const { locale, t } = useI18n()
 
@@ -443,6 +444,10 @@ async function testConnection() {
   } catch (e) {
     message.value = t('settings.connectionFailed')
     messageType.value = 'error'
+    trackEvent('provider_test_failed', {
+      provider_type: 'readiness',
+      mode: wizardMode.value,
+    })
   } finally {
     testing.value = false
   }
@@ -550,6 +555,10 @@ async function runReadinessCheck() {
   } catch (e) {
     wizardMessage.value = safeClientError(e)
     wizardMessageType.value = 'error'
+    trackEvent('provider_test_failed', {
+      provider_type: 'readiness',
+      mode: wizardMode.value,
+    })
   } finally {
     wizardLoading.value = false
   }
@@ -565,6 +574,11 @@ async function testLLMProvider() {
   } catch (e) {
     wizardMessage.value = safeClientError(e)
     wizardMessageType.value = 'error'
+    trackEvent('provider_test_failed', {
+      provider_type: 'llm',
+      provider: config.llm.provider,
+      mode: wizardMode.value,
+    })
   } finally {
     testingProvider.value = false
   }

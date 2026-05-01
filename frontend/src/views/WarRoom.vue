@@ -278,6 +278,7 @@ import ExportButton from '@/components/ExportButton.vue'
 import ResultSourceBadge from '@/components/ResultSourceBadge.vue'
 import { listCampaigns } from '@/api/campaign'
 import { runCompetitorSimulation } from '@/api/competitor'
+import { sourceModeFromValue, trackEvent } from '@/services/analytics'
 
 const { t } = useI18n()
 
@@ -550,10 +551,24 @@ async function runSimulation() {
   try {
     const res = await runCompetitorSimulation(buildBackendPayload())
     result.value = normalizeBackendResult(res.data || res)
+    trackEvent('war_room_scenario_run', {
+      scenario: activeScenario.value,
+      strategy: selectedStrategy.value,
+      source_mode: sourceModeFromValue(result.value?.source?.type),
+      backend_available: true,
+      competitor_count: competitors.value.length,
+    })
   } catch (error) {
     console.warn('Backend War Room simulation failed:', error.message)
     simulationWarning.value = t('warRoom.backendSimulationFailed')
     localFallbackAvailable.value = true
+    trackEvent('war_room_scenario_run', {
+      scenario: activeScenario.value,
+      strategy: selectedStrategy.value,
+      source_mode: 'unknown',
+      backend_available: false,
+      competitor_count: competitors.value.length,
+    })
   } finally {
     loading.value = false
   }
@@ -566,6 +581,13 @@ function runLocalEstimate() {
   localFallbackAvailable.value = false
   setTimeout(() => {
     result.value = runWarGame()
+    trackEvent('war_room_scenario_run', {
+      scenario: activeScenario.value,
+      strategy: selectedStrategy.value,
+      source_mode: 'local_estimate',
+      backend_available: false,
+      competitor_count: competitors.value.length,
+    })
     loading.value = false
   }, 250)
 }

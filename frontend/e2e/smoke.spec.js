@@ -377,3 +377,31 @@ test('settings wizard shows demo readiness without secrets', async ({ page }) =>
   await expect(page.getByText('Setup looks ready for this mode.')).toBeVisible()
   await expect(page.getByText('Cost Estimate').first()).toBeVisible()
 })
+
+test('feedback widget emits sanitized local analytics event', async ({ page }) => {
+  await page.goto('/')
+  await page.evaluate(() => {
+    window.__analyticsEvents = []
+    window.addEventListener('3c:analytics', (event) => {
+      window.__analyticsEvents.push(event.detail)
+    })
+  })
+
+  await page.getByRole('button', { name: 'Feedback' }).click()
+  await page.getByRole('button', { name: '4' }).click()
+  await page.locator('#feedback-confusion').selectOption('source_labels')
+  await page.getByRole('button', { name: 'Send feedback' }).click()
+
+  const feedbackEvent = await page.waitForFunction(() => (
+    window.__analyticsEvents || []
+  ).find((event) => event.event === 'feedback_submitted'))
+
+  const event = await feedbackEvent.jsonValue()
+  expect(event.properties).toEqual({
+    rating: 4,
+    confusion_area: 'source_labels',
+    route_bucket: 'home',
+  })
+  expect(JSON.stringify(event)).not.toContain('api_key')
+  expect(JSON.stringify(event)).not.toContain('campaign brief')
+})

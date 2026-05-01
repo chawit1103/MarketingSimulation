@@ -547,6 +547,7 @@ import {
 } from '@/api/campaign'
 import { listDemoCampaigns } from '@/api/demo'
 import { scoreBriefQuality } from '@/api/brief'
+import { trackEvent } from '@/services/analytics'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -567,6 +568,7 @@ const activePipelineStatus = ref(null)
 const activePipelineCampaignId = ref(null)
 const briefQuality = ref(null)
 const briefQualityLoading = ref(false)
+const simulationCompletedTracked = ref(false)
 let pipelinePollInterval = null
 
 // ── Form State ─────────────────────────────────────
@@ -1024,6 +1026,14 @@ async function submitCampaign() {
     // 2. Start pipeline
     try {
       await startPipeline(campaignId)
+      trackEvent('simulation_started', {
+        objective: payload.objective,
+        source_mode: 'live_backend',
+        platform: payload.platform,
+        platform_mode: payload.platform_mode,
+        channel_count: payload.target.channels.length,
+        persona_count: payload.target.persona_count,
+      })
     } catch (pipeErr) {
       console.warn('Pipeline start warning:', pipeErr.message)
     }
@@ -1038,6 +1048,7 @@ async function submitCampaign() {
     activePipelineCampaign.value = payload.name
     activePipelineCampaignId.value = campaignId
     activePipelineStatus.value = { current_step: 'persona_generation', status: 'running', step_progress: 0 }
+    simulationCompletedTracked.value = false
     showPipelineModal.value = true
     startPipelinePolling(campaignId)
   } catch (err) {
@@ -1092,6 +1103,12 @@ async function refreshBriefQuality() {
   try {
     const res = await scoreBriefQuality(buildCampaignPayload())
     briefQuality.value = res.data || res
+    trackEvent('brief_quality_scored', {
+      score: briefQuality.value?.score,
+      level: briefQuality.value?.level,
+      confidence_impact: briefQuality.value?.confidence_impact,
+      missing_fields_count: briefQuality.value?.missing_fields?.length || 0,
+    })
   } catch (err) {
     console.warn('Brief quality scoring failed:', err.message)
     briefQuality.value = {
@@ -1128,6 +1145,14 @@ function startPipelinePolling(campaignId) {
         activePipelineStatus.value = res.data
       } else if (res) {
         activePipelineStatus.value = res
+      }
+      if (activePipelineStatus.value?.status === 'complete' && !simulationCompletedTracked.value) {
+        simulationCompletedTracked.value = true
+        trackEvent('simulation_completed', {
+          source_mode: 'live_backend',
+          final_step: activePipelineStatus.value.current_step || 'complete',
+          percent_complete: pipelinePercent(activePipelineStatus.value),
+        })
       }
     } catch (e) {
       console.warn('Pipeline status poll failed:', e.message)
