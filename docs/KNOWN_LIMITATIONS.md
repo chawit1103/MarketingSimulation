@@ -24,9 +24,10 @@ This document separates what the system currently does from what should not yet 
 
 - Rate limiting is in-memory and per-process. Production deployments with multiple workers need edge/API-gateway or shared-store rate limiting.
 - Tenant data still relies on JSON storage paths plus Neo4j, not a production relational database migration.
-- Production deployment still needs TLS, backups, observability, CI gates, and environment-specific secret rotation.
+- Production deployment still needs TLS, backups, observability, environment-specific secret rotation, and deployment-owned rate limiting.
 - Neo4j availability warnings can appear during local tests when no local graph database is running.
 - Audit logging and data-retention policies are not complete enough for broad enterprise rollout.
+- Legacy local JSON simulation/report/project/task records created before `org_id` metadata was added may need to be re-created or backfilled before production use.
 
 ## Provider And Settings Readiness
 
@@ -34,6 +35,15 @@ This document separates what the system currently does from what should not yet 
 - The optional live LLM test requires authenticated runtime settings and real provider availability.
 - Readiness and provider APIs intentionally do not return API keys or graph passwords.
 - Cost estimate values are directional placeholders only and are not billing-grade.
+- Local JSON settings storage is for demo/local use. Production should provide provider credentials through environment variables or a managed secret store, and should not rely on plaintext runtime files for shared deployments.
+
+## Security Readiness
+
+- Historical secret-like values may have been committed before repository secret hygiene was added. The repository cannot prove external credential rotation; owners must rotate any affected provider/API/graph credentials manually.
+- RBAC has a centralized baseline, but newly added routes still need explicit role and tenant review before release.
+- Organization switching is intentionally disabled until a real multi-organization membership model exists.
+- Browser `localStorage` token/API-key storage remains an accepted local/demo risk and should be replaced before public or production exposure.
+- 5xx API responses are sanitized globally, but long-tail route-specific validation/error messages should continue to be reviewed for internal-detail leakage.
 
 ## Testing
 

@@ -47,7 +47,8 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 
 ## Security And Abuse Protection
 
-- [x] SEC-001 repository secret hygiene is partially remediated: `.env.dev` is removed from Git tracking, safe `.env.dev.example` placeholders are provided, and CI blocks tracked local env/runtime files plus common secret-like token patterns. Remaining manual action: rotate any provider/API/graph credentials that may have been committed before this PR.
+- [x] SEC-001 repository secret hygiene is partially remediated: `.env.dev` is removed from Git tracking, safe `.env.dev.example` placeholders are provided, and CI blocks tracked local env/runtime files plus common secret-like token patterns.
+- [ ] SEC-001 manual credential rotation is complete and evidenced outside the repository. Remaining manual action: rotate any provider/API/graph credentials that may have been committed before remediation.
 - [x] Production refuses known fallback auth/session secrets.
 - [x] New passwords use Werkzeug adaptive hashes.
 - [x] Legacy salted SHA256 hashes are rehashed on successful login.
@@ -64,9 +65,22 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] SEC-008/010/011/013 production hardening baseline is remediated: debug/body logging are opt-in, query-parameter API keys are rejected, production CORS requires explicit trusted origins, and 5xx API errors return stable client-safe messages.
 - [x] SEC-007 local settings storage is partially remediated: masked placeholders are not persisted as secrets, settings files use restrictive permissions where supported, and `SETTINGS_PERSIST_SECRETS=false` omits runtime secrets from JSON storage.
 - [ ] SEC-009 production rate limiting uses an edge/API-gateway or shared Redis-backed limiter; the built-in limiter remains in-memory and local/demo oriented.
+- [ ] SEC-012 production auth storage avoids long-lived tokens/API keys in browser `localStorage`, or the residual risk is explicitly accepted for the deployment.
+- [ ] SEC-013 long-tail route handlers have been reviewed so route-level validation/errors do not reveal internal paths, object IDs, provider details, or unrecognized secrets.
 - [ ] Production secrets are provided via environment variables or an external secret manager rather than local JSON settings.
 - [ ] Legacy local JSON simulation/report/project/task records without `org_id` are reviewed, backfilled, or re-created before production use.
 - [ ] External pilot data-retention and deletion procedure is documented and approved.
+
+## Security Remediation Gate
+
+- [x] SEC-002, SEC-003, SEC-005, SEC-008, SEC-010, and SEC-011 are fixed for the current architecture.
+- [x] SEC-001, SEC-004, SEC-006, SEC-007, and SEC-013 are tracked as partially fixed with remaining actions.
+- [x] SEC-009 and SEC-012 are documented accepted risks for local/demo and controlled private pilot contexts only.
+- [x] Local demo readiness: acceptable when demo data is used, no real secrets are entered, and source-mode labels remain visible.
+- [x] Controlled private pilot readiness: conditionally acceptable with trusted users, rotated credentials, environment-provided secrets, no confidential briefs, explicit source labels, and deployment-level rate limiting/CORS/log controls.
+- [ ] Public pilot readiness: blocked because at least one SEC-001 through SEC-008 item remains partially fixed.
+- [ ] Public internet exposure readiness: blocked until production rate limiting, secret management, auth storage, and deployment controls are complete.
+- [ ] Production customer deployment readiness: blocked until manual credential rotation, secret-manager strategy, full RBAC/org-switching maturity, shared rate limiting, data-retention policy, and storage architecture decisions are complete.
 
 ## Automated Validation
 
@@ -75,6 +89,14 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] Locale JSON validation: `python3 -m json.tool frontend/src/locales/en.json` and `th.json`
 - [ ] Frontend unit tests: not configured.
 - [ ] Frontend lint/typecheck: not configured.
+
+### PR O Verification Run
+
+- [x] `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-01: 47 passed, 26 warnings.
+- [x] `backend/.venv/bin/python -m pytest backend/tests/test_rbac.py backend/tests/test_tenant_isolation.py backend/tests/test_settings_readiness.py backend/tests/test_dashboard_provenance.py backend/tests/test_production_hardening.py backend/tests/test_security_controls.py -q` passed on 2026-05-01: 30 passed, 20 warnings.
+- [x] CI-equivalent secret hygiene scan passed on 2026-05-01.
+- [x] `git diff --check` passed on 2026-05-01.
+- [ ] Frontend build was not rerun for PR O because this PR changes documentation only.
 
 ## Manual Demo Flow Checks
 
@@ -94,4 +116,4 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 
 ## Release Decision
 
-This repository is suitable for a controlled demo, internal pilot, or product-discovery release candidate after manual demo-flow verification. It is not yet a fully calibrated enterprise prediction system.
+This repository is suitable for local demo use and conditionally suitable for a controlled private pilot after manual demo-flow verification and credential rotation. It is not ready for a public pilot, public internet exposure, or production customer deployment.

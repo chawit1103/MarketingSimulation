@@ -4,13 +4,31 @@ Updated: 2026-05-01
 
 Scope reviewed: authentication and authorization, tenant isolation, public APIs and rate limiting, error handling, demo/local/source labeling, environment variables, storage of campaign/user/API-key data, and frontend exposure of sensitive configuration.
 
-This review did not make product-code changes. It records release blockers and focused follow-up PR recommendations.
+This review did not make product-code changes. It records release blockers, remediation evidence, and focused follow-up recommendations.
 
 ## Executive Summary
 
-The repository has several good security foundations: password hashing now uses Werkzeug adaptive hashes, legacy password hashes are rehashed on login, production rejects known fallback auth secrets, public/demo routes are rate-limited, client-facing traceback payloads are sanitized, and demo/local/live/backend-verified source labels exist in the UI.
+The repository has several good security foundations: password hashing now uses Werkzeug adaptive hashes, legacy password hashes are rehashed on login, production rejects known fallback auth secrets, public/demo routes are rate-limited, client-facing traceback payloads are sanitized, settings secrets are masked from browser reads, ID-addressed resources are scoped to the authenticated organization in the current local JSON architecture, and demo/local/live/backend-verified source labels exist in the UI.
 
-However, the current repository is not production-ready for external customers. The main blockers are tenant/object authorization gaps, role enforcement, plaintext runtime secret storage, debug logging defaults, and result-provenance accuracy.
+However, the current repository is not production-ready for external customers. The remaining blockers are manual rotation of previously committed secret-like values, incomplete production-grade secret management, partial RBAC/org-switching maturity, in-memory rate limiting, and local/demo storage architecture limitations.
+
+## Remediation Status Table
+
+| Finding ID | Original severity | Current status | PR or file evidence | Remaining action |
+| --- | --- | --- | --- | --- |
+| SEC-001 | Critical | partially fixed | `.gitignore`, `.env.dev.example`, `.github/workflows/ci.yml`, `docs/CONTRIBUTING.md` | Repository hygiene is fixed, but owners must manually rotate any provider/API/graph credentials that may have been committed before remediation. Do not mark this complete without external rotation evidence. |
+| SEC-002 | Critical | fixed | `backend/app/api/settings.py`, `backend/app/models/settings.py`, `frontend/src/views/Settings.vue`, `backend/tests/test_settings_readiness.py` | Continue ensuring future settings fields use presence flags and admin-only access. |
+| SEC-003 | Critical | fixed | `backend/app/api/dashboard.py`, `backend/app/api/simulation.py`, `backend/app/api/report.py`, `backend/app/services/pipeline_orchestrator.py`, `backend/tests/test_tenant_isolation.py` | Backfill or re-create legacy local JSON records without `org_id` before any production use. Database-level tenant constraints remain future work. |
+| SEC-004 | Critical | partially fixed | `backend/app/middleware/tenant.py`, `backend/app/api/auth.py`, `backend/app/api/settings.py`, `backend/app/api/campaign.py`, `backend/tests/test_rbac.py` | Baseline role guards are in place, but every newly added route still requires explicit RBAC review; full enterprise authorization policy/audit remains future work. |
+| SEC-005 | High | fixed | `backend/app/services/kpi_calculator.py`, `backend/app/api/dashboard.py`, `frontend/src/components/ResultSourceBadge.vue`, `backend/tests/test_dashboard_provenance.py` | Expand real KPI extraction when the simulation runner emits a stable KPI schema; do not mark raw runner output as backend verified. |
+| SEC-006 | High | partially fixed | `backend/app/api/auth.py`, `backend/app/middleware/tenant.py`, `backend/tests/test_rbac.py` | Login/register are the only public auth routes and broken privileged paths are safe, but real multi-org membership and org switching remain unimplemented. |
+| SEC-007 | High | partially fixed | `backend/app/models/settings.py`, `backend/app/config.py`, `backend/tests/test_production_hardening.py`, `docs/KNOWN_LIMITATIONS.md` | Local JSON settings are demo/local only. Production must use environment variables or a managed secret store and should avoid persisting provider credentials on disk. |
+| SEC-008 | High | fixed | `backend/app/__init__.py`, `backend/app/utils/response_safety.py`, `backend/app/config.py`, `backend/tests/test_production_hardening.py` | Keep request body logging opt-in and redacted; review new logs for campaign brief or secret leakage. |
+| SEC-009 | Medium | accepted risk | `backend/app/middleware/rate_limit.py`, `docs/KNOWN_LIMITATIONS.md`, `docs/RELEASE_READINESS_CHECKLIST.md` | Built-in limiter is acceptable for local/demo use only. Public internet deployments need edge/API-gateway or shared Redis-backed rate limiting. |
+| SEC-010 | Medium | fixed | `backend/app/middleware/tenant.py`, `backend/tests/test_production_hardening.py` | Tokens/API keys must stay in `Authorization: Bearer` or `X-Api-Key`; do not reintroduce query-token auth. |
+| SEC-011 | Medium | fixed | `backend/app/config.py`, `backend/app/__init__.py`, `backend/tests/test_production_hardening.py` | Production deploys must set explicit trusted `CORS_ALLOWED_ORIGINS`. |
+| SEC-012 | Medium | accepted risk | `frontend/src/api/index.js`, `docs/KNOWN_LIMITATIONS.md` | Replace browser `localStorage` token/API-key storage with a safer auth design before public/customer production. Add CSP and XSS hardening. |
+| SEC-013 | Medium | partially fixed | `backend/app/utils/response_safety.py`, `backend/app/__init__.py`, `backend/tests/test_public_routes.py`, `backend/tests/test_security_controls.py`, `backend/tests/test_production_hardening.py` | 5xx API errors are sanitized globally, but long-tail route-level 4xx/error messages should continue to be normalized. |
 
 ## Critical Findings
 
@@ -177,8 +195,8 @@ Concerns:
 - Campaigns and users are stored as JSON files under per-org folders.
 - User JSON files include email/name plus `password_hash`, `api_key_hash`, and `api_key_prefix`; `to_dict(safe=True)` removes sensitive hashes from normal responses.
 - API keys are stored as SHA256 hashes. Because generated keys are high entropy, this is acceptable for local/demo use, but a keyed HMAC/pepper would reduce risk if storage is stolen.
-- Settings currently persist provider and graph secrets in plaintext local JSON.
-- Simulation and report storage are global rather than clearly tenant-scoped.
+- Settings can still persist provider and graph secrets in plaintext local JSON for demo/local workflows. `SETTINGS_PERSIST_SECRETS=false` omits those secrets from runtime JSON, and production should use environment variables or a managed secret store.
+- Simulation, report, project, pipeline, graph, and graph-task routes now carry or enforce organization ownership in the current local JSON architecture. Legacy records without ownership metadata need backfill or re-creation before production use.
 
 ## Frontend Exposure Review
 
@@ -227,4 +245,6 @@ Concerns:
 
 For controlled local demos, the current repository is acceptable if no real secrets are used and demo/local labels remain visible.
 
-For a public pilot or customer deployment, SEC-001 through SEC-008 should be treated as blockers. SEC-009 through SEC-013 are important hardening items that can follow once the blockers are closed, unless the deployment is internet-facing, in which case rate limiting, CORS, debug logging, and token storage should be addressed before launch.
+For a controlled private pilot, the repository is conditionally acceptable only with trusted users, rotated credentials, no confidential customer briefs, explicit source labels, environment-provided secrets, and deployment controls around rate limiting/CORS/logging. This is not a production-readiness claim.
+
+For a public pilot, public internet exposure, or customer production deployment, the release is not ready while SEC-001, SEC-004, SEC-006, and SEC-007 remain partially fixed and SEC-009/SEC-012 remain accepted risks.
