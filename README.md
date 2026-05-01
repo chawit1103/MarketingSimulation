@@ -43,6 +43,7 @@ For release validation, known limitations, and recommended next actions, see:
 - [docs/RELEASE_READINESS_CHECKLIST.md](docs/RELEASE_READINESS_CHECKLIST.md)
 - [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md)
 - [docs/POST_IMPLEMENTATION_ACTION_PLAN.md](docs/POST_IMPLEMENTATION_ACTION_PLAN.md)
+- [docs/PILOT_PLAN.md](docs/PILOT_PLAN.md)
 - [docs/ROADMAP.md](docs/ROADMAP.md)
 
 ---

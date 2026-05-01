@@ -17,6 +17,7 @@ This plan focuses on turning the current release candidate into a reliable pilot
 4. Replace browser-side comparator fallback with backend demo fixtures.
 5. Expand demo dashboards beyond `demo-premium-water`.
 6. Calibrate KPI, Decision Engine, War Room, and Action Plan rules against real or historical campaign outcomes.
+7. Maintain product claims discipline: describe outputs as scenario planning until calibration evidence exists.
 
 ## QA
 
@@ -35,6 +36,7 @@ This plan focuses on turning the current release candidate into a reliable pilot
    - public route rate limits
 4. Add manual release screenshots for dashboard, comparator, War Room, impact, and settings.
 5. Track test warnings separately from failures so Neo4j local warnings do not hide real regressions.
+6. Add regression checks for source labels, fallback warnings, and sanitized client-facing errors before every demo release.
 
 ## Deployment
 
@@ -51,6 +53,7 @@ This plan focuses on turning the current release candidate into a reliable pilot
 4. Add structured logs for auth events, settings changes, simulation runs, export attempts, and backend fallback/errors.
 5. Add backups for tenant JSON storage and Neo4j data.
 6. Add TLS, secret rotation, observability, and rollback steps before public launch.
+7. Document data retention and deletion expectations before inviting external pilot users.
 
 ## Pilot Users
 
@@ -65,6 +68,16 @@ This plan focuses on turning the current release candidate into a reliable pilot
    - eventual real-world outcome if available
 4. Use pilot feedback to tune brief-quality scoring and deterministic recommendation rules.
 5. Convert successful pilot outputs into anonymized case studies only after validating the underlying assumptions.
+
+See [PILOT_PLAN.md](PILOT_PLAN.md) for the recommended pilot structure, participant profile, session script, and success criteria.
+
+## Governance
+
+1. Use [../AGENTS.md](../AGENTS.md) as the standing instruction set for future Codex implementation and review tasks.
+2. Keep PRs focused by theme: security, product trust, demo/docs, QA, deployment, or UX.
+3. Require explicit source-mode labeling for every new result surface.
+4. Treat privacy, tenant isolation, auth, and fallback transparency regressions as release blockers.
+5. Keep docs synchronized with implementation whenever API routes, result-source modes, provider readiness, or demo paths change.
 
 ## Recommended Next PRs
 

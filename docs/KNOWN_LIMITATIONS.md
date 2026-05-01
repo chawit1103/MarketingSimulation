@@ -18,6 +18,7 @@ This document separates what the system currently does from what should not yet 
 - Local fallback output must be treated as Local Estimate and should not be used as evidence of backend simulation success.
 - Comparator still has browser-side demo fallback. A backend demo comparator fixture should replace it later.
 - Demo dashboards are strongest for `demo-premium-water`; broader demo campaign coverage remains pending.
+- Any new dashboard, export, or recommendation surface must inherit and show source-mode metadata before being considered release-ready.
 
 ## Infrastructure
 
@@ -25,6 +26,7 @@ This document separates what the system currently does from what should not yet 
 - Tenant data still relies on JSON storage paths plus Neo4j, not a production relational database migration.
 - Production deployment still needs TLS, backups, observability, CI gates, and environment-specific secret rotation.
 - Neo4j availability warnings can appear during local tests when no local graph database is running.
+- Audit logging and data-retention policies are not complete enough for broad enterprise rollout.
 
 ## Provider And Settings Readiness
 
@@ -39,6 +41,13 @@ This document separates what the system currently does from what should not yet 
 - Frontend production build is validated.
 - Frontend unit tests, lint, and typecheck scripts are not configured yet.
 - More backend coverage is needed for campaign CRUD, export edge cases, report generation flows, and full OASIS runner lifecycle.
+- Manual pilot scripts and screenshot checks are documented, but not yet automated.
+
+## Privacy And Governance
+
+- External pilot users should use non-confidential or approved campaign briefs until data-retention and deletion policies are formalized.
+- Screenshots and docs should use demo or synthetic data only.
+- Future Codex agents should follow repository-specific guidance in `AGENTS.md` before making implementation or review changes.
 
 ## Product Claims To Avoid
 

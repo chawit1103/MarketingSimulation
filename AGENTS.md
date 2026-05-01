@@ -1,3 +1,57 @@
+# MarketingSimulation Agent Guide
+
+This repository is a marketing decision-intelligence product with public demo flows, tenant-aware backend APIs, synthetic simulation outputs, and source-labeled fallback modes. Future Codex work should optimize for release safety, reviewability, and user trust.
+
+## Non-Negotiable Product Safety Rules
+
+- Do not expose secrets, API keys, provider tokens, passwords, auth headers, or graph credentials in logs, browser responses, screenshots, docs, or test fixtures.
+- Do not return raw tracebacks, stack traces, internal file paths, or provider exception dumps to clients. Keep detailed errors in server logs and sanitize API responses.
+- Clearly label result provenance everywhere users see simulation or recommendation output:
+  - Demo Mode
+  - Local Estimate
+  - Live Backend
+  - Backend Verified
+  - Unknown Source
+- Do not fabricate live simulation results. Demo fixtures and local estimates are allowed only when visibly labeled and documented as deterministic/synthetic.
+- Treat auth, tenant isolation, fallback transparency, and data privacy regressions as high-priority issues in code review.
+- Keep PRs focused and reviewable. Avoid bundling unrelated product features, refactors, migrations, providers, or design rewrites into release-readiness/security/docs PRs.
+
+## Engineering Expectations
+
+- Add or update tests for changed backend routes and critical frontend flows.
+- Route changes must keep frontend API helpers and Flask blueprint routes aligned.
+- Public/demo endpoints must remain rate-limited and must not require live LLM or network calls in automated tests.
+- Preserve local/demo development behavior unless the task explicitly asks to remove it.
+- Preserve i18n behavior where practical when changing user-facing UI text.
+- If adding screenshots or demo docs, use synthetic/demo data only and confirm source labels are visible where relevant.
+- If changing export, dashboard, comparator, War Room, decision, or settings flows, verify that result-source metadata is preserved.
+
+## Code Review Priorities
+
+Flag these as high severity:
+
+- Any client-facing raw traceback or secret leak.
+- Any fallback output that appears to be live/backend-verified when it is actually demo or local estimate data.
+- Any auth bypass or tenant data isolation issue.
+- Any route mismatch between frontend API calls and backend routes.
+- Any test that makes live LLM/provider/network calls.
+- Any docs or UI copy that claims guaranteed prediction accuracy, calibrated market-share forecasting, or real-world outcome certainty.
+
+## Recommended Validation
+
+- Backend: `backend/.venv/bin/python -m pytest backend/tests`
+- Frontend build: `cd frontend && npm run build`
+- Locale JSON: `python3 -m json.tool frontend/src/locales/en.json` and `frontend/src/locales/th.json`
+- Diff hygiene: `git diff --check`
+- If frontend source changes, manually inspect the affected flow or capture an updated screenshot when practical.
+
+## Current Product Boundaries
+
+- This is ready for controlled demos and pilot discovery, not guaranteed market prediction.
+- Decision Engine, War Room, Action Plan, and KPI outputs remain deterministic guidance until calibrated with real campaign outcomes.
+- Browser-side local fallback exists for demo continuity only and must remain explicit.
+- Production still needs edge/shared rate limiting, observability, backup, CI gates, deployment runbooks, and calibration.
+
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 

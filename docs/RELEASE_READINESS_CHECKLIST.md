@@ -11,6 +11,7 @@ Use this checklist before tagging or deploying a release candidate.
 - [x] No unsupported LLM, embedding, or graph providers added.
 - [x] Demo mode remains available without API keys.
 - [x] Local estimate fallbacks remain explicit and labeled.
+- [x] Repository governance is documented in top-level `AGENTS.md`.
 
 ## Critical Route Contracts
 
@@ -53,6 +54,7 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] Raw traceback and stack fields are stripped from client-facing API JSON.
 - [x] Common secret-like strings are redacted from client-facing API JSON.
 - [x] Settings readiness checks do not echo API keys or graph passwords.
+- [ ] External pilot data-retention and deletion procedure is documented and approved.
 
 ## Automated Validation
 
@@ -69,6 +71,14 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [ ] Open `/war-room`, run backend simulation, then verify explicit Local Estimate behavior if backend is unavailable.
 - [ ] Open `/impact` and verify quick scenarios use `/api/impact/scenarios/<sentiment_value>`.
 - [ ] Open `/settings` and verify Demo only, Local model, and Cloud API wizard paths do not expose secrets.
+
+## Pre-Merge Governance Checks
+
+- [ ] PR is focused and does not mix unrelated features, security work, docs, migrations, and refactors.
+- [ ] Any changed backend route has a test or an explicit reason why it cannot be tested.
+- [ ] Any changed critical frontend flow has a build check and either a manual check note or automated coverage.
+- [ ] Any new result surface labels Demo Mode, Local Estimate, Live Backend, Backend Verified, or Unknown Source.
+- [ ] Docs are updated if API routes, demo paths, source labels, provider readiness, or release claims changed.
 
 ## Release Decision
 
