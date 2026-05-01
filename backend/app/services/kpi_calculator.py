@@ -7,7 +7,6 @@ data becomes available, only the internal computation logic needs updating.
 """
 from typing import Dict, Any, List, Optional
 import random
-import uuid
 
 from ..models.report import (
     ExecutiveReport,
@@ -87,6 +86,7 @@ class KPICalculator:
         org_id: str = "default",
         simulation_data: Optional[Dict[str, Any]] = None,
         graph_data: Optional[Dict[str, Any]] = None,
+        simulation_id: Optional[str] = None,
     ) -> ExecutiveReport:
         """Produce a full ExecutiveReport for the given campaign.
 
@@ -95,14 +95,27 @@ class KPICalculator:
         mock data suitable for demos and UI development.
         """
         report = ExecutiveReport.empty(campaign_id, org_id)
+        report.simulation_id = simulation_id or (simulation_data or {}).get("simulation_id")
+        report.run_id = (simulation_data or {}).get("run_id") or report.simulation_id or report.report_id
 
         # --- Determine whether we have real data ---
-        use_real = self._has_real_data(simulation_data)
+        use_real = self._has_real_kpi_data(simulation_data)
 
         if use_real:
             self._compute_from_real(report, simulation_data, graph_data)
+            report.source_mode = "backend_verified"
+            report.data_basis = "real_simulation"
+            report.confidence = self._extract_confidence(simulation_data)
+            report.limitations = list((simulation_data or {}).get("limitations") or [])
         else:
             self._compute_from_mock(report)
+            report.source_mode = "local_estimate"
+            report.data_basis = "local_estimate"
+            report.confidence = None
+            report.limitations = [
+                "KPI values are local deterministic estimates because no persisted real simulation KPI output is available.",
+                "Use this dashboard for planning direction only; validate with a real simulation or live audience test before spend decisions.",
+            ]
 
         # --- Action plan (same pipeline for mock & real) ---
         self._generate_action_plan(report)
@@ -120,6 +133,29 @@ class KPICalculator:
         rounds = simulation_data.get("rounds") or simulation_data.get("round_summaries")
         return bool(rounds and len(rounds) > 0)
 
+    def _has_real_kpi_data(self, simulation_data: Optional[Dict[str, Any]]) -> bool:
+        """Return True only when explicit KPI metrics are present.
+
+        Raw runner rounds/actions prove that a backend run happened, but they do
+        not yet contain sentiment/conversion KPI facts. Treating those as
+        backend-verified would fabricate precision, so they remain local
+        estimates until a real KPI schema is present.
+        """
+        if not simulation_data:
+            return False
+        metrics = simulation_data.get("kpis") or simulation_data.get("metrics") or simulation_data
+        required = {"overall_sentiment", "conversion_probability", "crisis_risk"}
+        return required.issubset(metrics.keys())
+
+    def _extract_confidence(self, simulation_data: Optional[Dict[str, Any]]) -> Optional[float]:
+        if not simulation_data:
+            return None
+        value = simulation_data.get("confidence") or simulation_data.get("confidence_score")
+        try:
+            return float(value) if value is not None else None
+        except (TypeError, ValueError):
+            return None
+
     # ------------------------------------------------------------------
     # Real-data computation (stub — complete when simulation runner matures)
     # ------------------------------------------------------------------
@@ -130,13 +166,51 @@ class KPICalculator:
         simulation_data: Dict[str, Any],
         graph_data: Optional[Dict[str, Any]],
     ) -> None:
-        """Compute KPIs from actual simulation data.
+        """Compute KPIs from explicit persisted simulation KPI metrics."""
+        metrics = simulation_data.get("kpis") or simulation_data.get("metrics") or simulation_data
+        report.overall_sentiment = round(float(metrics.get("overall_sentiment", 0.0)), 1)
+        report.conversion_probability = _clamp(float(metrics.get("conversion_probability", 0.0)), 0.0, 100.0)
+        report.social_influence_index = _clamp(float(metrics.get("social_influence_index", metrics.get("social_influence", 0.0))), 0.0, 100.0)
+        report.message_resonance = _clamp(float(metrics.get("message_resonance", 0.0)), 0.0, 100.0)
+        report.crisis_risk = _clamp(float(metrics.get("crisis_risk", 0.0)), 0.0, 100.0)
+        report.brand_perception_shift = _clamp(float(metrics.get("brand_perception_shift", 0.0)))
+        report.opinion_polarization = _clamp(float(metrics.get("opinion_polarization", 0.0)), 0.0, 100.0)
 
-        TODO: Replace stub with real calculations once simulation output
-              schema is finalised.
-        """
-        logger.warning("Real-data KPI path not yet implemented — using mock fallback for now")
-        self._compute_from_mock(report)
+        report.sentiment_by_segment = [
+            SegmentSentiment(
+                segment_name=str(row.get("segment_name") or row.get("name") or "Segment"),
+                persona_count=int(row.get("persona_count") or row.get("size") or 0),
+                avg_sentiment=float(row.get("avg_sentiment", row.get("sentiment", 0.0))),
+                conversion_estimate=float(row.get("conversion_estimate", row.get("conversion", 0.0))),
+            )
+            for row in simulation_data.get("segments", [])
+            if isinstance(row, dict)
+        ]
+        report.top_influencers = [
+            Influencer(
+                agent_name=str(row.get("agent_name") or row.get("name") or "Influencer"),
+                agent_type=str(row.get("agent_type") or row.get("type") or "persona"),
+                influence_score=float(row.get("influence_score", 0.0)),
+                sentiment_impact=float(row.get("sentiment_impact", 0.0)),
+            )
+            for row in simulation_data.get("influencers", [])
+            if isinstance(row, dict)
+        ]
+        report.sentiment_timeline = [
+            TimelinePoint(
+                round_num=int(row.get("round_num") or row.get("round") or idx + 1),
+                simulated_hour=int(row.get("simulated_hour") or row.get("hour") or idx + 1),
+                avg_sentiment=float(row.get("avg_sentiment", row.get("sentiment", report.overall_sentiment))),
+                action_count=int(row.get("action_count") or row.get("total_actions") or 0),
+            )
+            for idx, row in enumerate(simulation_data.get("timeline", []))
+            if isinstance(row, dict)
+        ]
+
+        if not report.sentiment_by_segment:
+            report.sentiment_by_segment = [SegmentSentiment(segment_name="All personas", avg_sentiment=report.overall_sentiment)]
+        if not report.sentiment_timeline:
+            report.sentiment_timeline = [TimelinePoint(round_num=1, simulated_hour=1, avg_sentiment=report.overall_sentiment)]
 
     # ------------------------------------------------------------------
     # Mock-data computation
@@ -144,67 +218,68 @@ class KPICalculator:
 
     def _compute_from_mock(self, report: ExecutiveReport) -> None:
         """Populate report with plausible mock KPIs."""
+        rng = random.Random(f"{report.org_id}:{report.campaign_id}:local_estimate")
 
         # Overall sentiment: mild positive
-        overall = round(random.uniform(15.0, 45.0), 1)
+        overall = round(rng.uniform(15.0, 45.0), 1)
         report.overall_sentiment = overall
 
         # Conversion probability: correlated with positive sentiment
         report.conversion_probability = round(
-            _scale_to_hundred(overall, -50.0, 80.0) * random.uniform(0.8, 1.1), 1
+            _scale_to_hundred(overall, -50.0, 80.0) * rng.uniform(0.8, 1.1), 1
         )
         report.conversion_probability = _clamp(report.conversion_probability, 0.0, 100.0)
 
         # Social influence index
-        report.social_influence_index = round(random.uniform(40.0, 75.0), 1)
+        report.social_influence_index = round(rng.uniform(40.0, 75.0), 1)
 
         # Message resonance
-        report.message_resonance = round(random.uniform(30.0, 70.0), 1)
+        report.message_resonance = round(rng.uniform(30.0, 70.0), 1)
 
         # Crisis risk
-        report.crisis_risk = round(random.uniform(5.0, 35.0), 1)
+        report.crisis_risk = round(rng.uniform(5.0, 35.0), 1)
 
         # Brand perception shift
-        shift = round(random.uniform(-10.0, 25.0), 1)
+        shift = round(rng.uniform(-10.0, 25.0), 1)
         report.brand_perception_shift = shift
 
         # Opinion polarization
-        report.opinion_polarization = round(random.uniform(15.0, 55.0), 1)
+        report.opinion_polarization = round(rng.uniform(15.0, 55.0), 1)
 
         # Segment breakdown
-        report.sentiment_by_segment = self._mock_segments(overall)
+        report.sentiment_by_segment = self._mock_segments(overall, rng)
 
         # Top influencers
-        report.top_influencers = self._mock_influencers(overall)
+        report.top_influencers = self._mock_influencers(overall, rng)
 
         # Timeline (20 rounds, ~1 simulated hour each)
-        report.sentiment_timeline = self._mock_timeline(rounds=20)
+        report.sentiment_timeline = self._mock_timeline(rounds=20, rng=rng)
 
     # ------------------------------------------------------------------
     # Mock helpers
     # ------------------------------------------------------------------
 
-    def _mock_segments(self, base_sentiment: float) -> List[SegmentSentiment]:
+    def _mock_segments(self, base_sentiment: float, rng: random.Random) -> List[SegmentSentiment]:
         segments: List[SegmentSentiment] = []
         for name in _MOCK_SEGMENTS:
-            deviation = random.uniform(-25.0, 25.0)
+            deviation = rng.uniform(-25.0, 25.0)
             avg = _clamp(base_sentiment + deviation)
             se = SegmentSentiment(
                 segment_name=name,
-                persona_count=random.randint(40, 200),
+                persona_count=rng.randint(40, 200),
                 avg_sentiment=round(avg, 1),
                 conversion_estimate=round(_scale_to_hundred(avg, -50.0, 80.0), 1),
             )
             segments.append(se)
         return segments
 
-    def _mock_influencers(self, base_sentiment: float) -> List[Influencer]:
+    def _mock_influencers(self, base_sentiment: float, rng: random.Random) -> List[Influencer]:
         infs: List[Influencer] = []
         # Pick 5 random names
-        indices = random.sample(range(len(_MOCK_INFLUENCER_NAMES)), min(5, len(_MOCK_INFLUENCER_NAMES)))
+        indices = rng.sample(range(len(_MOCK_INFLUENCER_NAMES)), min(5, len(_MOCK_INFLUENCER_NAMES)))
         for i in indices:
-            inf_score = round(random.uniform(50.0, 95.0), 1)
-            impact = round(random.uniform(-15.0, 30.0), 1)
+            inf_score = round(rng.uniform(50.0, 95.0), 1)
+            impact = round(rng.uniform(-15.0, 30.0), 1)
             infs.append(Influencer(
                 agent_name=_MOCK_INFLUENCER_NAMES[i],
                 agent_type=_MOCK_INFLUENCER_TYPES[i],
@@ -215,18 +290,19 @@ class KPICalculator:
         infs.sort(key=lambda x: x.influence_score, reverse=True)
         return infs
 
-    def _mock_timeline(self, rounds: int = 20) -> List[TimelinePoint]:
+    def _mock_timeline(self, rounds: int = 20, rng: Optional[random.Random] = None) -> List[TimelinePoint]:
+        rng = rng or random.Random()
         points: List[TimelinePoint] = []
         sentiment = 0.0
         for r in range(1, rounds + 1):
             # Sentiment evolves with small random walk
-            delta = random.uniform(-5.0, 6.5)  # slight upward bias
+            delta = rng.uniform(-5.0, 6.5)  # slight upward bias
             sentiment = _clamp(sentiment + delta)
             points.append(TimelinePoint(
                 round_num=r,
                 simulated_hour=r,
                 avg_sentiment=round(sentiment, 1),
-                action_count=random.randint(5, 40),
+                action_count=rng.randint(5, 40),
             ))
         return points
 

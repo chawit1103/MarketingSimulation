@@ -613,6 +613,7 @@ const trustPanel = computed(() => {
   const sourceType = resultSource.value?.type || 'unknown'
   const sourceWarning = resultSource.value?.warning || ''
   const limitations = [
+    ...((resultSource.value && Array.isArray(resultSource.value.limitations)) ? resultSource.value.limitations : []),
     ...(briefQuality.known_limitations || []),
     ...(assumptions.value || []),
   ].filter(Boolean).slice(0, 4)
@@ -1020,13 +1021,17 @@ async function loadDashboard() {
     }
 
     await loadCampaignDetails(cid)
-    resultSource.value = { type: 'backend_verified', warning: t('dashboard.sourceBackendVerified') }
+    resultSource.value = { type: 'unknown', warning: t('dashboard.sourceUnknownPending') }
 
     // Fetch KPIs
     try {
       const kpiRes = await getKPIs(cid)
       if (kpiRes && kpiRes.data) {
         Object.assign(kpis.value, normalizeKpis(kpiRes.data))
+        resultSource.value = normalizeResultSource(kpiRes.data.source || kpiRes.data)
+        if (kpiRes.data.confidence != null) {
+          confidenceScore.value = Math.round(kpiRes.data.confidence)
+        }
         if (kpiRes.data.action_plan) {
           structuredActionPlan.value = normalizeActionPlan(kpiRes.data.action_plan)
         }
@@ -1041,6 +1046,9 @@ async function loadDashboard() {
     try {
       const tlRes = await getTimeline(cid)
       const tlData = tlRes?.data || tlRes || {}
+      if (tlData.source && resultSource.value?.type === 'unknown') {
+        resultSource.value = normalizeResultSource(tlData.source)
+      }
       const points = tlData.timeline || tlData.rounds || []
       if (points.length) {
         timeline.value = points.map(normalizeTimelinePoint)
@@ -1054,6 +1062,9 @@ async function loadDashboard() {
     try {
       const segRes = await getSegments(cid)
       const segData = segRes?.data || segRes || {}
+      if (segData.source && resultSource.value?.type === 'unknown') {
+        resultSource.value = normalizeResultSource(segData.source)
+      }
       const rows = segData.segments || segData
       if (Array.isArray(rows) && rows.length) {
         segments.value = rows.map(normalizeSegment)
@@ -1124,7 +1135,7 @@ async function loadDemoDashboard(cid) {
 
 function applyDemoDashboard(data) {
   const campaign = data.campaign || demoCampaignDetails('demo-premium-water')
-  resultSource.value = data.source || { type: 'demo_mode', warning: t('dashboard.sourceDemoMode') }
+  resultSource.value = normalizeResultSource(data.source || { type: 'demo_mode', warning: t('dashboard.sourceDemoMode') })
   campaignDetails.value = campaign
   campaignName.value = campaign.name || campaignName.value
   Object.assign(kpis.value, normalizeKpis(data.kpis || {}))
@@ -1379,6 +1390,29 @@ function normalizeKpis(data) {
     next.crisis_risk = Math.round(next.crisis_risk)
   }
   return next
+}
+
+function normalizeResultSource(source) {
+  const rawType = source?.type || source?.source_mode || 'unknown'
+  const allowed = ['demo_mode', 'local_estimate', 'live_backend', 'backend_verified', 'unknown']
+  const type = allowed.includes(rawType) ? rawType : 'unknown'
+  const fallbackWarnings = {
+    demo_mode: t('dashboard.sourceDemoMode'),
+    local_estimate: t('dashboard.sourceLocalEstimate'),
+    backend_verified: t('dashboard.sourceBackendVerified'),
+    live_backend: t('dashboard.sourceLiveBackend'),
+    unknown: t('dashboard.sourceUnknownPending'),
+  }
+  return {
+    type,
+    warning: source?.warning || fallbackWarnings[type],
+    data_basis: source?.data_basis || 'unknown',
+    run_id: source?.run_id,
+    simulation_id: source?.simulation_id,
+    campaign_id: source?.campaign_id,
+    confidence: source?.confidence,
+    limitations: Array.isArray(source?.limitations) ? source.limitations : [],
+  }
 }
 
 function normalizeTimelinePoint(point) {

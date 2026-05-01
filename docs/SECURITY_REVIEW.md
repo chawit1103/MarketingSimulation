@@ -58,10 +58,11 @@ However, the current repository is not production-ready for external customers. 
 ### SEC-005: Backend-verified labels are applied to mock KPI output
 
 - Severity: High
-- Status: Blocker for product trust
+- Status: Remediated in PR M for dashboard KPI/report/timeline/segment APIs and KPI calculation provenance
 - Evidence: `backend/app/api/dashboard.py` marks dashboard action-plan source as `backend_verified`, while `KPICalculator.calculate()` falls back to mock data when no real simulation data is provided. It does not verify campaign existence or ownership before returning generated KPI values.
 - Impact: A user can request a dashboard for an arbitrary campaign ID and receive plausible-looking KPI values labeled as backend verified. This is not a direct secret leak, but it violates the repository's source-labeling safety rule and can mislead business decisions.
-- Recommended fix: Require campaign ownership/existence before dashboard KPI/report/timeline/segment responses. If mock output is used, source must be `local_estimate` or `demo_mode`, never `backend_verified`.
+- Remediation: Dashboard APIs require campaign existence and organization ownership before returning data. `KPICalculator.calculate()` now emits explicit provenance: local deterministic fallback is labeled `local_estimate` with `data_basis=local_estimate`, demo fixtures remain `demo_mode`, and `backend_verified` is used only when explicit persisted simulation KPI metrics are provided with `data_basis=real_simulation`. Dashboard action plans inherit the same source metadata.
+- Remaining action: Expand real simulation KPI extraction once the OASIS runner emits a stable sentiment/conversion KPI schema. Raw runner rounds/actions alone are intentionally not treated as backend-verified KPI evidence.
 
 ### SEC-006: Auth routes bypass centralized tenant middleware and contain broken privileged paths
 
@@ -212,9 +213,9 @@ Concerns:
    - Ensure viewers are read-only. Covered by PR K tests for campaign/settings/API-key/destructive operations.
 
 5. Provenance labeling PR:
-   - Stop returning mock KPI data as `backend_verified`.
-   - Require campaign existence/ownership before dashboard APIs.
-   - Label any deterministic fallback as `local_estimate` or `demo_mode`.
+   - Stop returning mock KPI data as `backend_verified`. Completed in PR M.
+   - Require campaign existence/ownership before dashboard APIs. Completed in PR L and covered by PR M tests.
+   - Label any deterministic fallback as `local_estimate` or `demo_mode`. Completed in PR M.
 
 6. Production hardening PR:
    - Set debug false by default.

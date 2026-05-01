@@ -55,6 +55,12 @@ class ExecutiveReport(BaseModel):
     campaign_id: str
     org_id: str
     generated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    simulation_id: Optional[str] = None
+    run_id: Optional[str] = None
+    source_mode: str = "unknown"
+    data_basis: str = "unknown"
+    confidence: Optional[float] = None
+    limitations: List[str] = Field(default_factory=list)
 
     # ---- Aggregate KPIs (0-100 scale unless noted) ----
     overall_sentiment: float = 0.0              # -100 to +100 (avg across all agents)

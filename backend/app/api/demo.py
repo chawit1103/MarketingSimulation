@@ -146,6 +146,15 @@ def _dashboard_for(demo_id: str) -> dict:
     dashboard = DEMO_DASHBOARDS.get(demo_id, DEMO_DASHBOARDS["demo-premium-water"])
     source = {
         "type": "demo_mode",
+        "source_mode": "demo_mode",
+        "campaign_id": campaign["id"],
+        "simulation_id": None,
+        "run_id": f"demo:{campaign['id']}",
+        "data_basis": "demo_fixture",
+        "confidence": None,
+        "limitations": [
+            "Demo fixture only; not generated from a live simulation run.",
+        ],
         "label": "Demo Mode",
         "warning": "Synthetic demo data for product exploration; not a live simulation result.",
     }
