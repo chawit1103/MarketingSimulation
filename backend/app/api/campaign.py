@@ -203,7 +203,7 @@ def get_campaign(campaign_id: str):
         campaign = svc.get_campaign(campaign_id, org_id=org_id)
 
         if campaign is None:
-            return jsonify({'success': False, 'error': f'Campaign not found: {campaign_id}'}), 404
+            return jsonify({'success': False, 'error': 'Resource not found'}), 404
 
         return jsonify({
             'success': True,
@@ -235,7 +235,7 @@ def update_campaign(campaign_id: str):
         campaign = svc.update_campaign(campaign_id, org_id, data)
 
         if campaign is None:
-            return jsonify({'success': False, 'error': f'Campaign not found: {campaign_id}'}), 404
+            return jsonify({'success': False, 'error': 'Resource not found'}), 404
 
         return jsonify({
             'success': True,
@@ -262,11 +262,11 @@ def delete_campaign(campaign_id: str):
 
         deleted = svc.delete_campaign(campaign_id, org_id)
         if not deleted:
-            return jsonify({'success': False, 'error': f'Campaign not found: {campaign_id}'}), 404
+            return jsonify({'success': False, 'error': 'Resource not found'}), 404
 
         return jsonify({
             'success': True,
-            'message': f'Campaign {campaign_id} deleted',
+            'message': 'Campaign deleted',
         })
 
     except ValueError as e:
@@ -324,14 +324,15 @@ def get_pipeline_status(campaign_id: str):
     Returns progress dict with current_step, step_status, persona_count, etc.
     """
     try:
-        _get_org_id()  # Auth check
+        org_id = _get_org_id()
 
         orch = _get_pipeline_orchestrator()
-        status = orch.get_pipeline_status(campaign_id)
+        status = orch.get_pipeline_status(campaign_id, org_id=org_id)
 
         if status is None:
-            return jsonify({'success': False, 'error': f'Campaign not found: {campaign_id}'}), 404
+            return jsonify({'success': False, 'error': 'Resource not found'}), 404
 
+        status.pop("org_id", None)
         return jsonify({
             'success': True,
             'data': status,

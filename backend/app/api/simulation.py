@@ -5,7 +5,7 @@ Step2: Entity reading and filtering, OASIS simulation preparation and execution 
 
 import os
 import traceback
-from flask import request, jsonify, send_file, current_app
+from flask import request, jsonify, send_file, current_app, g
 
 from . import simulation_bp
 from ..config import Config
@@ -23,6 +23,55 @@ logger = get_logger('mirofish.api.simulation')
 # Interview prompt optimization prefix
 # Adding this prefix can prevent agents from calling tools and reply directly with text
 INTERVIEW_PROMPT_PREFIX = "Based on your persona, all your past memories and actions, reply directly to me with text without calling any tools:"
+
+
+def _get_org_id() -> str:
+    org_id = g.get("current_org_id")
+    if not org_id and g.get("current_user"):
+        org_id = g.current_user.get("org_id")
+    if not org_id:
+        raise ValueError("Authentication required")
+    return org_id
+
+
+def _resource_not_found():
+    return jsonify({"success": False, "error": "Resource not found"}), 404
+
+
+def _get_owned_simulation(manager: SimulationManager, simulation_id: str):
+    return manager.get_simulation(simulation_id, org_id=_get_org_id())
+
+
+def _owns_graph(graph_id: str) -> bool:
+    for project in ProjectManager.list_projects(limit=1000, org_id=_get_org_id()):
+        if project.graph_id == graph_id:
+            return True
+    return False
+
+
+@simulation_bp.before_request
+def _enforce_simulation_ownership():
+    """Block cross-tenant access for every route carrying a simulation_id."""
+    simulation_id = None
+    graph_id = None
+    data = {}
+    if request.view_args:
+        simulation_id = request.view_args.get("simulation_id")
+        graph_id = request.view_args.get("graph_id")
+    if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+        data = request.get_json(silent=True) or {}
+    if not simulation_id:
+        simulation_id = data.get("simulation_id")
+    if not graph_id:
+        graph_id = data.get("graph_id")
+    if not simulation_id:
+        if graph_id and not _owns_graph(graph_id):
+            return _resource_not_found()
+        return None
+
+    if not _get_owned_simulation(SimulationManager(), simulation_id):
+        return _resource_not_found()
+    return None
 
 
 def optimize_interview_prompt(prompt: str) -> str:
@@ -193,12 +242,9 @@ def create_simulation():
                 "error": "Please provide project_id"
             }), 400
         
-        project = ProjectManager.get_project(project_id)
+        project = ProjectManager.get_project(project_id, org_id=_get_org_id())
         if not project:
-            return jsonify({
-                "success": False,
-                "error": f"Project does not exist: {project_id}"
-            }), 404
+            return _resource_not_found()
         
         graph_id = data.get('graph_id') or project.graph_id
         if not graph_id:
@@ -206,6 +252,8 @@ def create_simulation():
                 "success": False,
                 "error": "Project has not built knowledge graph yet, please call /api/graph/build first"
             }), 400
+        if not _owns_graph(graph_id):
+            return _resource_not_found()
         
         language = data.get('language', 'en')
 
@@ -213,6 +261,8 @@ def create_simulation():
         state = manager.create_simulation(
             project_id=project_id,
             graph_id=graph_id,
+            org_id=_get_org_id(),
+            campaign_id=data.get('campaign_id'),
             enable_twitter=data.get('enable_twitter', True),
             enable_reddit=data.get('enable_reddit', True),
             language=language,
@@ -411,14 +461,12 @@ def prepare_simulation():
                 "error": "Please provide simulation_id"
             }), 400
         
+        org_id = _get_org_id()
         manager = SimulationManager()
-        state = manager.get_simulation(simulation_id)
+        state = manager.get_simulation(simulation_id, org_id=org_id)
         
         if not state:
-            return jsonify({
-                "success": False,
-                "error": f"Simulation does not exist: {simulation_id}"
-            }), 404
+            return _resource_not_found()
         
         # Check if forced regeneration
         force_regenerate = data.get('force_regenerate', False)
@@ -445,12 +493,9 @@ def prepare_simulation():
                 logger.info(f"Simulation {simulation_id} has no preparation complete, preparing now")
         
         # Get necessary information from project
-        project = ProjectManager.get_project(state.project_id)
+        project = ProjectManager.get_project(state.project_id, org_id=org_id)
         if not project:
-            return jsonify({
-                "success": False,
-                "error": f"Project does not exist: {state.project_id}"
-            }), 404
+            return _resource_not_found()
         
         # Get simulation requirements
         simulation_requirement = project.simulation_requirement or ""
@@ -498,7 +543,8 @@ def prepare_simulation():
             task_type="simulation_prepare",
             metadata={
                 "simulation_id": simulation_id,
-                "project_id": state.project_id
+                "project_id": state.project_id,
+                "org_id": org_id,
             }
         )
         
@@ -604,7 +650,7 @@ def prepare_simulation():
                 task_manager.fail_task(task_id, str(e))
                 
                 # Update simulation status to failed
-                state = manager.get_simulation(simulation_id)
+                state = manager.get_simulation(simulation_id, org_id=org_id)
                 if state:
                     state.status = SimulationStatus.FAILED
                     state.error = str(e)
@@ -680,6 +726,8 @@ def get_prepare_status():
         
         # If simulation_id is provided, check if preparation is complete
         if simulation_id:
+            if not _get_owned_simulation(SimulationManager(), simulation_id):
+                return _resource_not_found()
             is_prepared, prepare_info = _check_simulation_prepared(simulation_id)
             if is_prepared:
                 return jsonify({
@@ -716,7 +764,7 @@ def get_prepare_status():
         task_manager = TaskManager()
         task = task_manager.get_task(task_id)
         
-        if not task:
+        if not task or task.metadata.get("org_id") != _get_org_id():
             # Task does not exist, but if simulation_id is provided, check if preparation is complete
             if simulation_id:
                 is_prepared, prepare_info = _check_simulation_prepared(simulation_id)
@@ -736,10 +784,12 @@ def get_prepare_status():
             
             return jsonify({
                 "success": False,
-                "error": f"Task does not exist: {task_id}"
+                "error": "Resource not found"
             }), 404
         
         task_dict = task.to_dict()
+        if isinstance(task_dict.get("metadata"), dict):
+            task_dict["metadata"].pop("org_id", None)
         task_dict["already_prepared"] = False
         
         return jsonify({
@@ -760,13 +810,10 @@ def get_simulation(simulation_id: str):
     """Get simulation status"""
     try:
         manager = SimulationManager()
-        state = manager.get_simulation(simulation_id)
+        state = manager.get_simulation(simulation_id, org_id=_get_org_id())
         
         if not state:
-            return jsonify({
-                "success": False,
-                "error": f"Simulation does not exist: {simulation_id}"
-            }), 404
+            return _resource_not_found()
         
         result = state.to_dict()
         
@@ -800,7 +847,7 @@ def list_simulations():
         project_id = request.args.get('project_id')
         
         manager = SimulationManager()
-        simulations = manager.list_simulations(project_id=project_id)
+        simulations = manager.list_simulations(project_id=project_id, org_id=_get_org_id())
         
         return jsonify({
             "success": True,
@@ -817,7 +864,7 @@ def list_simulations():
         }), 500
 
 
-def _get_report_id_for_simulation(simulation_id: str) -> str:
+def _get_report_id_for_simulation(simulation_id: str, org_id: str) -> str:
     """
     Get simulation Corresponding latest report_id
     
@@ -830,47 +877,10 @@ def _get_report_id_for_simulation(simulation_id: str) -> str:
     Returns:
         report_id Or None
     """
-    import json
-    from datetime import datetime
-    
-    # reports Directory path：backend/uploads/reports
-    # __file__ Is app/api/simulation.py，Need to go up two levels to backend/
-    reports_dir = os.path.join(os.path.dirname(__file__), '../../uploads/reports')
-    if not os.path.exists(reports_dir):
-        return None
-    
-    matching_reports = []
-    
     try:
-        for report_folder in os.listdir(reports_dir):
-            report_path = os.path.join(reports_dir, report_folder)
-            if not os.path.isdir(report_path):
-                continue
-            
-            meta_file = os.path.join(report_path, "meta.json")
-            if not os.path.exists(meta_file):
-                continue
-            
-            try:
-                with open(meta_file, 'r', encoding='utf-8') as f:
-                    meta = json.load(f)
-                
-                if meta.get("simulation_id") == simulation_id:
-                    matching_reports.append({
-                        "report_id": meta.get("report_id"),
-                        "created_at": meta.get("created_at", ""),
-                        "status": meta.get("status", "")
-                    })
-            except Exception:
-                continue
-        
-        if not matching_reports:
-            return None
-        
-        # Sort by creation time descending，ReturnLatest
-        matching_reports.sort(key=lambda x: x.get("created_at", ""), reverse=True)
-        return matching_reports[0].get("report_id")
-        
+        from ..services.report_agent import ReportManager
+        report = ReportManager.get_report_by_simulation(simulation_id, org_id=org_id)
+        return report.report_id if report else None
     except Exception as e:
         logger.warning(f"Failed to find report for simulation {simulation_id}: {e}")
         return None
@@ -915,7 +925,7 @@ def get_simulation_history():
         limit = request.args.get('limit', 20, type=int)
         
         manager = SimulationManager()
-        simulations = manager.list_simulations()[:limit]
+        simulations = manager.list_simulations(org_id=_get_org_id())[:limit]
         
         # Enhance simulation data，Only from Simulation FileRead
         enriched_simulations = []
@@ -923,7 +933,7 @@ def get_simulation_history():
             sim_dict = sim.to_dict()
             
             # Get simulation configuration information（From simulation_config.json Read simulation_requirement）
-            config = manager.get_simulation_config(sim.simulation_id)
+            config = manager.get_simulation_config(sim.simulation_id, org_id=_get_org_id())
             if config:
                 sim_dict["simulation_requirement"] = config.get("simulation_requirement", "")
                 time_config = config.get("time_config", {})
@@ -951,7 +961,7 @@ def get_simulation_history():
                 sim_dict["total_rounds"] = recommended_rounds
             
             # Get associated project file list（At most3items）
-            project = ProjectManager.get_project(sim.project_id)
+            project = ProjectManager.get_project(sim.project_id, org_id=_get_org_id())
             if project and hasattr(project, 'files') and project.files:
                 sim_dict["files"] = [
                     {"filename": f.get("filename", "Unknown file")} 
@@ -961,7 +971,7 @@ def get_simulation_history():
                 sim_dict["files"] = []
             
             # Get associated report_id（FindThis simulation Latest report）
-            sim_dict["report_id"] = _get_report_id_for_simulation(sim.simulation_id)
+            sim_dict["report_id"] = _get_report_id_for_simulation(sim.simulation_id, _get_org_id())
             
             # Add version number
             sim_dict["version"] = "v1.0.2"
@@ -1536,13 +1546,10 @@ def start_simulation():
 
         # Check if simulation is ready
         manager = SimulationManager()
-        state = manager.get_simulation(simulation_id)
+        state = manager.get_simulation(simulation_id, org_id=_get_org_id())
 
         if not state:
-            return jsonify({
-                "success": False,
-                "error": f"Simulation does not exist: {simulation_id}"
-            }), 404
+            return _resource_not_found()
 
         force_restarted = False
         
@@ -1597,7 +1604,7 @@ def start_simulation():
             graph_id = state.graph_id
             if not graph_id:
                 # Try to get from project
-                project = ProjectManager.get_project(state.project_id)
+                project = ProjectManager.get_project(state.project_id, org_id=_get_org_id())
                 if project:
                     graph_id = project.graph_id
             
@@ -1686,7 +1693,7 @@ def stop_simulation():
         
         # Update simulation status
         manager = SimulationManager()
-        state = manager.get_simulation(simulation_id)
+        state = manager.get_simulation(simulation_id, org_id=_get_org_id())
         if state:
             state.status = SimulationStatus.PAUSED
             manager._save_simulation_state(state)
@@ -2706,7 +2713,7 @@ def close_simulation_env():
         
         # Update simulation status
         manager = SimulationManager()
-        state = manager.get_simulation(simulation_id)
+        state = manager.get_simulation(simulation_id, org_id=_get_org_id())
         if state:
             state.status = SimulationStatus.COMPLETED
             manager._save_simulation_state(state)

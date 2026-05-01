@@ -3,6 +3,7 @@
 from flask import Blueprint, request, jsonify, g
 
 from ..services.impact_calculator import ImpactCalculator, BusinessParams, ImpactResult, ComparisonResult
+from ..services.campaign_service import CampaignService
 from ..services.kpi_calculator import KPICalculator
 from ..utils.logger import get_logger
 
@@ -35,6 +36,10 @@ def _get_campaign_name(campaign_id: str) -> str:
     except Exception:
         pass
     return campaign_id[:12]
+
+
+def _get_owned_campaign(campaign_id: str, org_id: str):
+    return CampaignService().get_campaign(campaign_id, org_id=org_id)
 
 
 # ── API Routes ────────────────────────────────────────────
@@ -74,6 +79,9 @@ def calculate_impact():
 
     # Fetch KPIs
     org_id = _get_org_id()
+    campaign = _get_owned_campaign(campaign_id, org_id)
+    if not campaign:
+        return jsonify({"success": False, "error": "Resource not found"}), 404
     calc = _get_calculator()
     try:
         report = calc.calculate(campaign_id=campaign_id, org_id=org_id)
@@ -84,7 +92,7 @@ def calculate_impact():
             "message_resonance": report.message_resonance,
             "brand_perception_shift": report.brand_perception_shift,
         }
-        campaign_name = _get_campaign_name(campaign_id)
+        campaign_name = campaign.name
     except Exception as e:
         # Use demo KPIs if simulation not complete
         logger.warning(f"Using demo KPIs for {campaign_id}: {e}")

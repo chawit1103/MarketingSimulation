@@ -35,22 +35,23 @@ However, the current repository is not production-ready for external customers. 
 ### SEC-003: Tenant isolation is incomplete for ID-addressed resources
 
 - Severity: Critical
-- Status: Blocker
+- Status: Remediated in PR L for ID-addressed campaign, pipeline, dashboard, simulation, report, project, graph, and graph-task routes in the current local JSON architecture
 - Evidence:
   - `backend/app/api/campaign.py` authenticates pipeline status, but `PipelineOrchestrator.get_pipeline_status()` calls `campaign_service.get_campaign(campaign_id)` without `org_id`, which searches all organizations.
   - `SimulationState` does not include `org_id`, and many `/api/simulation/<simulation_id>/...` routes operate by global simulation ID.
   - `ReportManager` stores reports globally under `Config.UPLOAD_FOLDER/reports` and report routes fetch by `report_id` or `simulation_id` without an org ownership check.
 - Impact: An authenticated user who learns or guesses another tenant's object ID may be able to read status, report, simulation, or generated artifact data outside their organization.
-- Recommended fix: Add org ownership metadata to simulation/report records, enforce `org_id` checks on every object fetch/download/delete/status route, and add cross-tenant negative tests.
+- Remediation: Simulation, report, project, graph-build task, and pipeline status records now carry `org_id` ownership metadata where applicable. Routes that fetch, download, delete, or poll by `campaign_id`, `simulation_id`, `report_id`, `project_id`, `graph_id`, or graph `task_id` now verify the current organization before returning data. Cross-tenant negative tests cover campaign pipeline status, simulation reads, dashboard KPI reads, report download, report delete, safe unknown IDs, and owner-positive reads.
+- Remaining action: Legacy simulation/report/project/task records created before ownership metadata was introduced may need a one-time backfill or should remain inaccessible in production until re-created. This PR does not replace local JSON storage with a database-level tenant constraint.
 
 ### SEC-004: Role-based authorization is mostly absent
 
 - Severity: Critical
-- Status: Partially remediated in PR K; route ownership isolation remains PR L
+- Status: Partially remediated in PR K; route ownership isolation completed in PR L for ID-addressed resources
 - Evidence: `UserRole` exists, but protected routes generally only require authentication. Sensitive routes such as settings update, campaign deletion, report deletion, API-key generation, and simulation lifecycle operations do not consistently enforce admin/analyst/viewer permissions.
 - Impact: A viewer or low-privilege user may be able to mutate settings, delete data, start/stop simulations, or access privileged operational flows.
 - Remediation: A centralized `role_required()` guard now enforces admin-only settings/API-key/destructive operations, analyst-or-admin campaign/report/simulation generation flows, and viewer read-only behavior on the covered routes.
-- Remaining action: PR L still needs object ownership checks for ID-addressed resources, plus any route-specific RBAC gaps discovered during tenant isolation work.
+- Remaining action: Continue auditing newly added routes for explicit role checks and ownership checks as part of normal PR review.
 
 ## High Findings
 
@@ -201,9 +202,9 @@ Concerns:
    - Add tests proving secrets are not returned. Completed in PR J.
 
 3. Tenant isolation PR:
-   - Add `org_id` metadata to simulation/report records.
-   - Enforce org ownership on all ID-addressed campaign, simulation, report, graph, and pipeline routes.
-   - Add cross-tenant denial tests.
+   - Add `org_id` metadata to simulation/report records. Completed in PR L.
+   - Enforce org ownership on all ID-addressed campaign, simulation, report, graph, and pipeline routes. Completed in PR L for the current local JSON storage architecture.
+   - Add cross-tenant denial tests. Completed in PR L.
 
 4. RBAC PR:
    - Add centralized route role guards. Completed in PR K.

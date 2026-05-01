@@ -31,6 +31,7 @@ class Project:
     status: ProjectStatus
     created_at: str
     updated_at: str
+    org_id: str = ""
 
     # File information
     files: List[Dict[str, str]] = field(default_factory=list)  # [{filename, path, size}]
@@ -56,6 +57,7 @@ class Project:
         """Convert to dictionary"""
         return {
             "project_id": self.project_id,
+            "org_id": self.org_id,
             "name": self.name,
             "status": self.status.value if isinstance(self.status, ProjectStatus) else self.status,
             "created_at": self.created_at,
@@ -81,6 +83,7 @@ class Project:
         
         return cls(
             project_id=data['project_id'],
+            org_id=data.get('org_id', ''),
             name=data.get('name', 'Unnamed Project'),
             status=status,
             created_at=data.get('created_at', ''),
@@ -130,7 +133,7 @@ class ProjectManager:
         return os.path.join(cls._get_project_dir(project_id), 'extracted_text.txt')
 
     @classmethod
-    def create_project(cls, name: str = "Unnamed Project") -> Project:
+    def create_project(cls, name: str = "Unnamed Project", org_id: str = "") -> Project:
         """
         Create new project
 
@@ -147,6 +150,7 @@ class ProjectManager:
 
         project = Project(
             project_id=project_id,
+            org_id=org_id,
             name=name,
             status=ProjectStatus.CREATED,
             created_at=now,
@@ -174,7 +178,7 @@ class ProjectManager:
             json.dump(project.to_dict(), f, ensure_ascii=False, indent=2)
 
     @classmethod
-    def get_project(cls, project_id: str) -> Optional[Project]:
+    def get_project(cls, project_id: str, org_id: Optional[str] = None) -> Optional[Project]:
         """
         Get project
 
@@ -192,10 +196,13 @@ class ProjectManager:
         with open(meta_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
-        return Project.from_dict(data)
+        project = Project.from_dict(data)
+        if org_id is not None and project.org_id != org_id:
+            return None
+        return project
 
     @classmethod
-    def list_projects(cls, limit: int = 50) -> List[Project]:
+    def list_projects(cls, limit: int = 50, org_id: Optional[str] = None) -> List[Project]:
         """
         List all projects
 
@@ -211,6 +218,8 @@ class ProjectManager:
         for project_id in os.listdir(cls.PROJECTS_DIR):
             project = cls.get_project(project_id)
             if project:
+                if org_id is not None and project.org_id != org_id:
+                    continue
                 projects.append(project)
 
         # Sort by creation time (descending)
@@ -219,7 +228,7 @@ class ProjectManager:
         return projects[:limit]
 
     @classmethod
-    def delete_project(cls, project_id: str) -> bool:
+    def delete_project(cls, project_id: str, org_id: Optional[str] = None) -> bool:
         """
         Delete project and all its files
 
@@ -232,6 +241,8 @@ class ProjectManager:
         project_dir = cls._get_project_dir(project_id)
 
         if not os.path.exists(project_dir):
+            return False
+        if org_id is not None and cls.get_project(project_id, org_id=org_id) is None:
             return False
 
         shutil.rmtree(project_dir)
@@ -302,4 +313,3 @@ class ProjectManager:
             for f in os.listdir(files_dir)
             if os.path.isfile(os.path.join(files_dir, f))
         ]
-

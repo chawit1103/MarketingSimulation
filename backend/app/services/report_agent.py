@@ -445,6 +445,8 @@ class Report:
     graph_id: str
     simulation_requirement: str
     status: ReportStatus
+    org_id: str = ""
+    campaign_id: Optional[str] = None
     outline: Optional[ReportOutline] = None
     markdown_content: str = ""
     created_at: str = ""
@@ -458,6 +460,8 @@ class Report:
             "graph_id": self.graph_id,
             "simulation_requirement": self.simulation_requirement,
             "status": self.status.value,
+            "org_id": self.org_id,
+            "campaign_id": self.campaign_id,
             "outline": self.outline.to_dict() if self.outline else None,
             "markdown_content": self.markdown_content,
             "created_at": self.created_at,
@@ -891,6 +895,8 @@ class ReportAgent:
         llm_client: Optional[Any] = None,
         graph_tools: Optional[GraphToolsService] = None,
         language: str = 'en',
+        org_id: str = "",
+        campaign_id: Optional[str] = None,
     ):
         """
         Initialize Report Agent
@@ -906,6 +912,8 @@ class ReportAgent:
         self.simulation_id = simulation_id
         self.simulation_requirement = simulation_requirement
         self.language = language
+        self.org_id = org_id
+        self.campaign_id = campaign_id
 
         self.llm = llm_client or LLMProviderFactory.get_provider('report')
         if graph_tools is None:
@@ -1578,6 +1586,8 @@ class ReportAgent:
             graph_id=self.graph_id,
             simulation_requirement=self.simulation_requirement,
             status=ReportStatus.PENDING,
+            org_id=self.org_id,
+            campaign_id=self.campaign_id,
             created_at=datetime.now().isoformat()
         )
         
@@ -1801,7 +1811,7 @@ class ReportAgent:
         # GetalreadygenerateReportcontent
         report_content = ""
         try:
-            report = ReportManager.get_report_by_simulation(self.simulation_id)
+            report = ReportManager.get_report_by_simulation(self.simulation_id, org_id=self.org_id or None)
             if report and report.markdown_content:
                 # limitReportlength，avoid overly long context
                 report_content = report.markdown_content[:15000]
@@ -2453,7 +2463,7 @@ class ReportManager:
         logger.info(f"reportsaved: {report.report_id}")
     
     @classmethod
-    def get_report(cls, report_id: str) -> Optional[Report]:
+    def get_report(cls, report_id: str, org_id: Optional[str] = None) -> Optional[Report]:
         """getreport"""
         path = cls._get_report_path(report_id)
         
@@ -2492,21 +2502,26 @@ class ReportManager:
                 with open(full_report_path, 'r', encoding='utf-8') as f:
                     markdown_content = f.read()
         
-        return Report(
+        report = Report(
             report_id=data['report_id'],
             simulation_id=data['simulation_id'],
             graph_id=data['graph_id'],
             simulation_requirement=data['simulation_requirement'],
             status=ReportStatus(data['status']),
+            org_id=data.get('org_id', ''),
+            campaign_id=data.get('campaign_id'),
             outline=outline,
             markdown_content=markdown_content,
             created_at=data.get('created_at', ''),
             completed_at=data.get('completed_at', ''),
             error=data.get('error')
         )
+        if org_id is not None and report.org_id != org_id:
+            return None
+        return report
     
     @classmethod
-    def get_report_by_simulation(cls, simulation_id: str) -> Optional[Report]:
+    def get_report_by_simulation(cls, simulation_id: str, org_id: Optional[str] = None) -> Optional[Report]:
         """based onsimulationIDgetreport"""
         cls._ensure_reports_dir()
         
@@ -2515,19 +2530,24 @@ class ReportManager:
             # newformat：filefolder
             if os.path.isdir(item_path):
                 report = cls.get_report(item)
-                if report and report.simulation_id == simulation_id:
+                if report and report.simulation_id == simulation_id and (org_id is None or report.org_id == org_id):
                     return report
             # backward compatibleformat：JSONfile
             elif item.endswith('.json'):
                 report_id = item[:-5]
                 report = cls.get_report(report_id)
-                if report and report.simulation_id == simulation_id:
+                if report and report.simulation_id == simulation_id and (org_id is None or report.org_id == org_id):
                     return report
         
         return None
     
     @classmethod
-    def list_reports(cls, simulation_id: Optional[str] = None, limit: int = 50) -> List[Report]:
+    def list_reports(
+        cls,
+        simulation_id: Optional[str] = None,
+        limit: int = 50,
+        org_id: Optional[str] = None,
+    ) -> List[Report]:
         """columnappearreport"""
         cls._ensure_reports_dir()
         
@@ -2538,6 +2558,8 @@ class ReportManager:
             if os.path.isdir(item_path):
                 report = cls.get_report(item)
                 if report:
+                    if org_id is not None and report.org_id != org_id:
+                        continue
                     if simulation_id is None or report.simulation_id == simulation_id:
                         reports.append(report)
             # backward compatibleformat：JSONfile
@@ -2545,6 +2567,8 @@ class ReportManager:
                 report_id = item[:-5]
                 report = cls.get_report(report_id)
                 if report:
+                    if org_id is not None and report.org_id != org_id:
+                        continue
                     if simulation_id is None or report.simulation_id == simulation_id:
                         reports.append(report)
         
@@ -2554,9 +2578,11 @@ class ReportManager:
         return reports[:limit]
     
     @classmethod
-    def delete_report(cls, report_id: str) -> bool:
+    def delete_report(cls, report_id: str, org_id: Optional[str] = None) -> bool:
         """Deletereport（entirefolder）"""
         import shutil
+        if org_id is not None and cls.get_report(report_id, org_id=org_id) is None:
+            return False
         
         folder_path = cls._get_report_folder(report_id)
         

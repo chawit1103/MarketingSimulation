@@ -59,6 +59,8 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] Settings updates preserve existing secrets when blank fields, masked placeholders, or presence flags are submitted.
 - [x] SEC-004 RBAC baseline is partially remediated: centralized role guards protect settings/API-key/destructive/admin operations and analyst/admin mutation flows.
 - [x] SEC-006 auth route exposure is partially remediated: only auth login/register remain public, `/me` is authenticated, API-key generation is admin-only, and broken org switching returns a safe disabled response.
+- [x] SEC-003 tenant isolation for ID-addressed resources is remediated for the current local JSON architecture: campaign pipeline status, dashboard KPI/report/timeline/segment routes, simulation reads/status/actions, reports, projects, graphs, and graph tasks are scoped to the authenticated organization.
+- [ ] Legacy local JSON simulation/report/project/task records without `org_id` are reviewed, backfilled, or re-created before production use.
 - [ ] External pilot data-retention and deletion procedure is documented and approved.
 
 ## Automated Validation

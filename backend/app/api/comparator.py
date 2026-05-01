@@ -6,6 +6,7 @@ Compares KPIs across multiple campaigns and identifies winners per metric.
 from flask import Blueprint, request, jsonify, g
 
 from ..models.report import ExecutiveReport
+from ..services.campaign_service import CampaignService
 from ..services.kpi_calculator import KPICalculator
 from ..utils.logger import get_logger
 
@@ -33,6 +34,9 @@ def _get_org_id() -> str:
 def _fetch_kpi(campaign_id: str, org_id: str) -> dict:
     """Fetch KPI data for one campaign. Returns dict or error dict."""
     try:
+        campaign = CampaignService().get_campaign(campaign_id, org_id=org_id)
+        if campaign is None:
+            return {"campaign_id": campaign_id, "error": "Resource not found"}
         calc = _get_calculator()
         report = calc.calculate(campaign_id=campaign_id, org_id=org_id)
         return {
@@ -116,7 +120,7 @@ def _compute_comparison(kpis: list) -> dict:
         win_counts[wid] = win_counts.get(wid, 0) + 1
 
     overall_winner_id = max(win_counts, key=win_counts.get)
-    overall_winner_name = _get_campaign_name(overall_winner_id)
+    overall_winner_name = _get_campaign_name_for_org(overall_winner_id, org_id)
 
     # Build summary per campaign
     campaign_summaries = []
@@ -124,7 +128,7 @@ def _compute_comparison(kpis: list) -> dict:
         wins = win_counts.get(k["campaign_id"], 0)
         campaign_summaries.append({
             "campaign_id": k["campaign_id"],
-            "campaign_name": _get_campaign_name(k["campaign_id"]),
+            "campaign_name": _get_campaign_name_for_org(k["campaign_id"], org_id),
             "kpi": k,
             "metric_wins": wins,
             "is_overall_winner": k["campaign_id"] == overall_winner_id,
@@ -157,6 +161,11 @@ def _get_campaign_name(campaign_id: str) -> str:
     return campaign_id[:12]
 
 
+def _get_campaign_name_for_org(campaign_id: str, org_id: str) -> str:
+    camp = CampaignService().get_campaign(campaign_id, org_id=org_id)
+    return camp.name if camp else campaign_id[:12]
+
+
 # ── API Routes ───────────────────────────────────────────
 
 @comparator_bp.route("/compare", methods=["POST"])
@@ -174,6 +183,9 @@ def compare_campaigns():
         return jsonify({"error": "Provide at least 2 campaign_ids"}), 400
 
     org_id = _get_org_id()
+    missing = [cid for cid in campaign_ids if CampaignService().get_campaign(cid, org_id=org_id) is None]
+    if missing:
+        return jsonify({"success": False, "error": "Resource not found"}), 404
 
     # Fetch KPIs for all campaigns
     kpis = [_fetch_kpi(cid, org_id) for cid in campaign_ids]

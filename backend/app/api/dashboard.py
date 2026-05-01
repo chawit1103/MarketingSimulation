@@ -8,6 +8,7 @@ from flask import request, jsonify, g
 
 from ..models.report import ExecutiveReport
 from ..services.action_plan import ActionPlanService
+from ..services.campaign_service import CampaignService
 from ..services.kpi_calculator import KPICalculator
 from ..utils.logger import get_logger
 
@@ -37,6 +38,14 @@ def _get_org_id() -> str:
     return "unknown"
 
 
+def _get_owned_campaign(campaign_id: str, org_id: str):
+    return CampaignService().get_campaign(campaign_id, org_id=org_id)
+
+
+def _resource_not_found():
+    return jsonify({"success": False, "error": "Resource not found"}), 404
+
+
 # ---------------------------------------------------------------------------
 # GET /api/dashboard/campaign/<campaign_id>/kpi
 # ---------------------------------------------------------------------------
@@ -46,6 +55,9 @@ def get_campaign_kpi(campaign_id: str):
     """Return calculated KPIs for a campaign (lightweight — just the numbers)."""
     try:
         org_id = _get_org_id()
+        campaign = _get_owned_campaign(campaign_id, org_id)
+        if not campaign:
+            return _resource_not_found()
         calc = _get_calculator()
         report = calc.calculate(campaign_id=campaign_id, org_id=org_id)
 
@@ -61,7 +73,7 @@ def get_campaign_kpi(campaign_id: str):
             "opinion_polarization": report.opinion_polarization,
             "generated_at": report.generated_at,
             "action_plan": ActionPlanService().generate(
-                campaign={"id": campaign_id},
+                campaign={"id": campaign_id, "name": campaign.name},
                 kpis=report.model_dump(),
                 segments=[seg.model_dump() for seg in report.sentiment_by_segment],
                 evidence={},
@@ -88,12 +100,15 @@ def get_campaign_report(campaign_id: str):
     """Return the full executive report for a campaign."""
     try:
         org_id = _get_org_id()
+        campaign = _get_owned_campaign(campaign_id, org_id)
+        if not campaign:
+            return _resource_not_found()
         calc = _get_calculator()
         report = calc.calculate(campaign_id=campaign_id, org_id=org_id)
 
         data = report.to_dict()
         data["action_plan"] = ActionPlanService().generate(
-            campaign={"id": campaign_id},
+            campaign={"id": campaign_id, "name": campaign.name},
             kpis=data,
             segments=data.get("sentiment_by_segment", []),
             evidence={},
@@ -120,6 +135,8 @@ def get_campaign_timeline(campaign_id: str):
     """Return sentiment timeline data for a campaign."""
     try:
         org_id = _get_org_id()
+        if not _get_owned_campaign(campaign_id, org_id):
+            return _resource_not_found()
         calc = _get_calculator()
         report = calc.calculate(campaign_id=campaign_id, org_id=org_id)
 
@@ -152,6 +169,8 @@ def get_campaign_segments(campaign_id: str):
     """Return segment sentiment breakdown for a campaign."""
     try:
         org_id = _get_org_id()
+        if not _get_owned_campaign(campaign_id, org_id):
+            return _resource_not_found()
         calc = _get_calculator()
         report = calc.calculate(campaign_id=campaign_id, org_id=org_id)
 
