@@ -35,8 +35,45 @@ Optional provider/config values:
 - `NEO4J_URI`
 - `NEO4J_USER`
 - `SETTINGS_PERSIST_SECRETS=false`
+- `RATE_LIMIT_TRUSTED_PROXIES`, only if the app runs behind trusted proxies that overwrite forwarding headers
 
 Do not use placeholder, demo, or previously committed values for production.
+
+## CORS
+
+Local development keeps browser testing easy. Production is stricter: startup fails unless `CORS_ALLOWED_ORIGINS` is set to explicit trusted origins.
+
+Example:
+
+```bash
+CORS_ALLOWED_ORIGINS=https://app.example.com,https://admin.example.com
+```
+
+Do not use `*` for production API routes.
+
+## Rate Limiting
+
+The bundled limiter is dependency-free and suitable for local/demo protection. It is still in-memory and per-process, so it is not enough by itself for public internet exposure or multi-worker production deployments.
+
+Production deployments should add edge/API-gateway or shared-store rate limiting. If traffic reaches Flask through a proxy, set `RATE_LIMIT_TRUSTED_PROXIES` only to proxies that overwrite inbound forwarding headers.
+
+Examples:
+
+```bash
+RATE_LIMIT_TRUSTED_PROXIES=127.0.0.1
+RATE_LIMIT_TRUSTED_PROXIES=10.0.0.0/8,192.168.0.0/16
+```
+
+When `RATE_LIMIT_TRUSTED_PROXIES` is empty, `X-Forwarded-For` is ignored and the limiter keys by the direct remote address.
+
+## API Key Transport
+
+Authenticated API requests must send credentials through one of these headers:
+
+- `Authorization: Bearer <token>`
+- `X-Api-Key: <api-key>`
+
+Query-parameter credentials such as `?api_key=...` are not accepted.
 
 ## Manual Credential Rotation
 

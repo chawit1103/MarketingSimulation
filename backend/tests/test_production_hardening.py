@@ -105,6 +105,17 @@ def test_production_cors_requires_explicit_origins_and_blocks_unlisted_origin():
     assert disallowed.headers.get("Access-Control-Allow-Origin") is None
 
 
+def test_production_cors_requires_origins_at_startup():
+    class ProductionCorsConfig(Config):
+        ENVIRONMENT = "production"
+        SECRET_KEY = "unit-test-production-secret"
+        CORS_ALLOWED_ORIGINS = ""
+        RATE_LIMIT_ENABLED = False
+
+    with pytest.raises(RuntimeError, match="CORS_ALLOWED_ORIGINS"):
+        create_app(ProductionCorsConfig)
+
+
 def test_runtime_settings_file_omits_secrets_when_persistence_is_disabled(tmp_path, monkeypatch):
     monkeypatch.setattr(Config, "UPLOAD_FOLDER", str(tmp_path))
     monkeypatch.setattr(Config, "SETTINGS_PERSIST_SECRETS", False)

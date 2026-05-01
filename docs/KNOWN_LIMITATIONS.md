@@ -22,9 +22,9 @@ This document separates what the system currently does from what should not yet 
 
 ## Infrastructure
 
-- Rate limiting is in-memory and per-process. Production deployments with multiple workers need edge/API-gateway or shared-store rate limiting.
+- Rate limiting is in-memory and per-process. It trusts `X-Forwarded-For` only from configured `RATE_LIMIT_TRUSTED_PROXIES`, but production deployments with multiple workers still need edge/API-gateway or shared-store rate limiting.
 - Tenant data still relies on JSON storage paths plus Neo4j, not a production relational database migration.
-- Production deployment still needs TLS, backups, observability, environment-specific credential rotation, and deployment-owned rate limiting.
+- Production deployment still needs TLS, backups, observability, environment-specific credential rotation, and deployment-owned shared/edge rate limiting.
 - Neo4j availability warnings can appear during local tests when no local graph database is running.
 - Audit logging and data-retention policies are not complete enough for broad enterprise rollout.
 - Legacy local JSON simulation/report/project/task records created before `org_id` metadata was added may need to be re-created or backfilled before production use.

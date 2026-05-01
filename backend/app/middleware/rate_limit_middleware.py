@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+import ipaddress
 from collections import defaultdict, deque
 from threading import Lock
 from typing import Deque, Dict, Optional, Tuple
@@ -15,7 +16,7 @@ class RateLimitMiddleware:
 
     This is intentionally lightweight and dependency-free. It is suitable for a
     single-process app and local/demo protection. Production deployments with
-    multiple workers should pair it with an edge/API gateway limiter.
+    multiple workers should pair it with an edge/API gateway or shared limiter.
     """
 
     GROUPS = (
@@ -87,7 +88,33 @@ class RateLimitMiddleware:
         return None
 
     def _client_key(self) -> str:
+        remote_addr = request.remote_addr or "unknown"
         forwarded_for = request.headers.get("X-Forwarded-For", "")
-        if forwarded_for:
+        if forwarded_for and self._is_trusted_proxy(remote_addr):
             return forwarded_for.split(",", 1)[0].strip()
-        return request.remote_addr or "unknown"
+        return remote_addr
+
+    @staticmethod
+    def _is_trusted_proxy(remote_addr: str) -> bool:
+        configured = current_app.config.get("RATE_LIMIT_TRUSTED_PROXIES", "")
+        if not configured:
+            return False
+
+        try:
+            remote_ip = ipaddress.ip_address(remote_addr)
+        except ValueError:
+            return False
+
+        for item in str(configured).split(","):
+            entry = item.strip()
+            if not entry:
+                continue
+            try:
+                if "/" in entry:
+                    if remote_ip in ipaddress.ip_network(entry, strict=False):
+                        return True
+                elif remote_ip == ipaddress.ip_address(entry):
+                    return True
+            except ValueError:
+                continue
+        return False

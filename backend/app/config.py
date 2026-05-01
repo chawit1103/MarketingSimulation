@@ -52,6 +52,8 @@ class Config:
 
     # Lightweight in-memory rate limiting. Values are requests per window.
     RATE_LIMIT_ENABLED = os.environ.get("RATE_LIMIT_ENABLED", "true").lower() == "true"
+    RATE_LIMIT_BACKEND = os.environ.get("RATE_LIMIT_BACKEND", "memory").strip().lower()
+    RATE_LIMIT_TRUSTED_PROXIES = os.environ.get("RATE_LIMIT_TRUSTED_PROXIES", "").strip()
     RATE_LIMIT_WINDOW_SECONDS = int(os.environ.get("RATE_LIMIT_WINDOW_SECONDS", "60"))
     RATE_LIMIT_AUTH_PER_WINDOW = int(os.environ.get("RATE_LIMIT_AUTH_PER_WINDOW", "20"))
     RATE_LIMIT_DEMO_PER_WINDOW = int(os.environ.get("RATE_LIMIT_DEMO_PER_WINDOW", "120"))
@@ -151,6 +153,10 @@ class Config:
             raise RuntimeError(
                 "Production requires SECRET_KEY to be set to a non-default value."
             )
+        if cls.is_production() and not cls.get_cors_origins():
+            raise RuntimeError(
+                "Production requires CORS_ALLOWED_ORIGINS to be set to explicit trusted origins."
+            )
         if cls.is_production() and cls.get_cors_origins() == "*":
             raise RuntimeError(
                 "Production requires CORS_ALLOWED_ORIGINS to be set to explicit trusted origins."
@@ -164,4 +170,9 @@ class Config:
             logger.warning(
                 "REQUEST_BODY_LOGGING_ENABLED is enabled in production. Redaction is applied, "
                 "but request body logging should remain disabled unless temporarily debugging."
+            )
+        if cls.is_production() and getattr(cls, "RATE_LIMIT_BACKEND", "memory") == "memory":
+            logger.warning(
+                "Production is using the in-memory rate limiter. Use edge/API-gateway "
+                "or shared-store rate limiting before public internet exposure."
             )

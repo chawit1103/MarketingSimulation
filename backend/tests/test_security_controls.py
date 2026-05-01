@@ -77,6 +77,63 @@ def test_rate_limit_blocks_public_demo_after_configured_threshold():
     assert limited.headers["Retry-After"]
 
 
+def test_rate_limit_ignores_forwarded_for_from_untrusted_proxy():
+    class RateLimitTestConfig(Config):
+        RATE_LIMIT_ENABLED = True
+        RATE_LIMIT_WINDOW_SECONDS = 60
+        RATE_LIMIT_DEMO_PER_WINDOW = 1
+        RATE_LIMIT_TRUSTED_PROXIES = "10.0.0.0/8"
+
+    app = create_app(RateLimitTestConfig)
+    client = app.test_client()
+
+    first = client.get(
+        "/api/demo/campaigns",
+        headers={"X-Forwarded-For": "203.0.113.24"},
+        environ_overrides={"REMOTE_ADDR": "127.0.0.1"},
+    )
+    second = client.get(
+        "/api/demo/campaigns",
+        headers={"X-Forwarded-For": "198.51.100.7"},
+        environ_overrides={"REMOTE_ADDR": "127.0.0.1"},
+    )
+
+    assert first.status_code == 200
+    assert second.status_code == 429
+
+
+def test_rate_limit_trusts_forwarded_for_from_configured_proxy_only():
+    class RateLimitTestConfig(Config):
+        RATE_LIMIT_ENABLED = True
+        RATE_LIMIT_WINDOW_SECONDS = 60
+        RATE_LIMIT_DEMO_PER_WINDOW = 1
+        RATE_LIMIT_TRUSTED_PROXIES = "127.0.0.1"
+
+    app = create_app(RateLimitTestConfig)
+    client = app.test_client()
+    environ = {"REMOTE_ADDR": "127.0.0.1"}
+
+    first = client.get(
+        "/api/demo/campaigns",
+        headers={"X-Forwarded-For": "203.0.113.24"},
+        environ_overrides=environ,
+    )
+    second = client.get(
+        "/api/demo/campaigns",
+        headers={"X-Forwarded-For": "198.51.100.7"},
+        environ_overrides=environ,
+    )
+    repeat_first = client.get(
+        "/api/demo/campaigns",
+        headers={"X-Forwarded-For": "203.0.113.24"},
+        environ_overrides=environ,
+    )
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert repeat_first.status_code == 429
+
+
 def test_rate_limited_endpoint_groups_are_configured():
     from app.middleware.rate_limit_middleware import RateLimitMiddleware
 

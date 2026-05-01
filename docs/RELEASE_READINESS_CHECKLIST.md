@@ -62,9 +62,10 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] SEC-006 auth route exposure is remediated by safe disablement: only auth login/register remain public, `/me` is authenticated, API-key generation is admin-only, cross-org switching is denied without existence leakage, and current-org switching returns a safe disabled response without a token.
 - [x] SEC-003 tenant isolation for ID-addressed resources is remediated for the current local JSON architecture: campaign pipeline status, dashboard KPI/report/timeline/segment routes, simulation reads/status/actions, reports, projects, graphs, and graph tasks are scoped to the authenticated organization.
 - [x] SEC-005 dashboard provenance is remediated: fallback/mock KPI output is labeled `local_estimate`, demo fixtures are labeled `demo_mode`, and `backend_verified` is reserved for explicit persisted real simulation KPI metrics.
-- [x] SEC-008/010/011/013 production hardening baseline is remediated: debug/body logging are opt-in, query-parameter API keys are rejected, production CORS requires explicit trusted origins, and 5xx API errors return stable client-safe messages.
+- [x] SEC-008/010/011/013 production hardening baseline is remediated: debug/body logging are opt-in, query-parameter API keys are rejected, production CORS fails startup without explicit trusted origins, and 5xx API errors return stable client-safe messages.
 - [x] SEC-007 production settings secret persistence is remediated for local files: production resolves LLM/embedding/graph secrets from environment variables, ignores local JSON secret fields, writes blank secret fields to `settings.json`, and keeps restrictive settings-file permissions where supported.
 - [x] Local demo settings can still persist secrets only when explicitly allowed outside production.
+- [x] SEC-009 limiter spoofing hardening is in place: `X-Forwarded-For` is trusted only from configured `RATE_LIMIT_TRUSTED_PROXIES`.
 - [ ] SEC-009 production rate limiting uses an edge/API-gateway or shared Redis-backed limiter; the built-in limiter remains in-memory and local/demo oriented.
 - [ ] SEC-012 production auth storage avoids long-lived tokens/API keys in browser `localStorage`, or the residual risk is explicitly accepted for the deployment.
 - [ ] SEC-013 long-tail route handlers have been reviewed so route-level validation/errors do not reveal internal paths, object IDs, provider details, or unrecognized secrets.
@@ -82,7 +83,7 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] SEC-009 and SEC-012 are documented accepted risks for local/demo and controlled private pilot contexts only.
 - [x] Local demo readiness: acceptable when demo data is used, no real secrets are entered, and source-mode labels remain visible.
 - [x] Controlled private pilot readiness: conditionally acceptable with trusted users, rotated credentials, environment-provided secrets, no confidential briefs, explicit source labels, and deployment-level rate limiting/CORS/log controls.
-- [ ] Public pilot readiness: blocked until manual credential rotation is evidenced and deployment owners accept or close SEC-009/SEC-012 public-exposure risks.
+- [ ] Public pilot readiness: blocked until manual credential rotation is evidenced and deployment owners close SEC-009/SEC-012 public-exposure risks.
 - [ ] Public internet exposure readiness: blocked until production rate limiting, auth storage, and deployment controls are complete.
 - [ ] Production customer deployment readiness: blocked until manual credential rotation, shared rate limiting, safer auth storage, data-retention policy, storage architecture decisions, and any required multi-org membership feature are complete.
 
@@ -117,6 +118,14 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] CI-equivalent secret hygiene scan passed on 2026-05-01.
 - [x] `git diff --check` passed on 2026-05-01.
 - [ ] Frontend build was not rerun for PR Q because no frontend files were changed.
+
+### PR R Verification Run
+
+- [x] `backend/.venv/bin/python -m pytest backend/tests/test_security_controls.py backend/tests/test_production_hardening.py -q` passed on 2026-05-01: 15 passed, 4 warnings.
+- [x] `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-01: 54 passed, 38 warnings.
+- [x] CI-equivalent secret hygiene scan passed on 2026-05-01.
+- [x] `git diff --check` passed on 2026-05-01.
+- [ ] Frontend build was not rerun for PR R because no frontend files were changed.
 
 ## Manual Demo Flow Checks
 

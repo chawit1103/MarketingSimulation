@@ -24,9 +24,9 @@ However, the current repository is not production-ready for external customers. 
 | SEC-006 | High | fixed by safe disablement | `backend/app/api/auth.py`, `backend/app/middleware/tenant.py`, `backend/tests/test_rbac.py` | Login/register are the only public auth routes. API-key generation is admin-only. Org switching cannot issue cross-org tokens and remains disabled until a real membership model exists. |
 | SEC-007 | High | fixed for production file persistence | `backend/app/models/settings.py`, `backend/app/config.py`, `backend/tests/test_production_hardening.py`, `docs/DEPLOYMENT.md` | Production resolves provider/graph secrets from environment variables and writes blank secret fields to local JSON. A managed secret store is still recommended for mature deployments. |
 | SEC-008 | High | fixed | `backend/app/__init__.py`, `backend/app/utils/response_safety.py`, `backend/app/config.py`, `backend/tests/test_production_hardening.py` | Keep request body logging opt-in and redacted; review new logs for campaign brief or secret leakage. |
-| SEC-009 | Medium | accepted risk | `backend/app/middleware/rate_limit.py`, `docs/KNOWN_LIMITATIONS.md`, `docs/RELEASE_READINESS_CHECKLIST.md` | Built-in limiter is acceptable for local/demo use only. Public internet deployments need edge/API-gateway or shared Redis-backed rate limiting. |
+| SEC-009 | Medium | partially fixed | `backend/app/middleware/rate_limit_middleware.py`, `backend/app/config.py`, `backend/tests/test_security_controls.py` | Built-in limiter remains local/demo oriented, but it no longer trusts `X-Forwarded-For` unless the request comes from a configured trusted proxy. Public internet deployments still need edge/API-gateway or shared Redis-backed rate limiting. |
 | SEC-010 | Medium | fixed | `backend/app/middleware/tenant.py`, `backend/tests/test_production_hardening.py` | Tokens/API keys must stay in `Authorization: Bearer` or `X-Api-Key`; do not reintroduce query-token auth. |
-| SEC-011 | Medium | fixed | `backend/app/config.py`, `backend/app/__init__.py`, `backend/tests/test_production_hardening.py` | Production deploys must set explicit trusted `CORS_ALLOWED_ORIGINS`. |
+| SEC-011 | Medium | fixed | `backend/app/config.py`, `backend/app/__init__.py`, `backend/tests/test_production_hardening.py` | Production startup fails unless explicit trusted `CORS_ALLOWED_ORIGINS` are configured. |
 | SEC-012 | Medium | accepted risk | `frontend/src/api/index.js`, `docs/KNOWN_LIMITATIONS.md` | Replace browser `localStorage` token/API-key storage with a safer auth design before public/customer production. Add CSP and XSS hardening. |
 | SEC-013 | Medium | partially fixed | `backend/app/utils/response_safety.py`, `backend/app/__init__.py`, `backend/tests/test_public_routes.py`, `backend/tests/test_security_controls.py`, `backend/tests/test_production_hardening.py` | 5xx API errors are sanitized globally, but long-tail route-level 4xx/error messages should continue to be normalized. |
 
@@ -117,10 +117,11 @@ However, the current repository is not production-ready for external customers. 
 ### SEC-009: In-memory rate limiting is not sufficient for production
 
 - Severity: Medium
-- Status: Documented limitation in PR N; blocker for public internet exposure without edge controls
+- Status: Partially fixed in PR R; blocker for public internet exposure without edge/shared controls
 - Evidence: `RateLimitMiddleware` is per-process, memory-backed, and keys on `X-Forwarded-For` when present.
 - Impact: Multi-worker deployments do not share counters, restarts reset limits, and spoofed forwarding headers can bypass limits unless a trusted proxy overwrites them.
-- Recommended fix: Keep the current limiter for local/demo mode, but add edge/API-gateway or Redis-backed rate limiting for production. Only trust `X-Forwarded-For` from configured proxies.
+- Remediation: The built-in limiter remains dependency-free for local/demo mode and now only trusts `X-Forwarded-For` when the request remote address matches `RATE_LIMIT_TRUSTED_PROXIES`. Production startup warns when the limiter backend remains `memory`.
+- Remaining action: Add edge/API-gateway or Redis-backed shared rate limiting before public internet exposure. Only configure `RATE_LIMIT_TRUSTED_PROXIES` to proxies that overwrite inbound forwarding headers.
 
 ### SEC-010: API keys are accepted in query parameters
 
@@ -136,7 +137,7 @@ However, the current repository is not production-ready for external customers. 
 - Status: Remediated in PR N for production defaults
 - Evidence: Prior to PR N, `create_app()` configured `CORS(app, resources={r"/api/*": {"origins": "*"}})`.
 - Impact: The app uses Authorization headers rather than cookies, so this is not a classic cookie CSRF issue. Still, broad CORS weakens browser-origin boundaries and should not be the production default.
-- Remediation: CORS origins are configurable via `CORS_ALLOWED_ORIGINS`. Local development defaults to `*`; production defaults to no origins unless explicit trusted origins are configured.
+- Remediation: CORS origins are configurable via `CORS_ALLOWED_ORIGINS`. Local development defaults to `*`; production startup fails unless explicit trusted origins are configured.
 
 ### SEC-012: Frontend stores auth tokens/API keys in localStorage
 
@@ -239,7 +240,8 @@ Concerns:
    - Disable request body logging or redact it. Completed in PR N.
    - Restrict CORS by environment. Completed in PR N.
    - Remove query-parameter API-key auth. Completed in PR N.
-   - Document required edge/shared rate limiting. Completed in PR N; implementation remains deployment responsibility.
+   - Trust `X-Forwarded-For` only from configured trusted proxies. Completed in PR R.
+   - Document required edge/shared rate limiting. Updated in PR R; shared limiter implementation remains deployment responsibility.
 
 ## Release Decision
 
@@ -247,4 +249,4 @@ For controlled local demos, the current repository is acceptable if no real secr
 
 For a controlled private pilot, the repository is conditionally acceptable only with trusted users, rotated credentials, no confidential customer briefs, explicit source labels, environment-provided secrets, and deployment controls around rate limiting/CORS/logging. This is not a production-readiness claim.
 
-For a public pilot, public internet exposure, or customer production deployment, the release is not ready while manual SEC-001 credential rotation lacks evidence and SEC-009/SEC-012 remain accepted risks.
+For a public pilot, public internet exposure, or customer production deployment, the release is not ready while manual SEC-001 credential rotation lacks evidence, SEC-009 still lacks shared/edge enforcement, and SEC-012 remains an accepted risk.
