@@ -14,6 +14,14 @@ backend/.venv/bin/python -m pytest backend/tests
 
 These tests avoid live LLM/provider calls and cover public route contracts, security controls, brief quality scoring, settings readiness, competitor scenarios, and action plan generation.
 
+Focused RBAC/security checks:
+
+```bash
+backend/.venv/bin/python -m pytest backend/tests/test_rbac.py
+```
+
+This covers unauthenticated auth-route denial, viewer read-only behavior, analyst restrictions for settings/API-key/provider live-test flows, admin-positive privileged flows, and safe org-switch disablement without cross-org token issuance.
+
 ## Frontend Build
 
 Run from the repo root:

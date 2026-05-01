@@ -29,6 +29,7 @@ def rbac_context(tmp_path, monkeypatch):
 
     org_service = OrganizationService(upload_folder=str(tmp_path / "organizations"))
     org = org_service.create_org("RBAC Test Org", "rbac-test-org", "admin@example.com")
+    other_org = org_service.create_org("Other RBAC Org", "other-rbac-org", "owner@example.com")
     user_service = UserService(org_service=org_service, upload_folder=str(tmp_path / "organizations"))
 
     users = {
@@ -63,7 +64,7 @@ def rbac_context(tmp_path, monkeypatch):
         for role, user in users.items()
     }
 
-    yield app.test_client(), headers, org
+    yield app.test_client(), headers, org, other_org
 
     SettingsManager.invalidate()
     campaign_api._campaign_service = None
@@ -71,7 +72,7 @@ def rbac_context(tmp_path, monkeypatch):
 
 
 def test_auth_me_requires_authentication(rbac_context):
-    client, _, _ = rbac_context
+    client, _, _, _ = rbac_context
 
     response = client.get("/api/auth/me")
     api_key_response = client.post("/api/auth/api-key")
@@ -85,7 +86,7 @@ def test_auth_me_requires_authentication(rbac_context):
 
 
 def test_viewer_can_read_campaigns_but_cannot_mutate(rbac_context):
-    client, headers, _ = rbac_context
+    client, headers, _, _ = rbac_context
 
     read_response = client.get("/api/campaign", headers=headers["viewer"])
     create_response = client.post("/api/campaign", headers=headers["viewer"], json={"name": "Viewer Attempt"})
@@ -98,7 +99,7 @@ def test_viewer_can_read_campaigns_but_cannot_mutate(rbac_context):
 
 
 def test_analyst_can_create_campaign_but_cannot_manage_settings_or_api_keys(rbac_context):
-    client, headers, _ = rbac_context
+    client, headers, _, _ = rbac_context
 
     campaign_response = client.post(
         "/api/campaign",
@@ -115,6 +116,11 @@ def test_analyst_can_create_campaign_but_cannot_manage_settings_or_api_keys(rbac
         json={"language": "en"},
     )
     api_key_response = client.post("/api/auth/api-key", headers=headers["analyst"])
+    provider_test_response = client.post(
+        "/api/settings/test-llm",
+        headers=headers["analyst"],
+        json={"provider": "openai", "model": "gpt-4o-mini", "api_key": "not-used"},
+    )
     switch_response = client.post(
         "/api/auth/switch-org",
         headers=headers["analyst"],
@@ -124,11 +130,12 @@ def test_analyst_can_create_campaign_but_cannot_manage_settings_or_api_keys(rbac
     assert campaign_response.status_code == 201
     assert settings_response.status_code == 403
     assert api_key_response.status_code == 403
+    assert provider_test_response.status_code == 403
     assert switch_response.status_code == 403
 
 
 def test_admin_can_access_privileged_auth_and_settings_flows(rbac_context):
-    client, headers, _ = rbac_context
+    client, headers, org, _ = rbac_context
 
     me_response = client.get("/api/auth/me", headers=headers["admin"])
     api_key_response = client.post("/api/auth/api-key", headers=headers["admin"])
@@ -165,7 +172,7 @@ def test_admin_can_access_privileged_auth_and_settings_flows(rbac_context):
     switch_response = client.post(
         "/api/auth/switch-org",
         headers=headers["admin"],
-        json={"org_id": "org_other"},
+        json={"org_id": org.org_id},
     )
 
     assert me_response.status_code == 200
@@ -175,14 +182,80 @@ def test_admin_can_access_privileged_auth_and_settings_flows(rbac_context):
     assert "password_hash" not in str(me_response.get_json())
     assert settings_response.status_code == 200
     assert switch_response.status_code == 501
-    assert "not implemented" in switch_response.get_json()["error"].lower()
+    assert "disabled" in switch_response.get_json()["error"].lower()
+    assert "token" not in str(switch_response.get_json()).lower()
 
 
 def test_viewer_and_analyst_cannot_run_admin_only_destructive_operations(rbac_context):
-    client, headers, _ = rbac_context
+    client, headers, _, _ = rbac_context
 
     viewer_graph_delete = client.delete("/api/graph/delete/graph_missing", headers=headers["viewer"])
     analyst_report_delete = client.delete("/api/report/report_missing", headers=headers["analyst"])
 
     assert viewer_graph_delete.status_code == 403
     assert analyst_report_delete.status_code == 403
+
+
+def test_viewer_cannot_run_simulation_report_export_or_persona_mutations(rbac_context):
+    client, headers, _, _ = rbac_context
+
+    start_response = client.post(
+        "/api/simulation/start",
+        headers=headers["viewer"],
+        json={},
+    )
+    stop_response = client.post(
+        "/api/simulation/stop",
+        headers=headers["viewer"],
+        json={},
+    )
+    close_env_response = client.post(
+        "/api/simulation/close-env",
+        headers=headers["viewer"],
+        json={},
+    )
+    report_response = client.post(
+        "/api/report/generate",
+        headers=headers["viewer"],
+        json={"simulation_id": "sim_missing"},
+    )
+    export_response = client.post(
+        "/api/export/pptx",
+        headers=headers["viewer"],
+        json={"title": "Viewer export attempt"},
+    )
+    persona_response = client.post(
+        "/api/persona/generate",
+        headers=headers["viewer"],
+        json={"campaign_id": "cmp_missing", "target": {"persona_count": 1}},
+    )
+
+    assert start_response.status_code == 403
+    assert stop_response.status_code == 403
+    assert close_env_response.status_code == 403
+    assert report_response.status_code == 403
+    assert export_response.status_code == 403
+    assert persona_response.status_code == 403
+
+
+def test_org_switching_does_not_allow_cross_org_or_existence_probing(rbac_context):
+    client, headers, _, other_org = rbac_context
+
+    other_org_response = client.post(
+        "/api/auth/switch-org",
+        headers=headers["admin"],
+        json={"org_id": other_org.org_id},
+    )
+    missing_org_response = client.post(
+        "/api/auth/switch-org",
+        headers=headers["admin"],
+        json={"org_id": "org_missing"},
+    )
+
+    assert other_org_response.status_code == 403
+    assert missing_org_response.status_code == 403
+    assert other_org_response.get_json() == missing_org_response.get_json()
+    rendered = str(other_org_response.get_json()) + str(missing_org_response.get_json())
+    assert other_org.org_id not in rendered
+    assert "org_missing" not in rendered
+    assert "token" not in rendered.lower()

@@ -58,8 +58,8 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] Settings readiness checks do not echo API keys or graph passwords.
 - [x] SEC-002 settings read exposure is remediated: `GET /api/settings` returns only secret presence flags and never raw or masked API keys/passwords.
 - [x] Settings updates preserve existing secrets when blank fields, masked placeholders, or presence flags are submitted.
-- [x] SEC-004 RBAC baseline is partially remediated: centralized role guards protect settings/API-key/destructive/admin operations and analyst/admin mutation flows.
-- [x] SEC-006 auth route exposure is partially remediated: only auth login/register remain public, `/me` is authenticated, API-key generation is admin-only, and broken org switching returns a safe disabled response.
+- [x] SEC-004 RBAC baseline is remediated for the current route set: centralized role guards protect settings/API-key/destructive/admin operations, analyst/admin mutation flows, persona generation, report/export/simulation actions, and viewer read-only behavior.
+- [x] SEC-006 auth route exposure is remediated by safe disablement: only auth login/register remain public, `/me` is authenticated, API-key generation is admin-only, cross-org switching is denied without existence leakage, and current-org switching returns a safe disabled response without a token.
 - [x] SEC-003 tenant isolation for ID-addressed resources is remediated for the current local JSON architecture: campaign pipeline status, dashboard KPI/report/timeline/segment routes, simulation reads/status/actions, reports, projects, graphs, and graph tasks are scoped to the authenticated organization.
 - [x] SEC-005 dashboard provenance is remediated: fallback/mock KPI output is labeled `local_estimate`, demo fixtures are labeled `demo_mode`, and `backend_verified` is reserved for explicit persisted real simulation KPI metrics.
 - [x] SEC-008/010/011/013 production hardening baseline is remediated: debug/body logging are opt-in, query-parameter API keys are rejected, production CORS requires explicit trusted origins, and 5xx API errors return stable client-safe messages.
@@ -76,14 +76,15 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 ## Security Remediation Gate
 
 - [x] SEC-002, SEC-003, SEC-005, SEC-008, SEC-010, and SEC-011 are fixed for the current architecture.
-- [x] SEC-001, SEC-004, SEC-006, and SEC-013 are tracked as partially fixed with remaining actions.
+- [x] SEC-001 and SEC-013 are tracked as partially fixed with remaining actions.
+- [x] SEC-004 and SEC-006 are fixed for the current local single-org architecture.
 - [x] SEC-007 is fixed for production local-file secret persistence; managed secret-store adoption remains recommended.
 - [x] SEC-009 and SEC-012 are documented accepted risks for local/demo and controlled private pilot contexts only.
 - [x] Local demo readiness: acceptable when demo data is used, no real secrets are entered, and source-mode labels remain visible.
 - [x] Controlled private pilot readiness: conditionally acceptable with trusted users, rotated credentials, environment-provided secrets, no confidential briefs, explicit source labels, and deployment-level rate limiting/CORS/log controls.
-- [ ] Public pilot readiness: blocked until manual credential rotation is evidenced and SEC-004/SEC-006 role/org gaps are closed or explicitly accepted for the pilot.
+- [ ] Public pilot readiness: blocked until manual credential rotation is evidenced and deployment owners accept or close SEC-009/SEC-012 public-exposure risks.
 - [ ] Public internet exposure readiness: blocked until production rate limiting, auth storage, and deployment controls are complete.
-- [ ] Production customer deployment readiness: blocked until manual credential rotation, full RBAC/org-switching maturity, shared rate limiting, data-retention policy, and storage architecture decisions are complete.
+- [ ] Production customer deployment readiness: blocked until manual credential rotation, shared rate limiting, safer auth storage, data-retention policy, storage architecture decisions, and any required multi-org membership feature are complete.
 
 ## Automated Validation
 
@@ -108,6 +109,14 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] CI-equivalent secret hygiene scan passed on 2026-05-01.
 - [x] `git diff --check` passed on 2026-05-01.
 - [ ] Frontend build was not rerun for PR P because no frontend files were changed.
+
+### PR Q Verification Run
+
+- [x] `backend/.venv/bin/python -m pytest backend/tests/test_rbac.py -q` passed on 2026-05-01: 7 passed, 5 warnings.
+- [x] `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-01: 51 passed, 38 warnings.
+- [x] CI-equivalent secret hygiene scan passed on 2026-05-01.
+- [x] `git diff --check` passed on 2026-05-01.
+- [ ] Frontend build was not rerun for PR Q because no frontend files were changed.
 
 ## Manual Demo Flow Checks
 

@@ -10,7 +10,7 @@ This review did not make product-code changes. It records release blockers, reme
 
 The repository has several good security foundations: password hashing now uses Werkzeug adaptive hashes, legacy password hashes are rehashed on login, production rejects known fallback auth secrets, public/demo routes are rate-limited, client-facing traceback payloads are sanitized, settings secrets are masked from browser reads, ID-addressed resources are scoped to the authenticated organization in the current local JSON architecture, and demo/local/live/backend-verified source labels exist in the UI.
 
-However, the current repository is not production-ready for external customers. The remaining blockers are manual rotation of previously committed secret-like values, partial RBAC/org-switching maturity, in-memory rate limiting, browser token storage, and local/demo storage architecture limitations.
+However, the current repository is not production-ready for external customers. The remaining blockers are manual rotation of previously committed secret-like values, in-memory rate limiting, browser token storage, and local/demo storage architecture limitations.
 
 ## Remediation Status Table
 
@@ -19,9 +19,9 @@ However, the current repository is not production-ready for external customers. 
 | SEC-001 | Critical | partially fixed | `.gitignore`, `.env.dev.example`, `.github/workflows/ci.yml`, `docs/CONTRIBUTING.md` | Repository hygiene is fixed, but owners must manually rotate any provider/API/graph credentials that may have been committed before remediation. Do not mark this complete without external rotation evidence. |
 | SEC-002 | Critical | fixed | `backend/app/api/settings.py`, `backend/app/models/settings.py`, `frontend/src/views/Settings.vue`, `backend/tests/test_settings_readiness.py` | Continue ensuring future settings fields use presence flags and admin-only access. |
 | SEC-003 | Critical | fixed | `backend/app/api/dashboard.py`, `backend/app/api/simulation.py`, `backend/app/api/report.py`, `backend/app/services/pipeline_orchestrator.py`, `backend/tests/test_tenant_isolation.py` | Backfill or re-create legacy local JSON records without `org_id` before any production use. Database-level tenant constraints remain future work. |
-| SEC-004 | Critical | partially fixed | `backend/app/middleware/tenant.py`, `backend/app/api/auth.py`, `backend/app/api/settings.py`, `backend/app/api/campaign.py`, `backend/tests/test_rbac.py` | Baseline role guards are in place, but every newly added route still requires explicit RBAC review; full enterprise authorization policy/audit remains future work. |
+| SEC-004 | Critical | fixed for current route set | `backend/app/authz.py`, `backend/app/api/auth.py`, `backend/app/api/settings.py`, `backend/app/api/campaign.py`, `backend/app/api/simulation.py`, `backend/app/api/report.py`, `backend/app/api/export.py`, `backend/app/api/persona.py`, `backend/tests/test_rbac.py` | Admin, analyst, and viewer route behavior is covered for critical routes. Every newly added route still requires explicit RBAC review. |
 | SEC-005 | High | fixed | `backend/app/services/kpi_calculator.py`, `backend/app/api/dashboard.py`, `frontend/src/components/ResultSourceBadge.vue`, `backend/tests/test_dashboard_provenance.py` | Expand real KPI extraction when the simulation runner emits a stable KPI schema; do not mark raw runner output as backend verified. |
-| SEC-006 | High | partially fixed | `backend/app/api/auth.py`, `backend/app/middleware/tenant.py`, `backend/tests/test_rbac.py` | Login/register are the only public auth routes and broken privileged paths are safe, but real multi-org membership and org switching remain unimplemented. |
+| SEC-006 | High | fixed by safe disablement | `backend/app/api/auth.py`, `backend/app/middleware/tenant.py`, `backend/tests/test_rbac.py` | Login/register are the only public auth routes. API-key generation is admin-only. Org switching cannot issue cross-org tokens and remains disabled until a real membership model exists. |
 | SEC-007 | High | fixed for production file persistence | `backend/app/models/settings.py`, `backend/app/config.py`, `backend/tests/test_production_hardening.py`, `docs/DEPLOYMENT.md` | Production resolves provider/graph secrets from environment variables and writes blank secret fields to local JSON. A managed secret store is still recommended for mature deployments. |
 | SEC-008 | High | fixed | `backend/app/__init__.py`, `backend/app/utils/response_safety.py`, `backend/app/config.py`, `backend/tests/test_production_hardening.py` | Keep request body logging opt-in and redacted; review new logs for campaign brief or secret leakage. |
 | SEC-009 | Medium | accepted risk | `backend/app/middleware/rate_limit.py`, `docs/KNOWN_LIMITATIONS.md`, `docs/RELEASE_READINESS_CHECKLIST.md` | Built-in limiter is acceptable for local/demo use only. Public internet deployments need edge/API-gateway or shared Redis-backed rate limiting. |
@@ -65,10 +65,10 @@ However, the current repository is not production-ready for external customers. 
 ### SEC-004: Role-based authorization is mostly absent
 
 - Severity: Critical
-- Status: Partially remediated in PR K; route ownership isolation completed in PR L for ID-addressed resources
+- Status: Fixed for the current route set in PR Q; route ownership isolation completed in PR L for ID-addressed resources
 - Evidence: `UserRole` exists, but protected routes generally only require authentication. Sensitive routes such as settings update, campaign deletion, report deletion, API-key generation, and simulation lifecycle operations do not consistently enforce admin/analyst/viewer permissions.
 - Impact: A viewer or low-privilege user may be able to mutate settings, delete data, start/stop simulations, or access privileged operational flows.
-- Remediation: A centralized `role_required()` guard now enforces admin-only settings/API-key/destructive operations, analyst-or-admin campaign/report/simulation generation flows, and viewer read-only behavior on the covered routes.
+- Remediation: A centralized `role_required()` guard now enforces admin-only settings/API-key/destructive operations, analyst-or-admin campaign/persona/report/simulation/export generation flows, and viewer read-only behavior on the covered routes. Regression tests cover viewer mutation denial, analyst denial for settings/API-key/provider live test, and admin-positive privileged flows.
 - Remaining action: Continue auditing newly added routes for explicit role checks and ownership checks as part of normal PR review.
 
 ## High Findings
@@ -85,15 +85,15 @@ However, the current repository is not production-ready for external customers. 
 ### SEC-006: Auth routes bypass centralized tenant middleware and contain broken privileged paths
 
 - Severity: High
-- Status: Partially remediated in PR K
+- Status: Fixed by safe disablement in PR Q
 - Evidence:
   - `TenantMiddleware.PUBLIC_PREFIXES` marks all `/api/auth/` routes as public.
   - `auth_required()` reimplements token checks, does not reject `None` payload before `.get()`, loads users globally, and allows downstream execution when user/org lookup fails.
   - `/api/auth/api-key` calls `UserService.generate_and_store_api_key()`, which is not implemented.
   - `/api/auth/switch-org` calls `AuthService.switch_org()`, which is not implemented.
 - Impact: Protected auth routes are inconsistent with the main auth/tenant control. API-key and org-switch flows fail, and token/user/org state checks are weaker than the main middleware.
-- Remediation: Only `/api/auth/login` and `/api/auth/register` remain public. `/me`, `/api-key`, and `/switch-org` now use tenant middleware plus explicit role guards. API-key generation uses the existing `UserService.generate_api_key()` path. Organization switching is disabled with a client-safe `501` until a tenant-membership model is implemented.
-- Remaining action: Implement real multi-organization membership and safe org switching, or remove the route entirely before production.
+- Remediation: Only `/api/auth/login` and `/api/auth/register` remain public. `/me`, `/api-key`, and `/switch-org` now use tenant middleware plus explicit role guards. API-key generation uses the existing `UserService.generate_api_key()` path and is admin-only. Organization switching denies all target organizations outside the current user's organization with the same safe `403`, never returns a token, and returns client-safe `501` for the current org until a tenant-membership model is implemented.
+- Remaining action: Implement real multi-organization membership and safe org switching if the product needs it, or remove the route entirely before production.
 
 ### SEC-007: Runtime settings are stored plaintext on local disk
 
@@ -247,4 +247,4 @@ For controlled local demos, the current repository is acceptable if no real secr
 
 For a controlled private pilot, the repository is conditionally acceptable only with trusted users, rotated credentials, no confidential customer briefs, explicit source labels, environment-provided secrets, and deployment controls around rate limiting/CORS/logging. This is not a production-readiness claim.
 
-For a public pilot, public internet exposure, or customer production deployment, the release is not ready while manual SEC-001 credential rotation lacks evidence, SEC-004/SEC-006 remain partially fixed, and SEC-009/SEC-012 remain accepted risks.
+For a public pilot, public internet exposure, or customer production deployment, the release is not ready while manual SEC-001 credential rotation lacks evidence and SEC-009/SEC-012 remain accepted risks.

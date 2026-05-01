@@ -8,6 +8,7 @@ from flask import Blueprint, request, jsonify, g
 from ..services.persona_factory import PersonaFactory
 from ..services.persona_context import ContextRegistry
 from ..models.campaign import CampaignTarget
+from ..authz import ANALYST_ROLES, role_required
 from ..utils.logger import get_logger
 
 logger = get_logger('mirofish.api.persona')
@@ -20,6 +21,7 @@ def _get_org_id():
 
 
 @persona_bp.route('/generate', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def generate_personas():
     """Generate personas for a campaign in any supported language.
 

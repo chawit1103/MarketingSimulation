@@ -257,9 +257,24 @@ def switch_org():
         { success: true, data: { user: {...}, token: "...", org: {...} } }
     """
     try:
+        data = request.get_json(silent=True) or {}
+        target_org_id = str(data.get('org_id') or '').strip()
+        if not target_org_id:
+            return jsonify({'success': False, 'error': 'Target organization is required'}), 400
+
+        # The current local JSON user model supports exactly one organization
+        # per user. Until a real membership model exists, never issue a token
+        # for any other org and use one generic denial message so callers
+        # cannot probe organization existence.
+        if target_org_id != g.current_org_id:
+            return jsonify({
+                'success': False,
+                'error': 'Organization switch is not available for this user',
+            }), 403
+
         return jsonify({
             'success': False,
-            'error': 'Organization switching is not implemented in this build',
+            'error': 'Organization switching is disabled until multi-org membership is implemented',
         }), 501
 
     except ValueError as e:

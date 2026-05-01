@@ -40,8 +40,8 @@ This document separates what the system currently does from what should not yet 
 ## Security Readiness
 
 - Historical secret-like values may have been committed before repository secret hygiene was added. The repository cannot prove external credential rotation; owners must rotate any affected provider/API/graph credentials manually outside Codex.
-- RBAC has a centralized baseline, but newly added routes still need explicit role and tenant review before release.
-- Organization switching is intentionally disabled until a real multi-organization membership model exists.
+- RBAC is enforced for the current route set, but newly added routes still need explicit role and tenant review before release.
+- Organization switching is safely disabled and cannot issue cross-org tokens until a real multi-organization membership model exists.
 - Browser `localStorage` token/API-key storage remains an accepted local/demo risk and should be replaced before public or production exposure.
 - 5xx API responses are sanitized globally, but long-tail route-specific validation/error messages should continue to be reviewed for internal-detail leakage.
 
