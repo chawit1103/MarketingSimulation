@@ -35,6 +35,7 @@ class TenantMiddleware:
         "/health",
         "/api/status",
         "/api/demo",
+        "/api/decision",
         "/api/auth/",
         "/api/persona/archetypes",
         "/api/persona/regions",

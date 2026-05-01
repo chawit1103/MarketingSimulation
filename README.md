@@ -92,7 +92,14 @@ Supported campaign objectives:
 
 ### 2. Competitor War Room
 
-Model competitive dynamics across multiple brands. Simulate events such as price wars, first-mover launches, copycat moves, and scandals.
+Model competitive dynamics across multiple brands. Simulate events such as price wars, first-mover launches, copycat moves, creator backlash, media blitzes, and scandals.
+
+The War Room now works like a strategy sandbox:
+
+- choose a live or demo campaign as the brand in play
+- tune competitor budget and aggression
+- select a response strategy such as proof-led defense, selective price match, creator counter-wave, or containment
+- review market-share movement, risk exposure, response playbook, and immediate action recommendations
 
 ### 3. Crisis Intelligence
 
@@ -185,6 +192,30 @@ Example insight:
 Crisis risk is medium because price-sensitive family personas reacted negatively
 to premium pricing, while health-focused urban buyers remained strongly positive.
 ```
+
+### Decision Engine
+
+The dashboard now includes a deterministic strategy layer that converts KPIs into:
+
+- recommended strategy
+- next best action
+- primary risk segment
+- business impact
+- estimated crisis loss
+- projected market share shift
+- KPI-to-business mapping
+
+This layer is intentionally rule-based first, so recommendations are consistent, auditable, and easier to calibrate with real campaign outcomes.
+
+### Strategy Sandbox
+
+Run lightweight what-if analysis from dashboard KPIs:
+
+- add proof points and testimonials
+- reduce price by 10%
+- simulate a competitor launch
+
+The what-if engine returns KPI deltas, adjusted business impact, and an updated decision recommendation.
 
 ### Export To Slide
 
@@ -382,6 +413,8 @@ All product APIs are registered under `/api/*`.
 
 | Method | Endpoint | Description |
 |---|---|---|
+| POST | `/api/decision/analyze` | Convert KPIs into recommendation, risk, actions, and business impact |
+| POST | `/api/decision/what-if` | Run deterministic what-if strategy simulation |
 | POST | `/api/comparator/compare` | Compare 2-5 campaigns |
 | GET | `/api/comparator/metrics` | Comparator metric definitions |
 | POST | `/api/impact/calculate` | Business impact calculation |
@@ -413,6 +446,7 @@ Flask Backend
   Persona Factory
   Industry Templates
   KPI Calculator
+  Decision Engine
   Demo API
   Status API
   Export Engine
@@ -430,6 +464,7 @@ Key decisions:
 - **JSON templates**: industry templates are importable and versionable.
 - **Runtime provider switching**: 17 LLM providers and multiple embedding providers are available through a unified configuration layer.
 - **Decision evidence over black-box scores**: dashboard output includes assumptions and explanation panels.
+- **Deterministic decision layer**: strategy recommendations and what-if deltas are rule-based first, not hidden in an LLM prompt.
 
 ---
 
@@ -478,6 +513,7 @@ Highest priority:
 
 - expand Thai industry templates for healthcare, restaurants, EV, FMCG, cosmetics, public policy, and agriculture
 - strengthen KPI calculation with real simulation traces rather than mock fallback where possible
+- calibrate Decision Engine rules with real campaign outcomes
 - improve PPTX export templates for agency/client deliverables
 - add broader backend tests for auth, campaign CRUD, template validation, KPI calculation, and export
 - deploy a public hosted demo

@@ -30,6 +30,86 @@
     </header>
 
     <div class="dash-body">
+      <section class="decision-console panel">
+        <div class="decision-main">
+          <span class="brief-kicker">{{ $t('dashboard.decisionConsole') }}</span>
+          <h2>{{ decisionHeadline }}</h2>
+          <p>{{ decisionRationale }}</p>
+          <div class="decision-actions-row">
+            <span :class="['decision-verdict', `verdict-${decisionStrategy.verdict || 'controlled_pilot'}`]">
+              {{ formatDecisionVerdict(decisionStrategy.verdict) }}
+            </span>
+            <span class="decision-confidence">
+              {{ $t('dashboard.confidenceScore') }} {{ Math.round(decisionStrategy.confidence || confidenceScore) }}%
+            </span>
+          </div>
+        </div>
+        <div class="decision-side">
+          <div class="next-action-card">
+            <span>{{ $t('dashboard.nextBestAction') }}</span>
+            <strong>{{ decisionNextAction }}</strong>
+          </div>
+          <div class="money-grid">
+            <div>
+              <span>{{ $t('dashboard.revenueImpact') }}</span>
+              <strong>{{ formatCurrency(businessImpact.estimated_revenue_impact) }}</strong>
+            </div>
+            <div>
+              <span>{{ $t('dashboard.crisisLoss') }}</span>
+              <strong>{{ formatCurrency(businessImpact.estimated_crisis_loss) }}</strong>
+            </div>
+            <div>
+              <span>{{ $t('dashboard.marketShareShift') }}</span>
+              <strong>{{ formatSigned(businessImpact.market_share_shift_pct) }} pts</strong>
+            </div>
+            <div>
+              <span>{{ $t('dashboard.roi') }}</span>
+              <strong>{{ formatSigned(businessImpact.roi_pct) }}%</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="what-if-console panel">
+        <div class="what-if-header">
+          <div>
+            <span class="brief-kicker">{{ $t('dashboard.strategySandbox') }}</span>
+            <h2 class="panel-title">{{ $t('dashboard.whatIfTitle') }}</h2>
+          </div>
+          <span v-if="whatIfLoading" class="sandbox-status">{{ $t('common.loading') }}</span>
+        </div>
+        <div class="scenario-row">
+          <button
+            v-for="scenario in whatIfScenarios"
+            :key="scenario.key"
+            type="button"
+            :class="['scenario-button', { active: activeScenario === scenario.key }]"
+            @click="runScenario(scenario)"
+          >
+            <strong>{{ $t(scenario.labelKey) }}</strong>
+            <span>{{ $t(scenario.descKey) }}</span>
+          </button>
+        </div>
+        <div v-if="whatIfResult" class="what-if-result">
+          <div>
+            <span>{{ $t('dashboard.conversionDelta') }}</span>
+            <strong>{{ formatSigned(whatIfResult.delta?.conversion_probability) }} pts</strong>
+          </div>
+          <div>
+            <span>{{ $t('dashboard.sentimentDelta') }}</span>
+            <strong>{{ formatSigned(whatIfResult.delta?.overall_sentiment) }} pts</strong>
+          </div>
+          <div>
+            <span>{{ $t('dashboard.riskDelta') }}</span>
+            <strong>{{ formatSigned(whatIfResult.delta?.crisis_risk) }} pts</strong>
+          </div>
+          <div>
+            <span>{{ $t('dashboard.projectedRevenue') }}</span>
+            <strong>{{ formatCurrency(whatIfResult.business_impact?.estimated_revenue_impact) }}</strong>
+          </div>
+        </div>
+      </section>
+
       <!-- Campaign Brief -->
       <section class="campaign-brief panel">
         <div class="brief-main">
@@ -171,6 +251,13 @@
           <article class="evidence-block quotes">
             <h3>{{ $t('dashboard.simulatedQuotes') }}</h3>
             <blockquote v-for="quote in simulatedQuotes" :key="quote">{{ quote }}</blockquote>
+          </article>
+        </div>
+        <div class="business-map">
+          <article v-for="item in businessMapping" :key="item.kpi" class="business-map-item">
+            <span>{{ item.kpi }}</span>
+            <strong>{{ item.business_meaning }}</strong>
+            <small>{{ item.interpretation }}</small>
           </article>
         </div>
       </section>
@@ -350,6 +437,7 @@ import { useI18n } from 'vue-i18n'
 import { getKPIs, getTimeline, getSegments, getInfluencers } from '@/api/dashboard'
 import { getCampaign, hasCampaignAuth } from '@/api/campaign'
 import { getDemoDashboard } from '@/api/demo'
+import { analyzeDecision, runWhatIf } from '@/api/decision'
 import ExportButton from '@/components/ExportButton.vue'
 
 const route = useRoute()
@@ -455,6 +543,34 @@ const assumptions = ref([])
 const scoreExplanations = ref([])
 const riskDrivers = ref([])
 const simulatedQuotes = ref([])
+const decisionStrategy = ref({})
+const businessImpact = ref({})
+const businessMapping = ref([])
+const primaryRisk = ref({})
+const whatIfResult = ref(null)
+const whatIfLoading = ref(false)
+const activeScenario = ref('')
+
+const whatIfScenarios = [
+  {
+    key: 'proof',
+    labelKey: 'dashboard.whatIfProof',
+    descKey: 'dashboard.whatIfProofDesc',
+    scenario: { proof_points: true, testimonials: true },
+  },
+  {
+    key: 'discount',
+    labelKey: 'dashboard.whatIfDiscount',
+    descKey: 'dashboard.whatIfDiscountDesc',
+    scenario: { price_discount_pct: 10, proof_points: true },
+  },
+  {
+    key: 'competitor',
+    labelKey: 'dashboard.whatIfCompetitor',
+    descKey: 'dashboard.whatIfCompetitorDesc',
+    scenario: { competitor_launch: true, budget_increase_pct: 20 },
+  },
+]
 
 // --- Computed: Grade class ---
 const gradeClass = computed(() => {
@@ -524,6 +640,37 @@ const crisisClass = computed(() => {
   return `crisis-${r}`
 })
 
+const decisionHeadline = computed(() => {
+  if (!decisionStrategy.value.verdict) return t('dashboard.decisionPending')
+  const map = {
+    launch_with_guardrails: t('dashboard.decisionHeadlineLaunch'),
+    revise_before_launch: t('dashboard.decisionHeadlineRevise'),
+    optimize_message: t('dashboard.decisionHeadlineOptimize'),
+    controlled_pilot: t('dashboard.decisionHeadlinePilot'),
+  }
+  return map[decisionStrategy.value.verdict] || decisionStrategy.value.headline || t('dashboard.decisionPending')
+})
+
+const decisionRationale = computed(() => {
+  if (!decisionStrategy.value.verdict) return t('dashboard.decisionPendingDesc')
+  return t('dashboard.decisionRationale', {
+    conversion: Math.round(kpis.value.conversion_probability || 0),
+    risk: crisisLabel.value,
+    segment: topPositiveSegmentLabel(),
+  })
+})
+
+const decisionNextAction = computed(() => {
+  const verdict = decisionStrategy.value.verdict
+  const map = {
+    launch_with_guardrails: t('dashboard.decisionNextLaunch'),
+    revise_before_launch: t('dashboard.decisionNextRevise'),
+    optimize_message: t('dashboard.decisionNextOptimize'),
+    controlled_pilot: t('dashboard.decisionNextPilot'),
+  }
+  return map[verdict] || decisionStrategy.value.next_best_action || primaryRisk.value.recommended_action || t('dashboard.decisionPending')
+})
+
 // --- Helpers ---
 function formatSentiment(val) {
   if (val == null) return '—'
@@ -535,6 +682,32 @@ function formatNumber(n) {
   if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M'
   if (n >= 1000) return (n / 1000).toFixed(1) + 'K'
   return String(n)
+}
+
+function formatCurrency(value) {
+  const n = Number(value || 0)
+  const abs = Math.abs(n)
+  const sign = n < 0 ? '-' : ''
+  if (abs >= 1000000) return `${sign}฿${(abs / 1000000).toFixed(1)}M`
+  if (abs >= 1000) return `${sign}฿${(abs / 1000).toFixed(0)}K`
+  return `${sign}฿${abs.toFixed(0)}`
+}
+
+function formatSigned(value) {
+  const n = Number(value || 0)
+  if (n > 0) return `+${Number.isInteger(n) ? n : n.toFixed(1)}`
+  if (n < 0) return Number.isInteger(n) ? String(n) : n.toFixed(1)
+  return '0'
+}
+
+function formatDecisionVerdict(verdict) {
+  const map = {
+    launch_with_guardrails: t('dashboard.verdictLaunch'),
+    revise_before_launch: t('dashboard.verdictRevise'),
+    optimize_message: t('dashboard.verdictOptimize'),
+    controlled_pilot: t('dashboard.verdictPilot'),
+  }
+  return map[verdict] || map.controlled_pilot
 }
 
 function barHeight(val) {
@@ -775,6 +948,7 @@ async function loadDashboard() {
     }
 
     buildEvidenceFromCurrentState()
+    await loadDecisionEngine()
 
     lastUpdated.value = new Date().toLocaleString()
     reportDate.value = new Date().toLocaleDateString('en-US', {
@@ -830,6 +1004,79 @@ function applyDemoDashboard(data) {
   winningHighlights.value = scoreExplanations.value.slice(0, 3)
   riskSummary.value = riskDrivers.value[0] || riskSummary.value
   executiveSummaryTH.value = scoreExplanations.value.join(' ') || executiveSummaryTH.value
+  loadDecisionEngine()
+}
+
+async function loadDecisionEngine() {
+  try {
+    const res = await analyzeDecision({
+      campaign: campaignDetails.value || {},
+      kpis: kpis.value,
+      segments: segments.value,
+      evidence: {
+        confidence_score: confidenceScore.value,
+        risk_drivers: riskDrivers.value,
+        why_this_score: scoreExplanations.value,
+        assumptions: assumptions.value,
+      },
+    })
+    applyDecision(res.data || res)
+  } catch (e) {
+    console.warn('Decision engine unavailable, using local fallback:', e.message)
+    applyDecision(localDecisionFallback())
+  }
+}
+
+function applyDecision(data) {
+  decisionStrategy.value = data.recommended_strategy || {}
+  businessImpact.value = data.business_impact || {}
+  businessMapping.value = data.business_mapping || []
+  primaryRisk.value = data.primary_risk || {}
+  if (Array.isArray(data.actions) && data.actions.length) {
+    actionItems.value = data.actions
+  }
+  if (data.primary_risk?.driver && !riskDrivers.value.includes(data.primary_risk.driver)) {
+    riskDrivers.value = [data.primary_risk.driver, ...riskDrivers.value].slice(0, 4)
+  }
+}
+
+function localDecisionFallback() {
+  const crisis = crisisLevel.value
+  const verdict = crisis >= 3 ? 'revise_before_launch' : kpis.value.conversion_probability >= 65 ? 'launch_with_guardrails' : 'controlled_pilot'
+  return {
+    recommended_strategy: {
+      verdict,
+      headline: verdict === 'launch_with_guardrails' ? 'Launch with proof guardrails.' : 'Run a controlled pilot before scaling.',
+      rationale: `Conversion ${kpis.value.conversion_probability}% with ${crisisLabel.value} crisis risk.`,
+      next_best_action: riskDrivers.value[0] || 'Add proof points and retest one revised message.',
+      confidence: confidenceScore.value,
+    },
+    business_impact: {
+      estimated_revenue_impact: kpis.value.conversion_probability * 10000,
+      estimated_crisis_loss: crisis * 500000,
+      market_share_shift_pct: (kpis.value.brand_perception_shift || 8) * 0.08,
+      roi_pct: kpis.value.conversion_probability - 40,
+    },
+    business_mapping: [],
+    primary_risk: { recommended_action: riskDrivers.value[0] || '' },
+  }
+}
+
+async function runScenario(scenario) {
+  activeScenario.value = scenario.key
+  whatIfLoading.value = true
+  try {
+    const res = await runWhatIf({
+      kpis: kpis.value,
+      scenario: scenario.scenario,
+    })
+    whatIfResult.value = res.data || res
+  } catch (e) {
+    console.warn('What-if API unavailable:', e.message)
+    whatIfResult.value = null
+  } finally {
+    whatIfLoading.value = false
+  }
 }
 
 function normalizeKpis(data) {
@@ -1109,6 +1356,201 @@ font-size: var(--text-sm);
   padding: 28px 40px 60px;
 }
 
+/* ====================== DECISION CONSOLE ====================== */
+.decision-console {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  gap: var(--space-5);
+  margin-bottom: 28px;
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--border-subtle));
+}
+
+.decision-main h2 {
+  margin: 8px 0 10px;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: clamp(1.65rem, 3vw, 2.6rem);
+  line-height: 1.02;
+}
+
+.decision-main p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+  line-height: 1.6;
+}
+
+.decision-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.decision-verdict,
+.decision-confidence,
+.sandbox-status {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.decision-verdict {
+  color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.verdict-launch_with_guardrails {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.verdict-revise_before_launch {
+  color: var(--red);
+  background: var(--red-soft);
+}
+
+.verdict-optimize_message,
+.verdict-controlled_pilot {
+  color: var(--yellow);
+  background: var(--yellow-soft);
+}
+
+.decision-confidence,
+.sandbox-status {
+  color: var(--text-tertiary);
+  background: var(--bg-elevated);
+}
+
+.decision-side {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.next-action-card,
+.money-grid div {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+}
+
+.next-action-card {
+  padding: var(--space-4);
+}
+
+.next-action-card span,
+.money-grid span,
+.what-if-result span {
+  display: block;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.next-action-card strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  line-height: 1.35;
+}
+
+.money-grid,
+.what-if-result {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.money-grid div,
+.what-if-result div {
+  min-width: 0;
+  padding: var(--space-3);
+}
+
+.money-grid strong,
+.what-if-result strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  line-height: 1;
+}
+
+.what-if-console {
+  margin-bottom: 28px;
+}
+
+.what-if-header,
+.evidence-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.what-if-header {
+  margin-bottom: var(--space-4);
+}
+
+.scenario-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.scenario-button {
+  min-height: 96px;
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  background: var(--bg-panel);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+}
+
+.scenario-button:hover,
+.scenario-button.active {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+  transform: translateY(-1px);
+}
+
+.scenario-button strong,
+.scenario-button span {
+  display: block;
+}
+
+.scenario-button strong {
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+}
+
+.scenario-button span {
+  margin-top: 8px;
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+  line-height: 1.45;
+}
+
+.what-if-result {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+}
+
 /* ====================== CAMPAIGN BRIEF ====================== */
 .campaign-brief {
   margin-bottom: 28px;
@@ -1181,13 +1623,7 @@ font-size: var(--text-sm);
   margin: 28px 0;
 }
 
-.evidence-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-4);
-  margin-bottom: var(--space-5);
-}
+.evidence-header { margin-bottom: var(--space-5); }
 
 .confidence-pill {
   min-width: 128px;
@@ -1254,6 +1690,46 @@ font-size: var(--text-sm);
   margin: 0 0 10px;
   padding-left: 12px;
   border-left: 2px solid var(--accent);
+}
+
+.business-map {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  margin-top: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--border-subtle);
+}
+
+.business-map-item {
+  min-width: 0;
+  padding: var(--space-3);
+  background: var(--bg-panel);
+}
+
+.business-map-item span,
+.business-map-item small {
+  display: block;
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+  line-height: 1.35;
+}
+
+.business-map-item span {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.business-map-item strong {
+  display: block;
+  margin: 8px 0 6px;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  line-height: 1.25;
 }
 
 /* ====================== KPI ROW ====================== */
@@ -2258,6 +2734,12 @@ font-size: var(--text-sm);
 
 /* ====================== RESPONSIVE ====================== */
 @media (max-width: 1100px) {
+  .decision-console {
+    grid-template-columns: 1fr;
+  }
+  .business-map {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
   .kpi-row {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -2280,6 +2762,11 @@ font-size: var(--text-sm);
   }
   .kpi-row {
     grid-template-columns: 1fr 1fr;
+  }
+  .scenario-row,
+  .money-grid,
+  .what-if-result {
+    grid-template-columns: 1fr;
   }
   .brief-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2310,6 +2797,9 @@ font-size: var(--text-sm);
     grid-template-columns: 1fr;
   }
   .brief-grid {
+    grid-template-columns: 1fr;
+  }
+  .business-map {
     grid-template-columns: 1fr;
   }
 }

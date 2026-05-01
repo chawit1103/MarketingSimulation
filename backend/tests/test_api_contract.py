@@ -16,6 +16,7 @@ def test_product_blueprints_are_registered_under_api_prefix():
         "/api/export",
         "/api/demo",
         "/api/status",
+        "/api/decision",
     ]
 
     for prefix in expected_prefixes:
@@ -26,4 +27,4 @@ def test_demo_and_status_are_public_for_no_key_onboarding():
     source = MIDDLEWARE.read_text(encoding="utf-8")
     assert '"/api/demo"' in source
     assert '"/api/status"' in source
-
+    assert '"/api/decision"' in source
