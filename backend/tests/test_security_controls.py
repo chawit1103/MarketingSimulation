@@ -96,3 +96,25 @@ def test_rate_limited_endpoint_groups_are_configured():
     assert "/api/settings/readiness" in configured_prefixes
     assert "/api/settings/providers" in configured_prefixes
     assert "/api/simulation" in configured_prefixes
+
+
+def test_response_safety_strips_tracebacks_and_redacts_secret_like_values():
+    from app.utils.response_safety import sanitize_api_payload
+
+    payload = {
+        "success": False,
+        "error": "Provider failed with api_key=sk-testsecret123456789 and password=hunter2",
+        "traceback": "Traceback (most recent call last): private stack",
+        "nested": {"message": "Authorization: Bearer token1234567890"},
+    }
+
+    sanitized, removed = sanitize_api_payload(payload)
+    rendered = str(sanitized)
+
+    assert "traceback" not in rendered.lower()
+    assert "sk-testsecret" not in rendered
+    assert "hunter2" not in rendered
+    assert "token1234567890" not in rendered
+    assert sanitized["error"] == "Provider failed with api_key=*** and password=***"
+    assert sanitized["nested"]["message"] == "Authorization: Bearer ***"
+    assert removed

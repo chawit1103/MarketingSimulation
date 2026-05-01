@@ -1,0 +1,75 @@
+# Release Readiness Checklist
+
+Updated: 2026-05-01
+
+Use this checklist before tagging or deploying a release candidate.
+
+## Scope Control
+
+- [x] No database migration added in the release-readiness pass.
+- [x] No billing, metering, or paid-plan enforcement added.
+- [x] No unsupported LLM, embedding, or graph providers added.
+- [x] Demo mode remains available without API keys.
+- [x] Local estimate fallbacks remain explicit and labeled.
+
+## Critical Route Contracts
+
+- [x] `/api/demo/campaigns`
+- [x] `/api/demo/campaigns/<demo_id>/dashboard`
+- [x] `/api/brief/quality`
+- [x] `/api/decision/analyze`
+- [x] `/api/decision/what-if`
+- [x] `/api/comparator/compare`
+- [x] `/api/comparator/metrics`
+- [x] `/api/impact/scenarios/<sentiment_value>`
+- [x] `/api/competitor/scenarios`
+- [x] `/api/competitor/simulate`
+- [x] `/api/export/pptx`
+- [x] `/api/export/csv`
+- [x] `/api/settings/providers`
+- [x] `/api/settings/readiness`
+- [x] `/api/report/generate/status`
+- [x] campaign CRUD and pipeline routes used by the Campaigns view
+- [x] dashboard KPI/report/timeline/segments routes
+- [x] simulation create/prepare/start/stop/status routes
+
+Backend smoke tests cover these contracts through `backend/tests/test_api_contract.py`.
+
+## Result Source And Fallback Safety
+
+- [x] Demo dashboards are labeled Demo Mode.
+- [x] Dashboard local fallbacks are labeled Local Estimate.
+- [x] Comparator demo/local fallback output is visibly labeled.
+- [x] War Room calls the backend by default and exposes Local Estimate only after an explicit fallback action.
+- [x] Action plans inherit source metadata.
+- [x] Unknown source is displayed conservatively when source metadata is missing.
+
+## Security And Abuse Protection
+
+- [x] Production refuses known fallback auth/session secrets.
+- [x] New passwords use Werkzeug adaptive hashes.
+- [x] Legacy salted SHA256 hashes are rehashed on successful login.
+- [x] Public/high-risk endpoints are rate-limited in-process for local/demo use.
+- [x] Raw traceback and stack fields are stripped from client-facing API JSON.
+- [x] Common secret-like strings are redacted from client-facing API JSON.
+- [x] Settings readiness checks do not echo API keys or graph passwords.
+
+## Automated Validation
+
+- [x] Backend tests: `backend/.venv/bin/python -m pytest backend/tests`
+- [x] Frontend production build: `cd frontend && npm run build`
+- [x] Locale JSON validation: `python3 -m json.tool frontend/src/locales/en.json` and `th.json`
+- [ ] Frontend unit tests: not configured.
+- [ ] Frontend lint/typecheck: not configured.
+
+## Manual Demo Flow Checks
+
+- [ ] Open `/dashboard/demo-premium-water` and confirm KPIs, confidence/evidence, source badge, and action plan render.
+- [ ] Open `/comparator` without auth and confirm demo/local labels are visible.
+- [ ] Open `/war-room`, run backend simulation, then verify explicit Local Estimate behavior if backend is unavailable.
+- [ ] Open `/impact` and verify quick scenarios use `/api/impact/scenarios/<sentiment_value>`.
+- [ ] Open `/settings` and verify Demo only, Local model, and Cloud API wizard paths do not expose secrets.
+
+## Release Decision
+
+This repository is suitable for a controlled demo, internal pilot, or product-discovery release candidate after manual demo-flow verification. It is not yet a fully calibrated enterprise prediction system.

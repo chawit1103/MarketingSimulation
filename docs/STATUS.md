@@ -19,6 +19,8 @@ Updated: 2026-05-01
 - Structured Action Plan output is available for dashboards and demo dashboards, with source mode, sectioned recommendations, reasons, expected impact, and risks.
 - Settings Wizard supports Demo only, Local model, and Cloud API setup readiness checks without exposing secrets.
 - Frontend source badges identify result provenance: Demo Mode, Local Estimate, Live Backend, Backend Verified, or Unknown Source.
+- Critical frontend route contracts are covered by backend smoke tests for demo, impact, decision, comparator, competitor, export, settings readiness, and report status endpoints.
+- API response safety removes raw traceback keys and redacts common secret-like strings before JSON responses reach clients.
 
 ## Demo / Prototype
 
@@ -28,7 +30,7 @@ Updated: 2026-05-01
 - Comparator can fall back to browser-side sample output for demo continuity; fallback output is visibly labeled as Local Estimate.
 - Quick impact scenarios are deterministic business estimates based on sentiment and supplied business inputs.
 
-## Fixed In This PR
+## Recently Fixed / Hardened
 
 - `/api/impact/scenarios/<sentiment_value>` is now reachable without auth for the frontend quick scenario flow.
 - `/api/demo/campaigns/<demo_id>/dashboard` has smoke coverage and returns result-source metadata.
@@ -47,6 +49,9 @@ Updated: 2026-05-01
 - Dashboard Action Plans now include creative adjustment, channel allocation, crisis prevention, and validation plan sections.
 - Dashboard export payloads, CSV export, quick download, and PPTX action-plan slides can include structured action plan rows.
 - Settings Wizard adds mode selection, deterministic readiness checks for LLM/embedding/Neo4j config, safe provider catalog access, sanitized provider errors, sample simulation guidance, and clearly labeled cost estimates.
+- Frontend report status helper now uses the backend `POST /api/report/generate/status` contract.
+- Response sanitization now redacts API-key, token, password, bearer-token, and `sk-*` style values from client-facing JSON.
+- Release-readiness documentation was added for checklist, known limitations, roadmap, and post-implementation action planning.
 
 ## Remaining Gaps
 

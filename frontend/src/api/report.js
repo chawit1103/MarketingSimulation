@@ -10,10 +10,13 @@ export const generateReport = (data) => {
 
 /**
  * Get report generation status
- * @param {string} reportId
+ * @param {string|Object} statusRef - task_id string or { task_id, simulation_id }
  */
-export const getReportStatus = (reportId) => {
-  return service.get(`/api/report/generate/status`, { params: { report_id: reportId } })
+export const getReportStatus = (statusRef) => {
+  const payload = typeof statusRef === 'object' && statusRef !== null
+    ? statusRef
+    : { task_id: statusRef }
+  return service.post('/api/report/generate/status', payload)
 }
 
 /**

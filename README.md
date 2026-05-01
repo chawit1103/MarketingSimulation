@@ -38,6 +38,12 @@ This is not positioned as an AI playground. It is a decision-support system for 
 - What should we show leadership or a client?
 
 For the current production/demo readiness matrix, see [docs/STATUS.md](docs/STATUS.md).
+For release validation, known limitations, and recommended next actions, see:
+
+- [docs/RELEASE_READINESS_CHECKLIST.md](docs/RELEASE_READINESS_CHECKLIST.md)
+- [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md)
+- [docs/POST_IMPLEMENTATION_ACTION_PLAN.md](docs/POST_IMPLEMENTATION_ACTION_PLAN.md)
+- [docs/ROADMAP.md](docs/ROADMAP.md)
 
 ---
 
@@ -239,6 +245,26 @@ Recommended deck structure:
 
 Settings includes a system health view backed by `GET /api/status`.
 
+### Settings Wizard
+
+Settings includes a setup wizard for three supported modes:
+
+- **Demo only**: no LLM, embedding provider, or Neo4j connection required.
+- **Local model**: configuration readiness for local Ollama-style LLM/embedding and local Neo4j.
+- **Cloud API**: configuration readiness for supported cloud LLM/embedding providers and Neo4j Aura-style graph storage.
+
+The readiness endpoint (`POST /api/settings/readiness`) is deterministic and does not make live provider calls. It validates required fields using secret-presence flags, so API keys and passwords are not echoed back to the browser. The optional LLM live test remains an authenticated runtime check and depends on real provider availability.
+
+### Result Source Labels
+
+The UI labels simulation and decision outputs with one of the supported result-source modes:
+
+- **Demo Mode**: deterministic sample data intended for onboarding and product exploration.
+- **Local Estimate**: browser-side deterministic fallback, visibly warned and not presented as live backend output.
+- **Live Backend**: backend-generated deterministic output.
+- **Backend Verified**: backend route completed successfully and supplied the displayed result.
+- **Unknown Source**: source metadata was unavailable and should be treated conservatively.
+
 It checks:
 
 - backend API readiness
@@ -356,6 +382,9 @@ All product APIs are registered under `/api/*`.
 | GET | `/api/demo/campaigns` | No-key demo campaign list |
 | GET | `/api/demo/campaigns/{id}/dashboard` | No-key demo dashboard |
 | GET | `/api/industry/templates` | Public industry template list |
+| POST | `/api/brief/quality` | Deterministic brief completeness scoring |
+| GET | `/api/settings/providers` | Safe provider catalog |
+| POST | `/api/settings/readiness` | Secret-safe setup readiness check |
 
 ### Auth
 
@@ -491,7 +520,7 @@ Key decisions:
 Backend contract tests:
 
 ```bash
-./backend/.venv/bin/python -m pytest backend/tests/test_api_contract.py
+./backend/.venv/bin/python -m pytest backend/tests
 ```
 
 Frontend production build:
@@ -507,26 +536,20 @@ Locale validation:
 for f in frontend/src/locales/*.json; do python3 -m json.tool "$f" >/dev/null || exit 1; done
 ```
 
+Available frontend scripts:
+
+```bash
+cd frontend
+npm run build
+```
+
+There is no frontend unit-test or lint script configured in `frontend/package.json` yet.
+
 ---
 
 ## Product Roadmap
 
-Highest priority:
-
-- expand Thai industry templates for healthcare, restaurants, EV, FMCG, cosmetics, public policy, and agriculture
-- strengthen KPI calculation with real simulation traces rather than mock fallback where possible
-- calibrate Decision Engine rules with real campaign outcomes
-- improve PPTX export templates for agency/client deliverables
-- add broader backend tests for auth, campaign CRUD, template validation, KPI calculation, and export
-- deploy a public hosted demo
-
-Nice-to-have:
-
-- scenario comparison history
-- calibration from real post-campaign data
-- cost estimator by LLM provider and persona count
-- team collaboration and comments on reports
-- template marketplace / library
+See [docs/ROADMAP.md](docs/ROADMAP.md). The highest-priority next work is calibration against real campaign outcomes, broader QA automation, deployment hardening, and pilot-user feedback loops.
 
 ---
 

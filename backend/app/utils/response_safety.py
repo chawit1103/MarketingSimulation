@@ -2,11 +2,19 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any, List, Tuple
 
 
 SENSITIVE_ERROR_KEYS = {"traceback", "stacktrace", "stack"}
 TRACEBACK_MARKER = "Traceback (most recent call last)"
+SECRET_PATTERNS = (
+    (re.compile(r"sk-[A-Za-z0-9_\-]{8,}"), "sk-***"),
+    (re.compile(r"(?i)(api[_-]?key\s*[:=]\s*)([^\s,;]+)"), r"\1***"),
+    (re.compile(r"(?i)(password\s*[:=]\s*)([^\s,;]+)"), r"\1***"),
+    (re.compile(r"(?i)(token\s*[:=]\s*)([^\s,;]+)"), r"\1***"),
+    (re.compile(r"(?i)(authorization\s*[:=]\s*bearer\s+)([^\s,;]+)"), r"\1***"),
+)
 
 
 def sanitize_api_payload(payload: Any) -> Tuple[Any, List[str]]:
@@ -28,9 +36,16 @@ def sanitize_api_payload(payload: Any) -> Tuple[Any, List[str]]:
             return clean
         if isinstance(value, list):
             return [_sanitize(item) for item in value]
-        if isinstance(value, str) and TRACEBACK_MARKER in value:
-            removed.append(value)
-            return "Internal server error"
+        if isinstance(value, str):
+            if TRACEBACK_MARKER in value:
+                removed.append(value)
+                return "Internal server error"
+            redacted = value
+            for pattern, replacement in SECRET_PATTERNS:
+                redacted = pattern.sub(replacement, redacted)
+            if redacted != value:
+                removed.append("Redacted secret-like value from client response")
+            return redacted
         return value
 
     return _sanitize(payload), removed
