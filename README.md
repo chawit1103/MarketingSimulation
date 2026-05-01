@@ -38,8 +38,13 @@ This is not positioned as an AI playground. It is a decision-support system for 
 - What should we show leadership or a client?
 
 For the current production/demo readiness matrix, see [docs/STATUS.md](docs/STATUS.md).
-For release validation, known limitations, and recommended next actions, see:
+For demo, release validation, known limitations, and recommended next actions, see:
 
+- [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)
+- [docs/DEMO_DATA.md](docs/DEMO_DATA.md)
+- [docs/FAQ.md](docs/FAQ.md)
+- [docs/SCREENSHOT_GUIDE.md](docs/SCREENSHOT_GUIDE.md)
+- [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md)
 - [docs/RELEASE_READINESS_CHECKLIST.md](docs/RELEASE_READINESS_CHECKLIST.md)
 - [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md)
 - [docs/POST_IMPLEMENTATION_ACTION_PLAN.md](docs/POST_IMPLEMENTATION_ACTION_PLAN.md)
@@ -131,7 +136,7 @@ The Settings Wizard checks readiness for demo-only, local model, and cloud API s
 
 ![Settings Wizard](docs/screenshots/settings-wizard.png)
 
-For a presenter-friendly run-through, see [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md). For a first-time user path, see [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md).
+For a presenter-friendly run-through, see [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md). For safe sample briefs, see [docs/DEMO_DATA.md](docs/DEMO_DATA.md). For expected buyer and pilot-user questions, see [docs/FAQ.md](docs/FAQ.md). For a first-time user path, see [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md).
 
 ---
 

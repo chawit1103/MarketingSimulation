@@ -2,7 +2,7 @@
 
 Updated: 2026-05-01
 
-Use this script for a concise product walkthrough. Keep the message grounded: the demo is deterministic scenario planning, not guaranteed prediction.
+Use this script for a concise product walkthrough. Keep the message grounded: the demo is deterministic scenario planning, not guaranteed prediction. Say the source mode out loud whenever a result appears: Demo Mode, Local Estimate, Live Backend, or Backend Verified.
 
 ## 0:00-0:30 — Position The Product
 
@@ -34,6 +34,8 @@ Show:
 - Campaign brief and persona count.
 - Confidence & Evidence panel.
 - KPI cards and next validation step.
+
+Do not say the numbers are real market predictions. Say they are safe synthetic demo outputs used to show the workflow.
 
 Screenshot: `docs/screenshots/demo-dashboard-overview.png`
 
@@ -72,6 +74,8 @@ Show:
   - Channel Allocation
   - Crisis Prevention
   - Validation Plan
+
+Point out that the Action Plan inherits the same source label as the dashboard result.
 
 Screenshots:
 
@@ -117,3 +121,9 @@ Screenshot: `docs/screenshots/settings-wizard.png`
 Close with:
 
 > The current release is ready for controlled demos and pilot discovery. The next product milestone is calibration against real campaign outcomes and broader QA/deployment hardening.
+
+Optional handoff:
+
+- Share [DEMO_DATA.md](DEMO_DATA.md) if the audience wants safe briefs to try.
+- Share [FAQ.md](FAQ.md) for trust, privacy, and accuracy questions.
+- Share [PILOT_PLAN.md](PILOT_PLAN.md) when a team wants to test with real internal stakeholders.

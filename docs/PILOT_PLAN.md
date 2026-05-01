@@ -2,7 +2,7 @@
 
 Updated: 2026-05-01
 
-This plan is for controlled testing with real users. The goal is to validate workflow value, trust, and decision usefulness before broad release. It is not a calibration study by itself.
+This plan is for controlled testing with 3-5 real users or internal stakeholders. The goal is to validate workflow value, trust, and decision usefulness before broad release. It is not a calibration study by itself.
 
 ## Pilot Objectives
 
@@ -14,7 +14,7 @@ This plan is for controlled testing with real users. The goal is to validate wor
 
 ## Participant Profile
 
-Recruit 5-10 pilot users across:
+Recruit 3-5 participants across:
 
 - marketing managers,
 - PR/crisis communication teams,
@@ -23,7 +23,7 @@ Recruit 5-10 pilot users across:
 - product marketers,
 - strategy or insights teams.
 
-Prefer participants who can bring one approved or non-confidential campaign scenario. Do not ask users to enter confidential customer data, regulated personal data, API keys, or real sensitive business material during early pilots.
+Prefer participants who can bring one approved or non-confidential campaign scenario. Internal stakeholders can use the sample briefs in [DEMO_DATA.md](DEMO_DATA.md). Do not ask users to enter confidential customer data, regulated personal data, API keys, or real sensitive business material during early pilots.
 
 ## Pilot Setup
 
@@ -34,6 +34,7 @@ Before the session:
 3. Verify the local or hosted demo environment is working.
 4. Confirm screenshots, recordings, and notes will not expose secrets or customer data.
 5. Prepare the 5-minute demo script from [DEMO_SCRIPT.md](DEMO_SCRIPT.md).
+6. Prepare the FAQ from [FAQ.md](FAQ.md) for trust, privacy, and accuracy questions.
 
 Recommended starting routes:
 
@@ -108,10 +109,10 @@ Do not capture:
 
 Pilot is successful if:
 
-- 80% of participants can explain the product purpose after the landing page and demo dashboard.
-- 80% can distinguish Demo Mode or Local Estimate from live/backend-verified output.
-- 70% can identify one recommended action and one validation step.
-- 60% say the Action Plan or Confidence & Evidence panel would help in a real campaign discussion.
+- At least 4 of 5 participants, or 3 of 4 in a smaller pilot, can explain the product purpose after the landing page and demo dashboard.
+- At least 4 of 5 participants, or 3 of 4, can distinguish Demo Mode or Local Estimate from live/backend-verified output.
+- At least 3 participants can identify one recommended action and one validation step.
+- At least 3 participants say the Action Plan or Confidence & Evidence panel would help in a real campaign discussion.
 - No participant mistakes local fallback output for measured live simulation output.
 
 ## Exit Criteria Before Public Demo
