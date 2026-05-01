@@ -29,7 +29,7 @@ except ImportError:
 
 def _get_secret() -> str:
     """Return the auth secret, preferring AUTH_SECRET_KEY env var."""
-    return os.environ.get("AUTH_SECRET_KEY", Config.SECRET_KEY or "mirofish-auth-fallback")
+    return os.environ.get("AUTH_SECRET_KEY", Config.SECRET_KEY or "3c-simulator-auth-fallback")
 
 
 # ---------------------------------------------------------------------------

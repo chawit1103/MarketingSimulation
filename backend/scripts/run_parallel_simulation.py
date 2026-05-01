@@ -202,6 +202,33 @@ REDDIT_ACTIONS = [
 ]
 
 
+def resolve_actions_for_platform(config: Dict[str, Any], platform: str, default_actions: List[Any]) -> List[Any]:
+    """Resolve OASIS actions from campaign platform preset metadata.
+
+    The preset can include future OASIS actions. We only activate actions that
+    exist in the installed camel-oasis version and fall back to defaults if the
+    preset would produce an empty action set.
+    """
+    preset = config.get("oasis_preset") or {}
+    action_names = preset.get(f"{platform}_actions") or []
+    if not action_names:
+        return default_actions
+
+    resolved = []
+    missing = []
+    for name in action_names:
+        action = getattr(ActionType, name, None)
+        if action is None:
+            missing.append(name)
+            continue
+        resolved.append(action)
+
+    if missing:
+        print(f"[OASIS preset] {platform}: unavailable actions skipped for installed OASIS version: {', '.join(missing)}")
+
+    return resolved or default_actions
+
+
 # IPC-related constants
 IPC_COMMANDS_DIR = "ipc_commands"
 IPC_RESPONSES_DIR = "ipc_responses"
@@ -1138,7 +1165,7 @@ async def run_twitter_simulation(
     result.agent_graph = await generate_twitter_agent_graph(
         profile_path=profile_path,
         model=model,
-        available_actions=TWITTER_ACTIONS,
+        available_actions=resolve_actions_for_platform(config, "twitter", TWITTER_ACTIONS),
     )
     
     # Get Agent real name mapping from config (use entity_name instead of default Agent_X)
@@ -1329,7 +1356,7 @@ async def run_reddit_simulation(
     result.agent_graph = await generate_reddit_agent_graph(
         profile_path=profile_path,
         model=model,
-        available_actions=REDDIT_ACTIONS,
+        available_actions=resolve_actions_for_platform(config, "reddit", REDDIT_ACTIONS),
     )
     
     # Get Agent real name mapping from config (use entity_name instead of default Agent_X)

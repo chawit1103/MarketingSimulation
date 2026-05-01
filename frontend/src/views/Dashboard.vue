@@ -2,10 +2,11 @@
   <div class="dashboard">
     <!-- Navigation -->
     <nav class="navbar">
-      <div class="nav-brand">MIROFISH EXECUTIVE DASHBOARD</div>
+      <div class="nav-brand">{{ $t('dashboard.brand') }}</div>
       <div class="nav-links">
         <router-link to="/" class="nav-link">{{ $t('nav.home') }}</router-link>
         <router-link to="/settings" class="nav-link">{{ $t('nav.settings') }}</router-link>
+        <ExportButton :data="exportData" :label="$t('common.export')" :filename="exportData.filename" />
         <span class="nav-campaign">#{{ campaignId }}</span>
       </div>
     </nav>
@@ -17,24 +18,67 @@
         <p class="campaign-meta">
           <span class="meta-date">{{ reportDate }}</span>
           <span class="meta-sep">|</span>
-          <span class="meta-rounds">{{ totalRounds }} Simulation Rounds</span>
+          <span class="meta-rounds">{{ totalRounds }} {{ $t('dashboard.simulationRounds') }}</span>
         </p>
       </div>
       <div class="header-right">
         <div :class="['grade-badge', gradeClass]">
           <span class="grade-letter">{{ overallGrade }}</span>
-          <span class="grade-label">Overall Score</span>
+          <span class="grade-label">{{ $t('dashboard.overallScore') }}</span>
         </div>
       </div>
     </header>
 
     <div class="dash-body">
+      <!-- Campaign Brief -->
+      <section class="campaign-brief panel">
+        <div class="brief-main">
+          <span class="brief-kicker">{{ $t('dashboard.campaignBrief') }}</span>
+          <h2>{{ campaignName }}</h2>
+          <p>{{ campaignBrief.description || $t('dashboard.noCampaignDescription') }}</p>
+        </div>
+        <div class="brief-grid">
+          <div class="brief-item">
+            <span>{{ $t('dashboard.briefObjective') }}</span>
+            <strong>{{ campaignBrief.objective }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.briefPlatform') }}</span>
+            <strong>{{ campaignBrief.platform }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.briefPlatformMode') }}</span>
+            <strong>{{ campaignBrief.platformMode }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.briefChannels') }}</span>
+            <strong>{{ campaignBrief.channels }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.briefAudience') }}</span>
+            <strong>{{ campaignBrief.audience }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.briefPersonas') }}</span>
+            <strong>{{ campaignBrief.personas }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.briefRounds') }}</span>
+            <strong>{{ campaignBrief.rounds }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.briefStatus') }}</span>
+            <strong>{{ campaignBrief.status }}</strong>
+          </div>
+        </div>
+      </section>
+
       <!-- KPI Cards Row -->
       <section class="kpi-row">
         <div class="kpi-card sentiment-card">
-          <div class="kpi-icon">📊</div>
+          <div class="kpi-icon">SI</div>
           <div class="kpi-content">
-            <span class="kpi-label">Overall Sentiment</span>
+            <span class="kpi-label">{{ $t('dashboard.overallSentiment') }}</span>
             <div class="sentiment-gauge">
               <div class="gauge-track">
                 <div class="gauge-fill-negative" :style="{ width: negativeGaugeWidth }"></div>
@@ -49,9 +93,9 @@
         </div>
 
         <div class="kpi-card">
-          <div class="kpi-icon">🎯</div>
+          <div class="kpi-icon">CV</div>
           <div class="kpi-content">
-            <span class="kpi-label">Conversion Probability</span>
+            <span class="kpi-label">{{ $t('dashboard.conversionProbability') }}</span>
             <span class="kpi-value big">{{ kpis.conversion_probability }}%</span>
             <div class="kpi-bar">
               <div class="kpi-bar-fill conversion" :style="{ width: kpis.conversion_probability + '%' }"></div>
@@ -60,9 +104,9 @@
         </div>
 
         <div class="kpi-card">
-          <div class="kpi-icon">🌐</div>
+          <div class="kpi-icon">IF</div>
           <div class="kpi-content">
-            <span class="kpi-label">Social Influence Index</span>
+            <span class="kpi-label">{{ $t('dashboard.socialInfluence') }}</span>
             <span class="kpi-value big">{{ kpis.social_influence }}/100</span>
             <div class="kpi-bar">
               <div class="kpi-bar-fill influence" :style="{ width: kpis.social_influence + '%' }"></div>
@@ -71,9 +115,9 @@
         </div>
 
         <div class="kpi-card">
-          <div class="kpi-icon">💬</div>
+          <div class="kpi-icon">MR</div>
           <div class="kpi-content">
-            <span class="kpi-label">Message Resonance</span>
+            <span class="kpi-label">{{ $t('dashboard.messageResonance') }}</span>
             <span class="kpi-value big">{{ kpis.message_resonance }}%</span>
             <div class="kpi-bar">
               <div class="kpi-bar-fill resonance" :style="{ width: kpis.message_resonance + '%' }"></div>
@@ -82,9 +126,9 @@
         </div>
 
         <div :class="['kpi-card', 'crisis-card', crisisClass]">
-          <div class="kpi-icon">⚠️</div>
+          <div class="kpi-icon">CR</div>
           <div class="kpi-content">
-            <span class="kpi-label">Crisis Risk</span>
+            <span class="kpi-label">{{ $t('dashboard.crisisRisk') }}</span>
             <span class="kpi-value big">{{ crisisLabel }}</span>
             <div class="crisis-indicator">
               <span class="crisis-dot" :style="{ background: crisisColor }"></span>
@@ -98,7 +142,7 @@
       <section class="mid-row">
         <!-- Sentiment Timeline Chart -->
         <div class="panel chart-panel">
-          <h2 class="panel-title">Sentiment Timeline by Round</h2>
+          <h2 class="panel-title">{{ $t('dashboard.sentimentTimeline') }}</h2>
           <div class="chart-container">
             <div class="chart-y-axis">
               <span>+100</span>
@@ -127,14 +171,14 @@
 
         <!-- Segment Breakdown Table -->
         <div class="panel table-panel">
-          <h2 class="panel-title">Persona Segment Breakdown</h2>
+          <h2 class="panel-title">{{ $t('dashboard.personaSegmentBreakdown') }}</h2>
           <table class="segment-table">
             <thead>
               <tr>
-                <th>Segment</th>
-                <th>Sentiment</th>
-                <th>Conv. Est.</th>
-                <th>Size</th>
+                <th>{{ $t('dashboard.tableSegment') }}</th>
+                <th>{{ $t('dashboard.tableSentiment') }}</th>
+                <th>{{ $t('dashboard.tableConvEst') }}</th>
+                <th>{{ $t('dashboard.tableSize') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -160,7 +204,7 @@
 
       <!-- Top Influencers -->
       <section class="panel">
-        <h2 class="panel-title">Top Influencers &amp; Impact</h2>
+        <h2 class="panel-title">{{ $t('dashboard.topInfluencers') }}</h2>
         <div class="influencer-grid">
           <div v-for="(inf, idx) in influencers" :key="idx" class="influencer-card">
             <div class="inf-rank">#{{ idx + 1 }}</div>
@@ -190,14 +234,14 @@
 
       <!-- Action Plan: Think to Finish -->
       <section class="action-plan">
-        <h2 class="panel-title">Action Plan — Think to Finish</h2>
+        <h2 class="panel-title">{{ $t('dashboard.actionPlan') }}</h2>
 
         <div class="action-grid">
           <!-- Winning Strategy -->
           <div class="action-box winning">
             <div class="action-box-header">
-              <span class="action-icon">🏆</span>
-              <h3>Winning Strategy</h3>
+              <span class="action-icon">WS</span>
+              <h3>{{ $t('dashboard.winningStrategy') }}</h3>
             </div>
             <p class="action-box-text">{{ winningStrategy }}</p>
             <ul class="winning-highlights">
@@ -208,13 +252,13 @@
           <!-- Risk Areas -->
           <div class="action-box risk">
             <div class="action-box-header">
-              <span class="action-icon">🚨</span>
-              <h3>Risk Areas</h3>
+              <span class="action-icon">RA</span>
+              <h3>{{ $t('dashboard.riskAreas') }}</h3>
             </div>
             <p class="action-box-text">{{ riskSummary }}</p>
             <ul class="risk-list">
               <li v-for="(r, idx) in riskAreas" :key="idx">
-                <span class="risk-severity" :style="{ color: r.severity === 'high' ? '#ef4444' : '#f59e0b' }">
+                <span class="risk-severity" :style="{ color: severityColor(r.severity) }">
                   {{ r.severity === 'high' ? 'HIGH' : 'MED' }}
                 </span>
                 {{ r.description }}
@@ -225,7 +269,7 @@
 
         <!-- Action Items -->
         <div class="action-items">
-          <h3 class="action-items-title">Priority Action Items</h3>
+          <h3 class="action-items-title">{{ $t('dashboard.priorityActionItems') }}</h3>
           <div class="action-item-list">
             <div v-for="(item, idx) in actionItems" :key="idx" class="action-item">
               <span class="action-item-num">{{ idx + 1 }}</span>
@@ -244,7 +288,7 @@
       <!-- Executive Summary -->
       <section class="panel summary-panel">
         <div class="summary-header" @click="showSummary = !showSummary">
-          <h2 class="panel-title">Executive Summary ภาษาไทย</h2>
+          <h2 class="panel-title">{{ $t('dashboard.executiveSummaryTH') }}</h2>
           <span class="summary-toggle">{{ showSummary ? '▲' : '▼' }}</span>
         </div>
         <div v-if="showSummary" class="summary-content">
@@ -255,8 +299,8 @@
       <!-- Data Info -->
       <div class="data-info">
         <span>{{ $t('common.loading') }}...</span>
-        <span v-if="loading">Fetching latest data...</span>
-        <span v-else>Last updated: {{ lastUpdated }}</span>
+        <span v-if="loading">{{ $t('dashboard.fetchingData') }}</span>
+        <span v-else>{{ $t('dashboard.lastUpdated') }}: {{ lastUpdated }}</span>
       </div>
     </div>
   </div>
@@ -267,6 +311,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getKPIs, getTimeline, getSegments, getInfluencers } from '@/api/dashboard'
+import { getCampaign } from '@/api/campaign'
+import ExportButton from '@/components/ExportButton.vue'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -279,6 +325,67 @@ const overallGrade = ref('B+')
 const loading = ref(true)
 const showSummary = ref(false)
 const lastUpdated = ref('')
+const campaignDetails = ref(null)
+
+// Export data (computed from current state)
+const exportData = computed(() => ({
+  slide_type: 'dashboard',
+  title: `${campaignName.value} — Executive Summary`,
+  subtitle: `${reportDate.value} | ${totalRounds.value} Rounds | Grade: ${overallGrade.value}`,
+  kpis: {
+    overall_sentiment: kpis.value.overall_sentiment,
+    conversion_probability: kpis.value.conversion_probability,
+    social_influence_index: kpis.value.social_influence,
+    message_resonance: kpis.value.message_resonance,
+    crisis_risk: crisisLabel.value,
+    brand_perception_shift: kpis.value.brand_perception_shift || 12,
+    opinion_polarization: kpis.value.opinion_polarization || 35,
+    roi_pct: kpis.value.conversion_probability - 40,
+  },
+  timeline: timeline.value,
+  recommendation: executiveSummaryTH.value || winningStrategy.value || 'Review action plan for next steps.',
+  revenue_projection: {
+    monthly: kpis.value.conversion_probability * 10000,
+    annual: kpis.value.conversion_probability * 120000,
+    crisis_loss: crisisLevel.value * 500000,
+  },
+  filename: `msaas_${campaignName.value.replace(/\s+/g, '_').toLowerCase()}`,
+}))
+
+const campaignBrief = computed(() => {
+  const campaign = campaignDetails.value || {}
+  const target = campaign.target || campaign.audience || {}
+  const simConfig = campaign.sim_config || {}
+  const ageRange = target.age_range || [target.age_min, target.age_max].filter(Boolean)
+  const channels = normalizeChannels(
+    target.channels || simConfig.audience_channels || campaign.audience_channels || []
+  )
+  const regions = Array.isArray(target.regions) && target.regions.length
+    ? target.regions.join(', ')
+    : ''
+  const audienceParts = [
+    target.segment_name,
+    Array.isArray(ageRange) && ageRange.length === 2 ? `${ageRange[0]}-${ageRange[1]}` : '',
+    regions,
+  ].filter(Boolean)
+
+  return {
+    description: campaign.description || '',
+    objective: formatObjective(campaign.objective),
+    platform: formatPlatform(simConfig.platform || campaign.platform),
+    platformMode: formatPlatformMode(
+      simConfig.platform_mode ||
+      campaign.platform_mode ||
+      simConfig.oasis_preset?.resolved_mode ||
+      simConfig.oasis_preset?.mode
+    ),
+    channels: channels.length ? channels.map(formatChannel).join(', ') : t('dashboard.briefNotSpecified'),
+    audience: audienceParts.join(' / ') || t('dashboard.briefNotSpecified'),
+    personas: target.persona_count || campaign.persona_count || '—',
+    rounds: simConfig.max_rounds || campaign.max_rounds || totalRounds.value || '—',
+    status: formatStatus(campaign.status),
+  }
+})
 
 // KPI State
 const kpis = ref({
@@ -339,15 +446,15 @@ const crisisLevel = computed(() => {
 })
 const crisisLabel = computed(() => {
   const r = kpis.value.crisis_risk
-  if (r === 'high') return 'HIGH'
-  if (r === 'medium') return 'MEDIUM'
-  return 'LOW'
+  if (r === 'high') return t('dashboard.crisisHigh')
+  if (r === 'medium') return t('dashboard.crisisMedium')
+  return t('dashboard.crisisLow')
 })
 const crisisColor = computed(() => {
   const r = kpis.value.crisis_risk
-  if (r === 'high') return '#ef4444'
-  if (r === 'medium') return '#f59e0b'
-  return '#22c55e'
+  if (r === 'high') return 'var(--red)'
+  if (r === 'medium') return 'var(--yellow)'
+  return 'var(--green)'
 })
 const crisisClass = computed(() => `crisis-${kpis.value.crisis_risk}`)
 
@@ -370,10 +477,149 @@ function barHeight(val) {
 }
 
 function priorityColor(p) {
-  if (p === 'critical') return '#ef4444'
-  if (p === 'high') return '#FF4500'
-  if (p === 'medium') return '#f59e0b'
-  return '#22c55e'
+  if (p === 'critical') return 'var(--red)'
+  if (p === 'high') return 'var(--accent)'
+  if (p === 'medium') return 'var(--yellow)'
+  return 'var(--green)'
+}
+
+function severityColor(severity) {
+  return severity === 'high' ? 'var(--red)' : 'var(--yellow)'
+}
+
+function formatObjective(objective) {
+  const map = {
+    message_testing: t('campaigns.objectiveMessageTesting'),
+    crisis_simulation: t('campaigns.objectiveCrisisSimulation'),
+    product_launch: t('campaigns.objectiveProductLaunch'),
+    competitor_response: t('campaigns.objectiveCompetitorResponse'),
+    brand_perception: t('campaigns.objectiveBrandPerception'),
+  }
+  return map[objective] || objective || t('dashboard.briefNotSpecified')
+}
+
+function formatPlatform(platform) {
+  const map = {
+    twitter: t('campaigns.platformTwitter'),
+    reddit: t('campaigns.platformReddit'),
+    both: t('campaigns.platformBoth'),
+  }
+  return map[platform] || platform || t('dashboard.briefNotSpecified')
+}
+
+function formatPlatformMode(mode) {
+  const map = {
+    auto: t('campaigns.modeAuto'),
+    microblog: t('campaigns.modeMicroblog'),
+    community_forum: t('campaigns.modeCommunityForum'),
+    group_chat: t('campaigns.modeGroupChat'),
+    creator_feed: t('campaigns.modeCreatorFeed'),
+    commerce_intent: t('campaigns.modeCommerceIntent'),
+  }
+  return map[mode] || mode || t('dashboard.briefNotSpecified')
+}
+
+function formatChannel(channel) {
+  const map = {
+    facebook: t('campaigns.channelFacebook'),
+    instagram: t('campaigns.channelInstagram'),
+    tiktok: t('campaigns.channelTikTok'),
+    youtube: t('campaigns.channelYouTube'),
+    line: t('campaigns.channelLine'),
+    twitter_x: t('campaigns.channelTwitterX'),
+    twitter: t('campaigns.channelTwitterX'),
+    reddit: t('campaigns.channelReddit'),
+    linkedin: t('campaigns.channelLinkedIn'),
+    whatsapp: 'WhatsApp',
+    tv: 'TV',
+    radio: 'Radio',
+    shopee_live: 'Shopee Live',
+  }
+  return map[channel] || channel
+}
+
+function normalizeChannels(channels) {
+  const values = Array.isArray(channels) ? channels : []
+  return [...new Set(values.map((channel) => {
+    if (channel === 'twitter') return 'twitter_x'
+    return String(channel || '').trim()
+  }).filter(Boolean))]
+}
+
+function formatStatus(status) {
+  const map = {
+    draft: t('campaigns.statusDraft'),
+    active: t('campaigns.statusActive'),
+    running: t('campaigns.statusRunning'),
+    complete: t('campaigns.statusComplete'),
+    completed: t('campaigns.statusComplete'),
+    failed: t('campaigns.statusFailed'),
+    paused: t('campaigns.statusPaused'),
+    persona_building: t('campaigns.personaGeneration'),
+    simulating: t('campaigns.simulationRunning'),
+  }
+  return map[status] || status || t('dashboard.briefNotSpecified')
+}
+
+async function loadCampaignDetails(cid) {
+  if (shouldUseDemoCampaignDetails()) {
+    campaignDetails.value = demoCampaignDetails(cid)
+    if (campaignDetails.value?.name) campaignName.value = campaignDetails.value.name
+    return
+  }
+
+  try {
+    const campaignRes = await getCampaign(cid)
+    const campaign = campaignRes.data || campaignRes
+    campaignDetails.value = campaign
+    if (campaign?.name) campaignName.value = campaign.name
+  } catch (e) {
+    console.warn('Campaign details fetch failed, using fallback:', e.message)
+    campaignDetails.value = demoCampaignDetails(cid)
+    if (campaignDetails.value?.name) campaignName.value = campaignDetails.value.name
+  }
+}
+
+function shouldUseDemoCampaignDetails() {
+  if (!import.meta.env.DEV) return false
+  return !localStorage.getItem('3c-auth-token') && !localStorage.getItem('3c-api-key')
+}
+
+function demoCampaignDetails(cid) {
+  const demos = {
+    'demo-1': {
+      name: 'Bank Digital Wallet Launch',
+      description: 'Market sentiment simulation for a new digital wallet feature targeting Thai urban customers.',
+      objective: 'product_launch',
+      status: 'complete',
+      target: { segment_name: 'Thai Urban Millennials', age_range: [22, 44], regions: ['Thailand'], persona_count: 120, channels: ['facebook', 'instagram', 'tiktok', 'twitter_x', 'reddit'] },
+      sim_config: { platform: 'both', platform_mode: 'creator_feed', max_rounds: 8, audience_channels: ['facebook', 'instagram', 'tiktok', 'twitter_x', 'reddit'] },
+    },
+    'demo-2': {
+      name: 'Crisis Response: Data Breach',
+      description: 'Public reaction simulation for a hypothetical data breach and response-message test.',
+      objective: 'crisis_simulation',
+      status: 'running',
+      target: { segment_name: 'Digital Banking Customers', age_range: [20, 58], regions: ['Thailand'], persona_count: 85, channels: ['twitter_x', 'facebook', 'line'] },
+      sim_config: { platform: 'twitter', platform_mode: 'microblog', max_rounds: 12, audience_channels: ['twitter_x', 'facebook', 'line'] },
+    },
+    'demo-3': {
+      name: 'Competitor Messaging Analysis',
+      description: 'Test how competitor launch messaging resonates across audience segments.',
+      objective: 'competitor_response',
+      status: 'draft',
+      target: { segment_name: 'Category Shoppers', age_range: [18, 55], regions: ['Thailand'], persona_count: 200, channels: ['reddit', 'youtube', 'linkedin'] },
+      sim_config: { platform: 'reddit', platform_mode: 'community_forum', max_rounds: 15, audience_channels: ['reddit', 'youtube', 'linkedin'] },
+    },
+  }
+  return demos[cid] || {
+    name: campaignName.value,
+    description: '',
+    objective: 'message_testing',
+    status: 'draft',
+    target: { segment_name: t('dashboard.briefNotSpecified'), persona_count: 100 },
+    sim_config: { platform: 'both', max_rounds: totalRounds.value || 10 },
+  }
 }
 
 // --- Load data ---
@@ -381,6 +627,19 @@ async function loadDashboard() {
   loading.value = true
   try {
     const cid = campaignId.value
+    const useDemoData = shouldUseDemoCampaignDetails()
+
+    await loadCampaignDetails(cid)
+
+    if (useDemoData) {
+      lastUpdated.value = new Date().toLocaleString()
+      reportDate.value = new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+      return
+    }
 
     // Fetch KPIs
     try {
@@ -527,53 +786,66 @@ onMounted(async () => {
 /* ====================== BASE ====================== */
 .dashboard {
   min-height: 100vh;
-  background: #0a0a0a;
-  font-family: 'Space Grotesk', 'Noto Sans SC', system-ui, sans-serif;
-  color: #e0e0e0;
+  background: var(--bg-canvas);
+  font-family: var(--font-sans);
+  color: var(--text-secondary);
 }
 
 /* ====================== NAVBAR ====================== */
 .navbar {
-  height: 60px;
-  background: #000;
-  color: #fff;
+  height: 52px;
+  background: var(--bg-panel);
+  color: var(--text-primary);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 40px;
-  border-bottom: 1px solid #1a1a1a;
+  padding: 0 var(--space-6);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .nav-brand {
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 800;
-  letter-spacing: 1px;
-  font-size: 1rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-size: var(--text-sm);
+  text-transform: uppercase;
 }
 
 .nav-links {
   display: flex;
-  gap: 24px;
+  gap: var(--space-4);
   align-items: center;
+  min-width: 0;
+  flex-wrap: nowrap;
 }
 
 .nav-link {
-  color: #999;
+  flex: 0 0 auto;
+  color: var(--text-tertiary);
   text-decoration: none;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.8rem;
-  transition: color 0.2s;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  transition: color var(--transition-fast);
 }
 
 .nav-link:hover {
-  color: #FF4500;
+  color: var(--accent);
+}
+
+.nav-link.active {
+  color: var(--text-primary);
 }
 
 .nav-campaign {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.75rem;
-  color: #FF4500;
-  background: rgba(255, 69, 0, 0.12);
+  color: var(--accent);
+  background: var(--accent-subtle);
   padding: 3px 10px;
   border-radius: 3px;
 }
@@ -584,26 +856,26 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: flex-start;
   padding: 32px 40px 24px;
-  border-bottom: 1px solid #1a1a1a;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .campaign-name {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-inverse);
   margin: 0 0 6px 0;
 }
 
 .campaign-meta {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.78rem;
-  color: #666;
+  color: var(--text-tertiary);
   margin: 0;
 }
 
 .meta-sep {
   margin: 0 10px;
-  color: #333;
+  color: var(--border-strong);
 }
 
 /* Grade Badge */
@@ -620,32 +892,34 @@ onMounted(async () => {
 }
 
 .grade-badge.grade-good {
-  border-color: #22c55e;
-  background: rgba(34, 197, 94, 0.08);
+  border-color: var(--green);
+  background: var(--green-soft);
 }
 
 .grade-badge.grade-ok {
-  border-color: #f59e0b;
-  background: rgba(245, 158, 11, 0.08);
+  border-color: var(--yellow);
+  background: var(--yellow-soft);
 }
 
 .grade-badge.grade-bad {
-  border-color: #ef4444;
-  background: rgba(239, 68, 68, 0.08);
+  border-color: var(--red);
+  background: var(--red-soft);
 }
 
 .grade-letter {
-  font-size: 2.4rem;
-  font-weight: 800;
-  font-family: 'JetBrains Mono', monospace;
-  color: #fff;
-  line-height: 1;
+font-size: var(--text-sm);
+  font-weight: 600;
+  margin: 0 0 var(--space-5) 0;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .grade-label {
   font-size: 0.6rem;
   font-family: 'JetBrains Mono', monospace;
-  color: #888;
+  color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -657,6 +931,73 @@ onMounted(async () => {
   padding: 28px 40px 60px;
 }
 
+/* ====================== CAMPAIGN BRIEF ====================== */
+.campaign-brief {
+  margin-bottom: 28px;
+}
+
+.brief-main {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.brief-kicker,
+.brief-item span {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.brief-main h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  line-height: 1.08;
+}
+
+.brief-main p {
+  max-width: 860px;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.65;
+}
+
+.brief-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--border-subtle);
+}
+
+.brief-item {
+  min-width: 0;
+  padding: 14px;
+  background: var(--bg-panel);
+}
+
+.brief-item span,
+.brief-item strong {
+  display: block;
+}
+
+.brief-item strong {
+  margin-top: 6px;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
 /* ====================== KPI ROW ====================== */
 .kpi-row {
   display: grid;
@@ -666,8 +1007,8 @@ onMounted(async () => {
 }
 
 .kpi-card {
-  background: #111;
-  border: 1px solid #1a1a1a;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
   padding: 18px 16px;
   display: flex;
@@ -677,7 +1018,7 @@ onMounted(async () => {
 }
 
 .kpi-card:hover {
-  border-color: #333;
+  border-color: var(--border-strong);
 }
 
 .kpi-icon {
@@ -695,7 +1036,7 @@ onMounted(async () => {
 .kpi-label {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.65rem;
-  color: #666;
+  color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   display: block;
@@ -706,7 +1047,7 @@ onMounted(async () => {
   font-family: 'JetBrains Mono', monospace;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-inverse);
   display: block;
 }
 
@@ -718,7 +1059,7 @@ onMounted(async () => {
 /* KPI Bars */
 .kpi-bar {
   height: 4px;
-  background: #1a1a1a;
+  background: var(--border-subtle);
   border-radius: 2px;
   margin-top: 6px;
   overflow: hidden;
@@ -731,15 +1072,15 @@ onMounted(async () => {
 }
 
 .kpi-bar-fill.conversion {
-  background: linear-gradient(90deg, #FF4500, #f59e0b, #22c55e);
+  background: linear-gradient(90deg, var(--accent), var(--yellow), var(--green));
 }
 
 .kpi-bar-fill.influence {
-  background: linear-gradient(90deg, #FF4500, #ff7f50);
+  background: linear-gradient(90deg, var(--accent), var(--accent-hover));
 }
 
 .kpi-bar-fill.resonance {
-  background: linear-gradient(90deg, #6366f1, #FF4500);
+  background: linear-gradient(90deg, var(--blue), var(--accent));
 }
 
 /* Sentiment Gauge */
@@ -749,20 +1090,20 @@ onMounted(async () => {
 
 .gauge-track {
   height: 6px;
-  background: #1a1a1a;
+  background: var(--border-subtle);
   border-radius: 3px;
   display: flex;
   overflow: hidden;
 }
 
 .gauge-fill-negative {
-  background: #ef4444;
+  background: var(--red);
   height: 100%;
   transition: width 0.6s ease;
 }
 
 .gauge-fill-positive {
-  background: #22c55e;
+  background: var(--green);
   height: 100%;
   transition: width 0.6s ease;
 }
@@ -772,25 +1113,25 @@ onMounted(async () => {
   justify-content: space-between;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.55rem;
-  color: #444;
+  color: var(--text-quaternary);
   margin-top: 2px;
 }
 
-.sentiment-positive { color: #22c55e !important; }
-.sentiment-negative { color: #ef4444 !important; }
-.sentiment-neutral { color: #f59e0b !important; }
+.sentiment-positive { color: var(--green) !important; }
+.sentiment-negative { color: var(--red) !important; }
+.sentiment-neutral { color: var(--yellow) !important; }
 
 /* Crisis Card States */
 .crisis-card.crisis-low {
-  border-left: 3px solid #22c55e;
+  border-left: 3px solid var(--green);
 }
 
 .crisis-card.crisis-medium {
-  border-left: 3px solid #f59e0b;
+  border-left: 3px solid var(--yellow);
 }
 
 .crisis-card.crisis-high {
-  border-left: 3px solid #ef4444;
+  border-left: 3px solid var(--red);
 }
 
 .crisis-indicator {
@@ -810,7 +1151,7 @@ onMounted(async () => {
 .crisis-text {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.65rem;
-  color: #888;
+  color: var(--text-tertiary);
 }
 
 /* ====================== MID ROW (Chart + Table) ====================== */
@@ -822,8 +1163,8 @@ onMounted(async () => {
 }
 
 .panel {
-  background: #111;
-  border: 1px solid #1a1a1a;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
   padding: 20px 22px;
 }
@@ -832,7 +1173,7 @@ onMounted(async () => {
   font-size: 0.9rem;
   font-family: 'JetBrains Mono', monospace;
   font-weight: 600;
-  color: #fff;
+  color: var(--text-inverse);
   margin: 0 0 16px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -854,7 +1195,7 @@ onMounted(async () => {
   height: 170px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.6rem;
-  color: #444;
+  color: var(--text-quaternary);
   padding-bottom: 22px;
   flex-shrink: 0;
 }
@@ -880,7 +1221,7 @@ onMounted(async () => {
 .bar-value-label {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.6rem;
-  color: #888;
+  color: var(--text-tertiary);
   margin-bottom: 2px;
 }
 
@@ -888,7 +1229,7 @@ onMounted(async () => {
   width: 100%;
   max-width: 40px;
   height: 150px;
-  background: #1a1a1a;
+  background: var(--border-subtle);
   border-radius: 3px 3px 0 0;
   display: flex;
   align-items: flex-end;
@@ -903,17 +1244,17 @@ onMounted(async () => {
 }
 
 .bar-positive {
-  background: linear-gradient(180deg, #22c55e, #16a34a);
+  background: linear-gradient(180deg, var(--green), var(--green));
 }
 
 .bar-negative {
-  background: linear-gradient(180deg, #ef4444, #dc2626);
+  background: linear-gradient(180deg, var(--red), var(--red));
 }
 
 .bar-round-label {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.6rem;
-  color: #555;
+  color: var(--text-tertiary);
   margin-top: 4px;
 }
 
@@ -927,22 +1268,22 @@ onMounted(async () => {
   text-align: left;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.6rem;
-  color: #555;
+  color: var(--text-tertiary);
   text-transform: uppercase;
   padding-bottom: 10px;
   font-weight: 500;
-  border-bottom: 1px solid #1a1a1a;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .segment-table td {
   padding: 10px 0;
   font-size: 0.82rem;
-  border-bottom: 1px solid #0f0f0f;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .seg-name {
   font-weight: 500;
-  color: #ccc;
+  color: var(--text-secondary);
 }
 
 .sentiment-tag {
@@ -954,13 +1295,13 @@ onMounted(async () => {
 }
 
 .tag-positive {
-  background: rgba(34, 197, 94, 0.12);
-  color: #22c55e;
+  background: var(--green-soft);
+  color: var(--green);
 }
 
 .tag-negative {
-  background: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
+  background: var(--red-soft);
+  color: var(--red);
 }
 
 .mini-bar-wrap {
@@ -971,7 +1312,7 @@ onMounted(async () => {
 
 .mini-bar {
   height: 6px;
-  background: linear-gradient(90deg, #ef4444, #f59e0b, #22c55e);
+  background: linear-gradient(90deg, var(--red), var(--yellow), var(--green));
   border-radius: 3px;
   min-width: 4px;
   transition: width 0.6s ease;
@@ -980,14 +1321,14 @@ onMounted(async () => {
 .mini-bar-val {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.7rem;
-  color: #aaa;
+  color: var(--text-secondary);
   flex-shrink: 0;
 }
 
 .seg-size {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.75rem;
-  color: #888;
+  color: var(--text-tertiary);
 }
 
 /* ====================== INFLUENCERS ====================== */
@@ -998,8 +1339,8 @@ onMounted(async () => {
 }
 
 .influencer-card {
-  background: #0d0d0d;
-  border: 1px solid #1a1a1a;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
   padding: 16px;
   display: flex;
@@ -1010,7 +1351,7 @@ onMounted(async () => {
 }
 
 .influencer-card:hover {
-  border-color: #333;
+  border-color: var(--border-strong);
 }
 
 .inf-rank {
@@ -1019,15 +1360,15 @@ onMounted(async () => {
   right: 12px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.7rem;
-  color: #FF4500;
+  color: var(--accent);
   font-weight: 700;
 }
 
 .inf-avatar {
   width: 36px;
   height: 36px;
-  background: #FF4500;
-  color: #fff;
+  background: var(--accent);
+  color: var(--text-inverse);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1046,13 +1387,13 @@ onMounted(async () => {
 .inf-name {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--text-inverse);
 }
 
 .inf-platform {
   font-size: 0.65rem;
   font-family: 'JetBrains Mono', monospace;
-  color: #666;
+  color: var(--text-tertiary);
 }
 
 .inf-metrics {
@@ -1069,7 +1410,7 @@ onMounted(async () => {
 .inf-metric-label {
   font-size: 0.6rem;
   font-family: 'JetBrains Mono', monospace;
-  color: #555;
+  color: var(--text-tertiary);
   text-transform: uppercase;
 }
 
@@ -1077,7 +1418,7 @@ onMounted(async () => {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.8rem;
   font-weight: 700;
-  color: #ddd;
+  color: var(--border-default);
 }
 
 .inf-sentiment {
@@ -1097,19 +1438,19 @@ onMounted(async () => {
 }
 
 .action-box {
-  border: 1px solid #1a1a1a;
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
   padding: 20px 22px;
 }
 
 .action-box.winning {
-  background: rgba(34, 197, 94, 0.03);
-  border-left: 3px solid #22c55e;
+  background: var(--green-soft);
+  border-left: 3px solid var(--green);
 }
 
 .action-box.risk {
   background: rgba(239, 68, 68, 0.03);
-  border-left: 3px solid #ef4444;
+  border-left: 3px solid var(--red);
 }
 
 .action-box-header {
@@ -1127,7 +1468,7 @@ onMounted(async () => {
   font-size: 0.9rem;
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-inverse);
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -1135,7 +1476,7 @@ onMounted(async () => {
 
 .action-box-text {
   font-size: 0.82rem;
-  color: #aaa;
+  color: var(--text-secondary);
   line-height: 1.5;
   margin: 0 0 10px 0;
 }
@@ -1148,7 +1489,7 @@ onMounted(async () => {
 
 .winning-highlights li {
   font-size: 0.78rem;
-  color: #86efac;
+  color: var(--green);
   padding: 3px 0;
   padding-left: 14px;
   position: relative;
@@ -1158,7 +1499,7 @@ onMounted(async () => {
   content: '✓';
   position: absolute;
   left: 0;
-  color: #22c55e;
+  color: var(--green);
   font-weight: 700;
 }
 
@@ -1170,7 +1511,7 @@ onMounted(async () => {
 
 .risk-list li {
   font-size: 0.78rem;
-  color: #aaa;
+  color: var(--text-secondary);
   padding: 5px 0;
   display: flex;
   gap: 6px;
@@ -1187,8 +1528,8 @@ onMounted(async () => {
 
 /* Action Items */
 .action-items {
-  background: #111;
-  border: 1px solid #1a1a1a;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
   padding: 20px 22px;
 }
@@ -1197,7 +1538,7 @@ onMounted(async () => {
   font-size: 0.85rem;
   font-family: 'JetBrains Mono', monospace;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-inverse);
   margin: 0 0 14px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -1213,7 +1554,7 @@ onMounted(async () => {
   display: flex;
   gap: 14px;
   padding: 12px 0;
-  border-bottom: 1px solid #0f0f0f;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .action-item:last-child {
@@ -1224,7 +1565,7 @@ onMounted(async () => {
 .action-item-num {
   width: 28px;
   height: 28px;
-  background: #1a1a1a;
+  background: var(--border-subtle);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1232,7 +1573,7 @@ onMounted(async () => {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.75rem;
   font-weight: 700;
-  color: #FF4500;
+  color: var(--accent);
   flex-shrink: 0;
 }
 
@@ -1249,7 +1590,7 @@ onMounted(async () => {
   font-size: 0.6rem;
   font-weight: 700;
   text-transform: uppercase;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--bg-elevated);
   padding: 2px 8px;
   border-radius: 3px;
   flex-shrink: 0;
@@ -1257,7 +1598,7 @@ onMounted(async () => {
 
 .action-item-desc {
   font-size: 0.82rem;
-  color: #ccc;
+  color: var(--text-secondary);
   flex: 1;
   min-width: 200px;
 }
@@ -1265,7 +1606,7 @@ onMounted(async () => {
 .action-item-timeline {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.65rem;
-  color: #555;
+  color: var(--text-tertiary);
   flex-shrink: 0;
 }
 
@@ -1284,23 +1625,23 @@ onMounted(async () => {
 
 .summary-toggle {
   font-size: 0.7rem;
-  color: #666;
+  color: var(--text-tertiary);
   transition: color 0.2s;
 }
 
 .summary-header:hover .summary-toggle {
-  color: #FF4500;
+  color: var(--accent);
 }
 
 .summary-content {
   margin-top: 14px;
   padding-top: 14px;
-  border-top: 1px solid #1a1a1a;
+  border-top: 1px solid var(--border-subtle);
 }
 
 .summary-thai {
   font-size: 0.9rem;
-  color: #bbb;
+  color: var(--text-secondary);
   line-height: 1.8;
   margin: 0;
   font-family: 'Noto Sans Thai', 'Space Grotesk', system-ui, sans-serif;
@@ -1312,10 +1653,349 @@ onMounted(async () => {
   padding: 16px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.7rem;
-  color: #444;
+  color: var(--text-quaternary);
   display: flex;
   justify-content: center;
   gap: 8px;
+}
+
+/* ====================== PREMIUM RESTYLE ====================== */
+.dashboard {
+  background: var(--bg-canvas);
+  color: var(--text-secondary);
+}
+
+.dashboard .navbar {
+  min-height: 64px;
+  background: rgba(var(--bg-canvas-rgb), 0.78);
+  border-bottom-color: var(--border-subtle);
+  padding: 0 clamp(18px, 4vw, 48px);
+}
+
+.dashboard .nav-brand {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.dashboard .nav-link:hover,
+.dashboard .nav-link.router-link-active {
+  color: var(--text-primary);
+}
+
+.nav-campaign {
+  color: var(--accent);
+  background: var(--accent-subtle);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-pill);
+}
+
+.dash-header {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: clamp(28px, 5vw, 52px) clamp(20px, 4vw, 44px) 28px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.campaign-name {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  letter-spacing: 0;
+}
+
+.campaign-meta,
+.grade-label,
+.kpi-label,
+.crisis-text,
+.panel-title,
+.segment-table th,
+.inf-platform,
+.inf-metric-label,
+.action-box-header h3,
+.action-items-title,
+.action-item-priority,
+.action-item-timeline,
+.data-info {
+  font-family: var(--font-mono);
+  letter-spacing: 0;
+}
+
+.campaign-meta,
+.grade-label,
+.kpi-label,
+.crisis-text,
+.segment-table th,
+.inf-platform,
+.inf-metric-label,
+.action-item-timeline,
+.data-info,
+.gauge-scale,
+.chart-y-axis,
+.bar-round-label {
+  color: var(--text-tertiary);
+}
+
+.meta-sep {
+  color: var(--border-strong);
+}
+
+.grade-badge {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.grade-badge.grade-good {
+  border-color: var(--green);
+  background: var(--green-soft);
+}
+
+.grade-badge.grade-ok {
+  border-color: var(--yellow);
+  background: var(--yellow-soft);
+}
+
+.grade-badge.grade-bad {
+  border-color: var(--red);
+  background: var(--red-soft);
+}
+
+.grade-letter {
+  margin: 0;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: none;
+}
+
+.dash-body {
+  max-width: 1280px;
+  padding: 28px clamp(20px, 4vw, 44px) 70px;
+}
+
+.kpi-row {
+  gap: var(--space-4);
+}
+
+.kpi-card,
+.panel,
+.action-items {
+  background: var(--bg-surface);
+  border-color: var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.kpi-card {
+  padding: var(--space-5);
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.kpi-card:hover,
+.panel:hover,
+.influencer-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-elevated);
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+}
+
+.kpi-icon,
+.action-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.action-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.kpi-value,
+.kpi-value.big,
+.panel-title,
+.action-box-header h3,
+.action-items-title,
+.inf-name,
+.inf-metric-val,
+.seg-name {
+  color: var(--text-primary);
+}
+
+.kpi-value.big {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.kpi-bar,
+.gauge-track,
+.bar-wrapper {
+  background: var(--bg-elevated);
+}
+
+.kpi-bar-fill.conversion,
+.mini-bar {
+  background: linear-gradient(90deg, var(--red), var(--yellow), var(--green));
+}
+
+.kpi-bar-fill.influence {
+  background: linear-gradient(90deg, var(--teal), var(--blue));
+}
+
+.kpi-bar-fill.resonance {
+  background: linear-gradient(90deg, var(--accent), var(--yellow));
+}
+
+.gauge-fill-negative,
+.bar-negative {
+  background: linear-gradient(180deg, var(--red), color-mix(in srgb, var(--red) 75%, var(--text-primary)));
+}
+
+.gauge-fill-positive,
+.bar-positive {
+  background: linear-gradient(180deg, var(--green), color-mix(in srgb, var(--green) 78%, var(--text-primary)));
+}
+
+.sentiment-positive { color: var(--green) !important; }
+.sentiment-negative { color: var(--red) !important; }
+.sentiment-neutral { color: var(--yellow) !important; }
+
+.crisis-card.crisis-low { border-left-color: var(--green); }
+.crisis-card.crisis-medium { border-left-color: var(--yellow); }
+.crisis-card.crisis-high { border-left-color: var(--red); }
+
+.mid-row {
+  gap: var(--space-4);
+}
+
+.panel {
+  padding: var(--space-6);
+}
+
+.panel-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.segment-table th {
+  border-bottom-color: var(--border-subtle);
+}
+
+.segment-table td {
+  border-bottom-color: var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.tag-positive {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.tag-negative {
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+.mini-bar-val,
+.seg-size,
+.bar-value-label {
+  color: var(--text-tertiary);
+}
+
+.influencer-grid {
+  gap: var(--space-4);
+}
+
+.influencer-card {
+  background: var(--bg-panel);
+  border-color: var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.inf-rank {
+  color: var(--accent);
+}
+
+.inf-avatar {
+  background: linear-gradient(145deg, var(--accent), var(--teal));
+  color: var(--text-inverse);
+}
+
+.action-box {
+  border-color: var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.action-box.winning {
+  background: var(--green-soft);
+  border-left-color: var(--green);
+}
+
+.action-box.risk {
+  background: var(--red-soft);
+  border-left-color: var(--red);
+}
+
+.action-box-text,
+.risk-list li,
+.action-item-desc,
+.summary-thai {
+  color: var(--text-secondary);
+}
+
+.winning-highlights li {
+  color: var(--text-secondary);
+}
+
+.winning-highlights li::before {
+  color: var(--green);
+}
+
+.action-item {
+  border-bottom-color: var(--border-subtle);
+}
+
+.action-item-num {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+
+.action-item-priority {
+  background: var(--bg-elevated);
+}
+
+.summary-content {
+  border-top-color: var(--border-subtle);
+}
+
+.summary-toggle {
+  color: var(--text-tertiary);
+}
+
+.summary-header:hover .summary-toggle {
+  color: var(--accent);
 }
 
 /* ====================== RESPONSIVE ====================== */
@@ -1343,6 +2023,9 @@ onMounted(async () => {
   .kpi-row {
     grid-template-columns: 1fr 1fr;
   }
+  .brief-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .mid-row {
     grid-template-columns: 1fr;
   }
@@ -1356,6 +2039,9 @@ onMounted(async () => {
 
 @media (max-width: 480px) {
   .kpi-row {
+    grid-template-columns: 1fr;
+  }
+  .brief-grid {
     grid-template-columns: 1fr;
   }
 }

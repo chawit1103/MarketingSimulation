@@ -1,5 +1,5 @@
 """
-MiroFish Backend - Flask Application Factory
+3C Simulator Backend — Flask Application Factory
 """
 
 import os
@@ -36,7 +36,7 @@ def create_app(config_class=Config):
 
     if should_log_startup:
         logger.info("=" * 50)
-        logger.info("MiroFish-Offline Backend starting...")
+        logger.info("3C Simulator Backend starting...")
         logger.info("=" * 50)
 
     # Enable CORS
@@ -87,6 +87,11 @@ def create_app(config_class=Config):
     from .api.auth import auth_bp
     from .api.persona import persona_bp
     from .api.campaign import campaign_bp
+    from .api.industry import industry_bp
+    from .api.comparator import comparator_bp
+    from .api.impact import impact_bp
+    from .api.competitor import competitor_bp
+    from .api.export import export_bp
     app.register_blueprint(graph_bp, url_prefix='/api/graph')
     app.register_blueprint(simulation_bp, url_prefix='/api/simulation')
     app.register_blueprint(report_bp, url_prefix='/api/report')
@@ -95,14 +100,18 @@ def create_app(config_class=Config):
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(persona_bp, url_prefix='/api/persona')
     app.register_blueprint(campaign_bp, url_prefix='/api/campaign')
+    app.register_blueprint(industry_bp, url_prefix='/api/industry')
+    app.register_blueprint(comparator_bp, url_prefix='/api/comparator')
+    app.register_blueprint(impact_bp, url_prefix='/api/impact')
+    app.register_blueprint(competitor_bp, url_prefix='/api/competitor')
+    app.register_blueprint(export_bp, url_prefix='/api/export')
 
     # Health check
     @app.route('/health')
     def health():
-        return {'status': 'ok', 'service': 'MiroFish-Offline Backend'}
+        return {'status': 'ok', 'service': '3C Simulator Backend'}
 
     if should_log_startup:
-        logger.info("MiroFish-Offline Backend startup complete")
+        logger.info("3C Simulator Backend startup complete")
 
     return app
-

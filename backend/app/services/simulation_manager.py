@@ -17,6 +17,7 @@ from ..utils.logger import get_logger
 from .entity_reader import EntityReader, FilteredEntities
 from .oasis_profile_generator import OasisProfileGenerator, OasisAgentProfile
 from .simulation_config_generator import SimulationConfigGenerator, SimulationParameters
+from .oasis_platform_presets import resolve_preset, normalize_channels
 
 logger = get_logger('mirofish.simulation')
 
@@ -64,6 +65,11 @@ class SimulationState:
     
     # Language
     language: str = 'en'
+
+    # OASIS platform preset layer
+    platform_mode: str = "auto"
+    audience_channels: List[str] = field(default_factory=list)
+    oasis_preset: Dict[str, Any] = field(default_factory=dict)
     
     # Runtime data
     current_round: int = 0
@@ -92,6 +98,9 @@ class SimulationState:
             "config_generated": self.config_generated,
             "config_reasoning": self.config_reasoning,
             "language": self.language,
+            "platform_mode": self.platform_mode,
+            "audience_channels": self.audience_channels,
+            "oasis_preset": self.oasis_preset,
             "current_round": self.current_round,
             "twitter_status": self.twitter_status,
             "reddit_status": self.reddit_status,
@@ -113,6 +122,9 @@ class SimulationState:
             "config_generated": self.config_generated,
             "error": self.error,
             "language": self.language,
+            "platform_mode": self.platform_mode,
+            "audience_channels": self.audience_channels,
+            "oasis_preset": self.oasis_preset,
         }
 
 
@@ -184,6 +196,10 @@ class SimulationManager:
             entity_types=data.get("entity_types", []),
             config_generated=data.get("config_generated", False),
             config_reasoning=data.get("config_reasoning", ""),
+            language=data.get("language", "en"),
+            platform_mode=data.get("platform_mode", "auto"),
+            audience_channels=data.get("audience_channels", []),
+            oasis_preset=data.get("oasis_preset", {}),
             current_round=data.get("current_round", 0),
             twitter_status=data.get("twitter_status", "not_started"),
             reddit_status=data.get("reddit_status", "not_started"),
@@ -202,6 +218,9 @@ class SimulationManager:
         enable_twitter: bool = True,
         enable_reddit: bool = True,
         language: str = 'en',
+        platform_mode: str = "auto",
+        audience_channels: Optional[List[str]] = None,
+        oasis_preset: Optional[Dict[str, Any]] = None,
     ) -> SimulationState:
         """
         Create new simulation
@@ -217,6 +236,12 @@ class SimulationManager:
         """
         import uuid
         simulation_id = f"sim_{uuid.uuid4().hex[:12]}"
+        channels = normalize_channels(audience_channels or [])
+        resolved_preset = oasis_preset or resolve_preset(
+            mode=platform_mode,
+            channels=channels,
+            engine_platform="both" if enable_twitter and enable_reddit else ("twitter" if enable_twitter else "reddit"),
+        )
         
         state = SimulationState(
             simulation_id=simulation_id,
@@ -226,6 +251,9 @@ class SimulationManager:
             enable_reddit=enable_reddit,
             status=SimulationStatus.CREATED,
             language=language,
+            platform_mode=platform_mode,
+            audience_channels=channels,
+            oasis_preset=resolved_preset,
         )
         
         self._save_simulation_state(state)
@@ -431,10 +459,18 @@ class SimulationManager:
                     total=3
                 )
             
-            # Save config files
+            # Save config files, enriched with campaign-level OASIS preset metadata.
             config_path = os.path.join(sim_dir, "simulation_config.json")
+            sim_config_dict = sim_params.to_dict()
+            sim_config_dict["platform_mode"] = state.platform_mode
+            sim_config_dict["audience_channels"] = state.audience_channels
+            sim_config_dict["oasis_preset"] = state.oasis_preset or resolve_preset(
+                mode=state.platform_mode,
+                channels=state.audience_channels,
+                engine_platform="both" if state.enable_twitter and state.enable_reddit else ("twitter" if state.enable_twitter else "reddit"),
+            )
             with open(config_path, 'w', encoding='utf-8') as f:
-                f.write(sim_params.to_json())
+                json.dump(sim_config_dict, f, ensure_ascii=False, indent=2)
             
             state.config_generated = True
             state.config_reasoning = sim_params.generation_reasoning
@@ -532,7 +568,7 @@ class SimulationManager:
                 "parallel": f"python {scripts_dir}/run_parallel_simulation.py --config {config_path}",
             },
             "instructions": (
-                f"1. Activate conda environment: conda activate MiroFish\n"
+                f"1. Activate conda environment: cd 3c-simulator/backend && uv sync\n"
                 f"2. Run simulation (scripts located in {scripts_dir}):\n"
                 f"   - Run Twitter alone: python {scripts_dir}/run_twitter_simulation.py --config {config_path}\n"
                 f"   - Run Reddit alone: python {scripts_dir}/run_reddit_simulation.py --config {config_path}\n"

@@ -1,0 +1,418 @@
+{
+  "id": "finance",
+  "name_th": "ธนาคาร / การเงิน / FinTech",
+  "name_en": "Banking / Finance / FinTech",
+  "description_th": "Template สำหรับธุรกิจการเงิน: วิกฤตหนี้ครัวเรือน, NPL พุ่ง, ดอกเบี้ยขาขึ้น, Mobile Banking ล่ม, ข้อมูลรั่วไหล, หนี้นอกระบบ, Digital Lending ครบทุกวิกฤตที่สถาบันการเงินไทยต้องเผชิญ",
+  "description_en": "Financial sector template: household debt crisis, NPL surge, rising interest rates, mobile banking outages, data breaches, informal debt, digital lending — every crisis Thai financial institutions face",
+  "icon": "🏦",
+  "color": "#1a5276",
+  "objectives": ["crisis_simulation", "brand_perception", "product_launch", "competitor_response"],
+  "default_objective": "crisis_simulation",
+  "default_platform": "both",
+  "default_max_rounds": 25,
+  "default_language": "th",
+  "target_audience": {
+    "age_range": [18, 70],
+    "gender": "all",
+    "regions": ["bangkok", "central", "northeast", "north", "south", "east"],
+    "persona_count": 100
+  },
+  "persona_segments": [
+    {
+      "id": "debtors",
+      "name_th": "ลูกหนี้ / ผู้กู้ยืม (Debtors)",
+      "name_en": "Debtors & Borrowers",
+      "count": 25,
+      "interests": ["หนี้ครัวเรือน", "ดอกเบี้ย", "ประนอมหนี้", "สินเชื่อ", "บัตรเครดิต", "ผ่อนบ้าน", "ผ่อนรถ"],
+      "archetypes": [
+        {
+          "id": "credit_card_debtor",
+          "name_th": "หนี้บัตรเครดิตพอกพูน",
+          "name_en": "Credit Card Debt Accumulator",
+          "age_range": [28, 45],
+          "income": "middle",
+          "regions": ["bangkok"],
+          "occupation_th": "พนักงานออฟฟิศ",
+          "channels": ["facebook", "twitter_x", "line"],
+          "narrative_th": "มนุษย์เงินเดือน รูดบัตร 5 ใบ หนี้รวม 800,000 จ่ายขั้นต่ำมา 3 ปี ดอกเบี้ย 16% ต่อปี ทบต้นจนหนี้ไม่ลด เริ่มหาเงินกู้นอกระบบมาจ่ายขั้นต่ำ กลัวแบงก์ฟ้อง เครียดจนนอนไม่หลับ",
+          "purchase_style": "price_sensitive"
+        },
+        {
+          "id": "home_loan_struggler",
+          "name_th": "ผ่อนบ้านไม่ไหว",
+          "name_en": "Mortgage Struggler",
+          "age_range": [32, 48],
+          "income": "middle",
+          "regions": ["bangkok", "central"],
+          "occupation_th": "พนักงานบริษัท/ข้าราชการ",
+          "channels": ["facebook", "line", "youtube"],
+          "narrative_th": "กู้ซื้อทาวน์เฮ้าส์ 3.5 ล้าน ผ่อนเดือนละ 18,500 ดอกเบี้ย MRR-2% หมดโปร 3 ปีแรก กลายเป็นดอกลอยตัว เพิ่มเป็น 22,000/เดือน เงินเดือน 45,000 หักค่าผ่อน+ค่ากิน+ค่ารถ แทบไม่เหลือเก็บ กลัวธนาคารยึดบ้าน",
+          "purchase_style": "price_sensitive"
+        },
+        {
+          "id": "car_loan_default",
+          "name_th": "รถกำลังจะโดนยึด",
+          "name_en": "Car Loan Near Default",
+          "age_range": [25, 40],
+          "income": "lower_middle",
+          "regions": ["bangkok", "east", "northeast"],
+          "occupation_th": "พนักงานโรงงาน/ไรเดอร์",
+          "channels": ["tiktok", "facebook", "line"],
+          "narrative_th": "ออกรถกระบะมือหนึ่ง ราคา 850,000 ดาวน์ 10% ผ่อน 60 งวด งวดละ 15,800 ตกงานช่วงโควิด กลับมาทำงานแต่รายได้ลด ตามส่งไม่ไหวมา 3 งวด ไฟแนนซ์โทรตามทุกวัน กลัวรถโดนยึด",
+          "purchase_style": "price_sensitive"
+        },
+        {
+          "id": "student_loan_debtor",
+          "name_th": "กยศ. จบแล้วต้องใช้หนี้",
+          "name_en": "Student Loan Graduate",
+          "age_range": [23, 32],
+          "income": "lower_middle",
+          "regions": ["bangkok", "north", "northeast"],
+          "occupation_th": "พนักงานบริษัท/ฟรีแลนซ์",
+          "channels": ["twitter_x", "tiktok", "instagram"],
+          "narrative_th": "กู้ กยศ. เรียนจบปริญญาตรี หนี้รวม 280,000 เพิ่งเริ่มทำงานเงินเดือน 18,000 ต้องเริ่มใช้หนี้ปีหน้า แต่รายได้ยังไม่พอ ดอกเบี้ยเริ่มคิด โกรธที่รัฐไม่ขยายเวลาปลอดหนี้ แชร์ประสบการณ์ใน Twitter",
+          "purchase_style": "price_sensitive"
+        },
+        {
+          "id": "informal_debt_victim",
+          "name_th": "เหยื่อหนี้นอกระบบ",
+          "name_en": "Informal Debt Victim",
+          "age_range": [35, 60],
+          "income": "low",
+          "regions": ["northeast", "north", "south", "central"],
+          "occupation_th": "เกษตรกร/ค้าขายรายย่อย",
+          "channels": ["facebook", "tv", "line"],
+          "narrative_th": "เป็นหนี้ ธกส. 200,000 + หนี้นอกระบบ 100,000 ดอกเบี้ยร้อยละ 20 ต่อเดือน ถูกทวงหนี้โหด — ข่มขู่ โทรตามญาติ เอาคนมาหน้าบ้าน ไม่กล้าแจ้งความเพราะกลัว อยากลงทะเบียนแก้หนี้แต่ไม่รู้ช่องทาง",
+          "purchase_style": "price_sensitive"
+        }
+      ]
+    },
+    {
+      "id": "savers_investors",
+      "name_th": "ผู้ฝากเงิน / นักออม / นักลงทุน",
+      "name_en": "Depositors / Savers / Investors",
+      "count": 20,
+      "interests": ["ดอกเบี้ยเงินฝาก", "การลงทุน", "หุ้น", "กองทุน", "สลากออมสิน", "คริปโต", "หุ้นกู้", "ประกันสะสมทรัพย์"],
+      "archetypes": [
+        {
+          "id": "fixed_deposit_saver",
+          "name_th": "ผู้สูงอายุฝากประจำ",
+          "name_en": "Fixed Deposit Senior",
+          "age_range": [55, 75],
+          "income": "middle",
+          "regions": ["bangkok", "central", "north"],
+          "occupation_th": "ข้าราชการเกษียณ/ธุรกิจส่วนตัว",
+          "channels": ["tv", "facebook", "line"],
+          "narrative_th": "ข้าราชการเกษียณ มีเงินเก็บ 3-5 ล้าน ฝากประจำตลอดชีวิต ดอกเบี้ย 0.5-1.5% ต่อปี ต่ำมากแต่กลัวความเสี่ยง ไม่เชื่อหุ้น/กองทุน เคยโดนหลอกขายประกันสะสมทรัพย์ ไม่พอใจธนาคารที่ดอกเบี้ยไม่ขึ้นตามดอกเบี้ยนโยบาย",
+          "purchase_style": "traditional"
+        },
+        {
+          "id": "mutual_fund_investor",
+          "name_th": "มนุษย์เงินเดือนเล่นกองทุน",
+          "name_en": "Mutual Fund Office Worker",
+          "age_range": [28, 45],
+          "income": "upper_middle",
+          "regions": ["bangkok"],
+          "occupation_th": "พนักงานบริษัท/ผู้จัดการ",
+          "channels": ["twitter_x", "youtube", "facebook"],
+          "narrative_th": "พนักงานออฟฟิศ เงินเดือน 50,000-80,000 ลงทุนกองทุนรวมผ่านแอปธนาคารเดือนละ 10,000-20,000 กระจาย SSF/RMF เพื่อลดภาษี + กองทุนหุ้นต่างประเทศ ติดตาม Finfluencer เรื่องการลงทุน อยากรู้ว่าธนาคารไหนให้ผลตอบแทนดีที่สุด",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "genz_trader",
+          "name_th": "เด็กจบใหม่เล่นหุ้น",
+          "name_en": "Gen Z Stock Trader",
+          "age_range": [20, 28],
+          "income": "lower_middle",
+          "regions": ["bangkok"],
+          "occupation_th": "พนักงานบริืษัท/ฟรีแลนซ์",
+          "channels": ["twitter_x", "tiktok", "discord"],
+          "narrative_th": "เพิ่งทำงานปีแรก เงินเดือน 22,000 เปิดพอร์ตหุ้นผ่านแอป Streaming ลงทุน 5,000-10,000 ต่อเดือน เล่นหุ้นตามทวิตเตอร์/Clubhouse ซื้อหุ้นตามกระแส — NVDIA, GULF, DELTA กำไรเร็ว เจ๊งเร็ว ติดตาม Finfluencer หุ้นไทย",
+          "purchase_style": "impulsive"
+        },
+        {
+          "id": "crypto_believer",
+          "name_th": "สายคริปโต",
+          "name_en": "Crypto Believer",
+          "age_range": [22, 35],
+          "income": "middle",
+          "regions": ["bangkok", "north"],
+          "occupation_th": "ฟรีแลนซ์/Content Creator",
+          "channels": ["twitter_x", "discord", "youtube"],
+          "narrative_th": "สายคริปโตเต็มตัว ไม่เชื่อธนาคาร — ถือ Bitcoin, Ethereum ใน Bitkub/Orbix กำไรหลักแสนตอนตลาดขึ้น เจ๊งตอนตลาดลง วิจารณ์ธนาคารกลางเรื่อง CBDC มองว่า DeFi คืออนาคต ไม่ไว้ใจแบงก์ชาติ",
+          "purchase_style": "early_adopter"
+        }
+      ]
+    },
+    {
+      "id": "digital_users",
+      "name_th": "ผู้ใช้ Mobile Banking / Digital Payment",
+      "name_en": "Mobile Banking & Digital Payment Users",
+      "count": 20,
+      "interests": ["Mobile Banking", "พร้อมเพย์", "QR Code", "e-Wallet", "TrueMoney", "ShopeePay", "แอปธนาคาร", "Digital Lending"],
+      "archetypes": [
+        {
+          "id": "mobile_only_user",
+          "name_th": "ชีวิตติดแอปธนาคาร",
+          "name_en": "Mobile-Only Banking User",
+          "age_range": [20, 35],
+          "income": "middle",
+          "regions": ["bangkok"],
+          "occupation_th": "พนักงานบริษัท/ฟรีแลนซ์",
+          "channels": ["twitter_x", "tiktok", "instagram"],
+          "narrative_th": "ไม่เคยเข้าสาขาธนาคารเลยใน 3 ปี — ทำทุกอย่างผ่านแอป โอน จ่ายบิล ซื้อกองทุน สแกน QR พร้อมเพย์ ชีวิตพังวันไหนที่แอปธนาคารล่ม — โอนเงินไม่ได้ จ่ายค่ากาแฟไม่ได้ โมโหจนทวีต #แอปแบงก์ล่ม ทันที",
+          "purchase_style": "early_adopter"
+        },
+        {
+          "id": "street_vendor_qr",
+          "name_th": "แม่ค้า-พ่อค้าสแกน QR",
+          "name_en": "Street Vendor QR Merchant",
+          "age_range": [30, 55],
+          "income": "lower_middle",
+          "regions": ["bangkok", "central", "northeast", "south"],
+          "occupation_th": "ค้าขายรายย่อย",
+          "channels": ["facebook", "line", "tiktok"],
+          "narrative_th": "ขายก๋วยเตี๋ยว/ส้มตำ ข้างทาง ติด QR พร้อมเพย์หน้าร้าน — ลูกค้า 90% จ่ายผ่านมือถือ ไม่ต้องทอนเงิน สะดวกมาก แต่กังวลเรื่องค่าธรรมเนียมถ้าวันนึงพร้อมเพย์คิดเงิน เงินเข้าบัญชีทุกวัน แต่ไม่รู้จะบริหารภาษียังไง",
+          "purchase_style": "price_sensitive"
+        },
+        {
+          "id": "ewallet_user",
+          "name_th": "สาย e-Wallet หลายแอป",
+          "name_en": "Multi e-Wallet User",
+          "age_range": [18, 30],
+          "income": "low",
+          "regions": ["bangkok", "central", "northeast"],
+          "occupation_th": "นักศึกษา/พนักงานพาร์ทไทม์",
+          "channels": ["tiktok", "instagram", "twitter_x"],
+          "narrative_th": "ใช้ TrueMoney, ShopeePay, Rabbit LINE Pay หมุนเวียน — ตามโปรโมชั่น ตาม cashback โอนเงินระหว่าง e-Wallet ตลอด ไม่ค่อยใช้บัญชีธนาคารหลักเพราะมันยุ่งยาก เติมเงินผ่าน 7-Eleven อย่างเดียว",
+          "purchase_style": "impulsive"
+        },
+        {
+          "id": "elderly_digital_newbie",
+          "name_th": "ผู้สูงวัยหัดใช้ Mobile Banking",
+          "name_en": "Elderly Digital Banking Newbie",
+          "age_range": [55, 70],
+          "income": "middle",
+          "regions": ["bangkok", "central", "north"],
+          "occupation_th": "ข้าราชการเกษียณ/แม่บ้าน",
+          "channels": ["line", "facebook", "tv"],
+          "narrative_th": "ลูกหลานบังคับให้ใช้ Mobile Banking — เพิ่งหัดโอนเงินผ่านมือถือ กลัวกดผิด กลัวโดนหลอก กลัวเงินหาย เขียนรหัสผ่านใส่กระดาษแปะหลังมือถือ เวลาแอปอัพเดทแล้วหน้าตาเปลี่ยน = ใช้ไม่เป็นทันที ต้องโทรหาลูกให้ช่วยทุกครั้ง",
+          "purchase_style": "traditional"
+        }
+      ]
+    },
+    {
+      "id": "sme_entrepreneurs",
+      "name_th": "SME / ผู้ประกอบการ",
+      "name_en": "SMEs & Entrepreneurs",
+      "count": 15,
+      "interests": ["สินเชื่อ SME", "ดอกเบี้ยธุรกิจ", "เงินทุนหมุนเวียน", "Digital Lending", "SME D", "Soft Loan", "บสย."],
+      "archetypes": [
+        {
+          "id": "sme_loan_seeker",
+          "name_th": "SME ขอสินเชื่อไม่ผ่าน",
+          "name_en": "SME Loan Rejected",
+          "age_range": [35, 55],
+          "income": "middle",
+          "regions": ["bangkok", "central", "east"],
+          "occupation_th": "เจ้าของธุรกิจขนาดกลาง-เล็ก",
+          "channels": ["facebook", "line", "youtube"],
+          "narrative_th": "มีโรงงานพลาสติก 50 คน ต้องการเงินทุนหมุนเวียน 5 ล้าน ขอสินเชื่อจาก 3 แบงก์ — ไม่ผ่านทั้งหมด เพราะงบการเงินปีที่แล้วขาดทุนจากโควิด ทั้งที่ปีนี้订单เต็มมือ จนต้องไปกู้นอกระบบดอก 2% ต่อเดือน รู้สึกว่าระบบธนาคารไทยไม่เข้าใจ SME",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "fintech_borrower",
+          "name_th": "กู้ผ่านแอป Digital Lending",
+          "name_en": "Digital Lending App Borrower",
+          "age_range": [22, 35],
+          "income": "lower_middle",
+          "regions": ["bangkok", "central"],
+          "occupation_th": "ฟรีแลนซ์/เจ้าของร้านออนไลน์",
+          "channels": ["tiktok", "instagram", "twitter_x"],
+          "narrative_th": "ขายของออนไลน์ผ่าน Shopee/TikTok ไม่มีสลิปเงินเดือน เลยไม่ผ่านสินเชื่อแบงก์ ใช้แอป Digital Lending — เงินเข้าภายใน 5 นาที ไม่ต้องใช้เอกสาร แต่ดอกเบี้ย 25-33% ต่อปี รู้ว่าดอกแพงแต่ไม่มีทางเลือก",
+          "purchase_style": "price_sensitive"
+        },
+        {
+          "id": "restaurant_chain_owner",
+          "name_th": "เจ้าของร้านอาหารขยายสาขา",
+          "name_en": "Restaurant Chain Expanding",
+          "age_range": [35, 50],
+          "income": "upper_middle",
+          "regions": ["bangkok", "central", "south"],
+          "occupation_th": "เจ้าของธุรกิจร้านอาหาร",
+          "channels": ["facebook", "line", "youtube"],
+          "narrative_th": "มีร้านอาหาร 5 สาขา อยากเปิดสาขาที่ 6 แต่ดอกเบี้ยธุรกิจสูง — MRR 7.5% ทำให้ ROI ไม่คุ้ม ติดตามข่าวดอกเบี้ยนโยบายตลอดเวลา อยากให้รัฐมีมาตรการ Soft Loan เพิ่ม รู้สึกว่าดอกเบี้ยไทยสูงเกินจริงเทียบกับเงินเฟ้อ",
+          "purchase_style": "researcher"
+        }
+      ]
+    },
+    {
+      "id": "regulators_ngos",
+      "name_th": "หน่วยงานกำกับ / นักวิชาการ / NGO",
+      "name_en": "Regulators / Academics / NGOs",
+      "count": 10,
+      "interests": ["นโยบายการเงิน", "หนี้ครัวเรือน", "PDPA", "Digital Banking", "Financial Literacy", "คุ้มครองผู้บริโภค"],
+      "archetypes": [
+        {
+          "id": "bot_official",
+          "name_th": "เจ้าหน้าที่ธนาคารแห่งประเทศไทย",
+          "name_en": "BOT Official",
+          "age_range": [30, 55],
+          "income": "upper_middle",
+          "regions": ["bangkok"],
+          "occupation_th": "นักเศรษฐศาสตร์/เจ้าหน้าที่อาวุโส",
+          "channels": ["line", "twitter_x"],
+          "narrative_th": "นักเศรษฐศาสตร์ ธปท. ดูแลเสถียรภาพระบบการเงิน ต้อง balance ระหว่างคุมเงินเฟ้อกับไม่ให้หนี้ครัวเรือนระเบิด จับตา NPL และ Digital Lending อย่างใกล้ชิด ออกมาตรการ LTV/D SR ตามสถานการณ์ ไม่ชอบ social media แต่ต้อง monitor",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "consumer_protection",
+          "name_th": "นักคุ้มครองผู้บริโภค",
+          "name_en": "Consumer Protection Advocate",
+          "age_range": [30, 50],
+          "income": "middle",
+          "regions": ["bangkok"],
+          "occupation_th": "ทนายความ/NGO",
+          "channels": ["twitter_x", "facebook"],
+          "narrative_th": "ทนายความ/นักวิชาการด้านการเงิน ผลักดันกฎหมายดอกเบี้ยสูงสุด ลดเพดานจาก 15% เหลือ 10% ต่อปี รับเรื่องร้องเรียนหนี้นอกระบบ แก๊งทวงหนี้โหด ฟ้องคดีแบบกลุ่มให้เหยื่อสินเชื่อ predatory lending มองว่าแบงก์ชาติอ่อนแอเกินไปในการกำกับ",
+          "purchase_style": "social_proof"
+        },
+        {
+          "id": "finance_professor",
+          "name_th": "อาจารย์การเงิน",
+          "name_en": "Finance Professor",
+          "age_range": [35, 55],
+          "income": "upper_middle",
+          "regions": ["bangkok"],
+          "occupation_th": "อาจารย์มหาวิทยาลัย",
+          "channels": ["twitter_x", "youtube", "facebook"],
+          "narrative_th": "อาจารย์ด้านการเงิน มหาวิทยาลัยชั้นนำ ให้ความเห็นเรื่องหนี้ครัวเรือน 90% GDP — มองว่าเป็นระเบิดเวลา ออกรายการทีวี/YouTube วิเคราะห์โครงสร้างหนี้ ดอกเบี้ย และความเหลื่อมล้ำทางการเงิน สอนวิชาการเงินส่วนบุคคลให้ประชาชน",
+          "purchase_style": "researcher"
+        }
+      ]
+    },
+    {
+      "id": "executives_fintech",
+      "name_th": "ผู้บริหารสถาบันการเงิน / FinTech",
+      "name_en": "Bank Executives / FinTech Leaders",
+      "count": 10,
+      "interests": ["Digital Transformation", "RegTech", "NPL Management", "ESG", "Financial Inclusion", "Open Banking"],
+      "archetypes": [
+        {
+          "id": "bank_exe",
+          "name_th": "ผู้บริหารธนาคารพาณิชย์",
+          "name_en": "Commercial Bank Executive",
+          "age_range": [45, 60],
+          "income": "upper_middle",
+          "regions": ["bangkok"],
+          "occupation_th": "ผู้บริหารระดับสูง",
+          "channels": ["line", "youtube"],
+          "narrative_th": "รองกรรมการผู้จัดการธนาคารใหญ่ ดูแล Digital Banking และ Retail Banking ต้องบริหาร NPL ที่พุ่งขึ้นหลังโควิด บริหารทีม Tech 500+ คน แข่งขันกับ FinTech และ Digital Lending ต้องรายงานบอร์ดทุกเดือนเรื่อง Digital Transformation",
+          "purchase_style": "traditional"
+        },
+        {
+          "id": "fintech_founder",
+          "name_th": "ผู้ก่อตั้ง FinTech Startup",
+          "name_en": "FinTech Startup Founder",
+          "age_range": [28, 40],
+          "income": "upper_middle",
+          "regions": ["bangkok"],
+          "occupation_th": "ผู้ประกอบการ Startup",
+          "channels": ["twitter_x", "linkedin", "youtube"],
+          "narrative_th": "ก่อตั้ง FinTech Startup ทำ Digital Lending ให้คนไม่มีสลิปเงินเดือน ระดมทุน Series A ได้ 200 ล้าน ต้องแข่งกับแบงก์ใหญ่และเจรจากับ BOT เรื่อง regulatory sandbox มองว่า Open Banking คือโอกาสทองของ FinTech ไทย",
+          "purchase_style": "early_adopter"
+        },
+        {
+          "id": "bank_shareholder",
+          "name_th": "ผู้ถือหุ้นธนาคาร",
+          "name_en": "Bank Shareholder",
+          "age_range": [45, 65],
+          "income": "upper_middle",
+          "regions": ["bangkok"],
+          "occupation_th": "นักลงทุน/นักธุรกิจ",
+          "channels": ["twitter_x", "youtube", "line"],
+          "narrative_th": "ถือหุ้น SCB, KBANK, BBL ในพอร์ตระยะยาว ติดตามผลประกอบการรายไตรมาส — กำไรจากดอกเบี้ยรับ, NPL ratio, NIM, เงินปันผล กังวลเรื่อง Digital Disruption และการแข่งขันจาก FinTech แต่มองว่าธนาคารไทยยังแข็งแกร่ง",
+          "purchase_style": "researcher"
+        }
+      ]
+    }
+  ],
+  "crisis_scenarios": [
+    {
+      "id": "mobile_banking_crash",
+      "name_th": "Mobile Banking ล่มทั้งวัน",
+      "name_en": "Mobile Banking System Crash",
+      "trigger": "แอป Mobile Banking ธนาคารใหญ่ล่มทั้งวัน — ลูกค้า 15 ล้านคนโอนเงินไม่ได้ จ่ายบิลไม่ได้ สแกน QR ไม่ได้ #แอปแบงก์ล่ม ติดเทรนด์อันดับ 1 Twitter",
+      "impact": "negative",
+      "intensity": 9
+    },
+    {
+      "id": "data_breach",
+      "name_th": "ข้อมูลลูกค้ารั่วไหล",
+      "name_en": "Customer Data Breach",
+      "trigger": "แฮกเกอร์เจาะฐานข้อมูลธนาคาร — ข้อมูลส่วนตัว + ข้อมูลบัญชีลูกค้า 3 ล้านรายหลุด ถูกขายใน Dark Web ลูกค้าเริ่มโดน SMS หลอกดูดเงิน",
+      "impact": "negative",
+      "intensity": 10
+    },
+    {
+      "id": "npl_surge_report",
+      "name_th": "ประกาศ NPL พุ่ง — หุ้นร่วง",
+      "name_en": "NPL Surge Quarterly Report",
+      "trigger": "ธนาคารประกาศผลประกอบการไตรมาส — NPL พุ่งเป็นประวัติการณ์ 7.5% สินเชื่อรายย่อยเสียหายหนัก SET ร่วง 3% นักลงทุน panic",
+      "impact": "negative",
+      "intensity": 9
+    },
+    {
+      "id": "interest_rate_hike",
+      "name_th": "กนง. ขึ้นดอกเบี้ยนโยบาย",
+      "name_en": "MPC Interest Rate Hike",
+      "trigger": "กนง. มีมติขึ้นดอกเบี้ยนโยบาย 0.25% เป็น 2.75% — ธนาคารพาณิชย์ปรับขึ้นดอกเบี้ยกู้ทันที แต่ดอกเบี้ยเงินฝากไม่ขยับ #ดอกเบี้ยขึ้น #กนง ติดเทรนด์ทวิตเตอร์",
+      "impact": "negative",
+      "intensity": 7
+    },
+    {
+      "id": "aggressive_debt_collection",
+      "name_th": "แก๊งทวงหนี้โหด — คลิปไวรัล",
+      "name_en": "Aggressive Debt Collection Viral",
+      "trigger": "คลิปแก๊งทวงหนี้บุกบ้านลูกหนี้ — ข่มขู่ ทำร้ายร่างกาย ใช้ความรุนแรง ถูกแชร์ว่อน TikTok/Facebook โยงใยถึงสถาบันการเงินที่จ้าง外包ทวงหนี้",
+      "impact": "negative",
+      "intensity": 8
+    },
+    {
+      "id": "app_loan_shark",
+      "name_th": "แอปกู้นอกระบบ Digital Loan Shark",
+      "name_en": "Digital Loan Shark App Scandal",
+      "trigger": "สื่อนอก揭露แอปเงินกู้ดิจิทัล 50+ แอป — ดอกเบี้ยโหด 300% ต่อปี เข้าถึงรายชื่อผู้ติดต่อในมือถือ ทวงหนี้ด้วยการประจานในโซเชียล กระทบภาพลักษณ์ Digital Lending ทั้งระบบ",
+      "impact": "negative",
+      "intensity": 9
+    },
+    {
+      "id": "bank_merger_rumor",
+      "name_th": "ข่าวลือควบรวมธนาคาร",
+      "name_en": "Bank Merger Rumor",
+      "trigger": "ข่าวลือวงใน — ธนาคาร A กำลังเจรจาซื้อกิจการธนาคาร B — พนักงาน panic ลูกค้ากังวลเรื่องค่าธรรมเนียมและการปิดสาขา #ควบรวมแบงก์ ติดเทรนด์",
+      "impact": "mixed",
+      "intensity": 7
+    }
+  ],
+  "document_seeds": [
+    {
+      "id": "interest_rate_announcement",
+      "name_th": "ประกาศปรับอัตราดอกเบี้ย",
+      "description_th": "Template ประกาศปรับอัตราดอกเบี้ยเงินกู้และเงินฝากหลังจาก กนง. มีมติ",
+      "content": "# ประกาศปรับอัตราดอกเบี้ย\n## ธนาคาร [ชื่อธนาคาร] จำกัด (มหาชน)\n\n**วันที่:** [วันที่]\n**เรื่อง:** การปรับอัตราดอกเบี้ยเงินกู้และเงินฝาก\n\nตามที่คณะกรรมการนโยบายการเงิน (กนง.) มีมติปรับอัตราดอกเบี้ยนโยบาย [ขึ้น/ลง] [xx]% สู่ระดับ [xx]% ต่อปี เมื่อวันที่ [วันที่]\n\nธนาคารขอแจ้งปรับอัตราดอกเบี้ยดังนี้:\n\n**อัตราดอกเบี้ยเงินกู้ (มีผล [วันที่]):**\n| ประเภท | อัตราเดิม | อัตราใหม่ | เปลี่ยนแปลง |\n|--------|---------|---------|-------------|\n| MRR | x.xx% | x.xx% | +/-x.xx% |\n| MLR | x.xx% | x.xx% | +/-x.xx% |\n| MOR | x.xx% | x.xx% | +/-x.xx% |\n\n**อัตราดอกเบี้ยเงินฝาก (มีผล [วันที่]):**\n| ประเภท | อัตราเดิม | อัตราใหม่ | เปลี่ยนแปลง |\n|--------|---------|---------|-------------|\n| ออมทรัพย์ | x.xx% | x.xx% | +/-x.xx% |\n| ฝากประจำ 12 เดือน | x.xx% | x.xx% | +/-x.xx% |\n\n**ผลกระทบต่อลูกค้า:**\n- สินเชื่อบ้าน (MRR): ผ่อนเพิ่ม/ลดประมาณ xx บาท/ล้านบาท/เดือน\n- สินเชื่อธุรกิจ (MLR): ต้นทุนทางการเงินปรับ [ขึ้น/ลง]\n\n**มาตรการช่วยเหลือลูกหนี้:**\n- [ระบุมาตรการ เช่น พักชำระเงินต้น ขยายเวลาผ่อน]\n\nสอบถามเพิ่มเติม: Contact Center โทร [เบอร์] | www.[bank].co.th\n\n---\nธนาคาร [ชื่อธนาคาร] จำกัด (มหาชน)"
+    },
+    {
+      "id": "system_outage_statement",
+      "name_th": "แถลงการณ์ — ระบบขัดข้อง",
+      "description_th": "Template แถลงการณ์กรณี Mobile Banking/ระบบธนาคารล่ม ใช้สำหรับ crisis communication",
+      "content": "# แถลงการณ์ — ระบบให้บริการขัดข้อง\n## ธนาคาร [ชื่อธนาคาร] จำกัด (มหาชน)\n\n**วันที่:** [วันที่]\n**เวลา:** [เวลา] น.\n\nเรียน ลูกค้าธนาคาร [ชื่อธนาคาร]\n\nธนาคารขออภัยอย่างสูงที่ระบบ Mobile Banking, Internet Banking และบริการ ATM/CDM บางส่วนไม่สามารถให้บริการได้ตามปกติ ตั้งแต่เวลา [เวลาเริ่ม] น.\n\n**สถานะปัจจุบัน:**\n\n1. **ระบบที่ได้รับผลกระทบ:**\n   - [✓] Mobile Banking — ไม่สามารถเข้าสู่ระบบ/โอนเงิน\n   - [✓] Internet Banking — ไม่สามารถเข้าสู่ระบบ\n   - [✓] ATM/CDM — ให้บริการได้บางส่วน\n   - [✗] สาขา — ให้บริการได้ตามปกติ\n\n2. **สาเหตุเบื้องต้น:**\n   - [ระบบฐานข้อมูล/Network/Cyber Attack/กำลังตรวจสอบ]\n\n3. **มาตรการที่ดำเนินการ:**\n   - ทีมวิศวกรกำลังดำเนินการแก้ไขอย่างเร่งด่วน\n   - ประสานงานกับ [ผู้ให้บริการระบบ/ธปท./สภาธุรกิจการเงิน]\n   - ตั้ง War Room ติดตามสถานการณ์แบบ Real-time\n\n4. **ผลกระทบ:**\n   - ลูกค้าไม่สามารถทำธุรกรรมผ่านช่องทางดิจิทัลได้ชั่วคราว\n   - รายการโอนเงิน/ชำระเงินที่มีกำหนดวันนี้ — ธนาคารจะดำเนินการให้เมื่อระบบกลับมา\n   - ไม่มีข้อมูลของลูกค้ารั่วไหล\n\n**คำแนะนำสำหรับลูกค้า:**\n- สามารถใช้บริการผ่านสาขาได้ตามปกติ\n- ติดตามสถานะการแก้ไขได้ที่ www.[bank].co.th/status\n- สายด่วน 24 ชม.: [เบอร์]\n\nธนาคารขออภัยอย่างสูงในความไม่สะดวก เราจะเร่งแก้ไขโดยเร็วที่สุด\n\n---\nธนาคาร [ชื่อธนาคาร] จำกัด (มหาชน)"
+    },
+    {
+      "id": "bot_policy_announcement",
+      "name_th": "ประกาศ ธปท. — มาตรการ LTV/การเงิน",
+      "description_th": "Template ประกาศนโยบายการเงินจากธนาคารแห่งประเทศไทย กระทบวงกว้าง",
+      "content": "# ประกาศธนาคารแห่งประเทศไทย\n## เรื่อง [ชื่อมาตรการ]\n### ฉบับที่ [เลขที่]/2569\n\n**วันที่:** [วันที่]\n\nธนาคารแห่งประเทศไทย (ธปท.) ออกมาตรการ [ชื่อมาตรการ] เพื่อ [วัตถุประสงค์] ดังนี้:\n\n**1. หลักการและเหตุผล**\n\n[อธิบายสถานการณ์เศรษฐกิจที่นำไปสู่มาตรการ — เช่น หนี้ครัวเรือนสูง NPL เพิ่มขึ้น ตลาดอสังหาฯ ชะลอตัว]\n\n**2. รายละเอียดมาตรการ**\n\n| มาตรการ | รายละเอียด | มีผลบังคับใช้ |\n|---------|-----------|--------------|\n| [ชื่อ] | [รายละเอียด] | [วันที่] |\n| [ชื่อ] | [รายละเอียด] | [วันที่] |\n\n**3. ผลกระทบที่คาดการณ์**\n\n- **ภาคครัวเรือน:** [ผลกระทบ]\n- **ภาคธุรกิจ:** [ผลกระทบ]\n- **สถาบันการเงิน:** [ผลกระทบ]\n- **ตลาดการเงิน:** [ผลกระทบ]\n\n**4. การติดตามและประเมินผล**\n\nธปท. จะติดตามผลและทบทวนมาตรการทุก [ระยะเวลา]\n\n**5. สอบถามข้อมูลเพิ่มเติม**\n\n- ศูนย์คุ้มครองผู้ใช้บริการทางการเงิน (ศคง.) โทร 1213\n- เว็บไซต์: www.bot.or.th\n- อีเมล: [อีเมล]\n\n---\nธนาคารแห่งประเทศไทย\n[วันที่]"
+    }
+  ]
+}

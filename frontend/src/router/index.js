@@ -1,13 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
-import Process from '../views/MainView.vue'
-import Settings from '../views/Settings.vue'
-import SimulationView from '../views/SimulationView.vue'
-import SimulationRunView from '../views/SimulationRunView.vue'
-import ReportView from '../views/ReportView.vue'
-import InteractionView from '../views/InteractionView.vue'
-import Dashboard from '../views/Dashboard.vue'
-import Campaigns from '../views/Campaigns.vue'
+
+const Home = () => import('../views/Home.vue')
+const Process = () => import('../views/MainView.vue')
+const Settings = () => import('../views/Settings.vue')
+const SimulationView = () => import('../views/SimulationView.vue')
+const SimulationRunView = () => import('../views/SimulationRunView.vue')
+const ReportView = () => import('../views/ReportView.vue')
+const InteractionView = () => import('../views/InteractionView.vue')
+const Dashboard = () => import('../views/Dashboard.vue')
+const Campaigns = () => import('../views/Campaigns.vue')
+const ComparatorView = () => import('../views/ComparatorView.vue')
+const ImpactSimulator = () => import('../views/ImpactSimulator.vue')
+const WarRoom = () => import('../views/WarRoom.vue')
 
 const routes = [
   {
@@ -60,6 +64,21 @@ const routes = [
     name: 'Dashboard',
     component: Dashboard,
     props: true
+  },
+  {
+    path: '/comparator',
+    name: 'Comparator',
+    component: ComparatorView
+  },
+  {
+    path: '/impact',
+    name: 'ImpactSimulator',
+    component: ImpactSimulator
+  },
+  {
+    path: '/war-room',
+    name: 'WarRoom',
+    component: WarRoom
   }
 ]
 

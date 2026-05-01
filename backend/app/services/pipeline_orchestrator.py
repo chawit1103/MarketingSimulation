@@ -26,6 +26,7 @@ from ..models.campaign import (
 from ..models.persona import ThaiPersona
 from ..models.report import ExecutiveReport
 from ..utils.logger import get_logger
+from .oasis_platform_presets import resolve_preset
 
 logger = get_logger('mirofish.pipeline_orchestrator')
 
@@ -347,6 +348,32 @@ class PipelineOrchestrator:
                 elif isinstance(campaign.sim_config, dict):
                     language = campaign.sim_config.get('language', 'th')
 
+                platform_mode = "auto"
+                audience_channels = []
+                oasis_preset = {}
+                if hasattr(campaign.sim_config, 'platform_mode'):
+                    platform_mode = campaign.sim_config.platform_mode
+                    audience_channels = getattr(campaign.sim_config, 'audience_channels', []) or []
+                    oasis_preset = getattr(campaign.sim_config, 'oasis_preset', {}) or {}
+                elif isinstance(campaign.sim_config, dict):
+                    platform_mode = campaign.sim_config.get('platform_mode', 'auto')
+                    audience_channels = campaign.sim_config.get('audience_channels', []) or []
+                    oasis_preset = campaign.sim_config.get('oasis_preset', {}) or {}
+
+                if not audience_channels:
+                    target = campaign.target
+                    if isinstance(target, dict):
+                        audience_channels = target.get('channels', []) or []
+                    elif getattr(target, 'channels', None):
+                        audience_channels = target.channels
+
+                if not oasis_preset:
+                    oasis_preset = resolve_preset(
+                        mode=platform_mode,
+                        channels=audience_channels,
+                        engine_platform=platform,
+                    )
+
                 # Create simulation in SimulationManager
                 sim_state = self.simulation_manager.create_simulation(
                     project_id=campaign.project_id or campaign.campaign_id,
@@ -354,6 +381,9 @@ class PipelineOrchestrator:
                     enable_twitter=enable_twitter,
                     enable_reddit=enable_reddit,
                     language=language,
+                    platform_mode=platform_mode,
+                    audience_channels=audience_channels,
+                    oasis_preset=oasis_preset,
                 )
 
                 progress.simulation_id = sim_state.simulation_id
@@ -461,16 +491,28 @@ class PipelineOrchestrator:
         if isinstance(target, dict):
             parts.append(f"Target Segment: {target.get('segment_name', 'General')}")
             parts.append(f"Target Regions: {', '.join(target.get('regions', []))}")
+            if target.get('channels'):
+                parts.append(f"Audience Channels: {', '.join(target.get('channels', []))}")
         elif hasattr(target, 'segment_name'):
             parts.append(f"Target Segment: {target.segment_name}")
             parts.append(f"Target Regions: {', '.join(target.regions)}")
+            if getattr(target, 'channels', None):
+                parts.append(f"Audience Channels: {', '.join(target.channels)}")
 
         sim = campaign.sim_config
         if isinstance(sim, dict):
-            parts.append(f"Platform: {sim.get('platform', 'twitter')}")
+            parts.append(f"Simulation Engine: {sim.get('platform', 'twitter')}")
+            parts.append(f"Platform Mode: {sim.get('platform_mode', 'auto')}")
+            preset = sim.get("oasis_preset") or {}
+            if preset.get("modeled_behavior"):
+                parts.append(f"OASIS Behavior Model: {preset.get('modeled_behavior')}")
             parts.append(f"Language: {sim.get('language', 'th')}")
         elif hasattr(sim, 'platform'):
-            parts.append(f"Platform: {sim.platform}")
+            parts.append(f"Simulation Engine: {sim.platform}")
+            parts.append(f"Platform Mode: {getattr(sim, 'platform_mode', 'auto')}")
+            preset = getattr(sim, 'oasis_preset', {}) or {}
+            if preset.get("modeled_behavior"):
+                parts.append(f"OASIS Behavior Model: {preset.get('modeled_behavior')}")
             parts.append(f"Language: {sim.language}")
 
         return "\n".join(parts)

@@ -1,7 +1,7 @@
 <template>
   <div class="settings-page">
     <nav class="navbar">
-      <div class="nav-brand">MIROFISH OFFLINE</div>
+      <div class="nav-brand">3C SIMULATOR</div>
       <div class="nav-links">
         <router-link to="/" class="nav-link">{{ $t('nav.home') }}</router-link>
         <router-link to="/settings" class="nav-link active">{{ $t('nav.settings') }}</router-link>
@@ -146,6 +146,11 @@
         </div>
       </section>
 
+      <!-- Industry Template Import -->
+      <section class="config-section">
+        <TemplateImportDropZone @template-imported="onTemplateImported" />
+      </section>
+
       <!-- Action Buttons -->
       <div class="action-row">
         <button class="btn-primary" @click="saveSettings" :disabled="saving">
@@ -164,8 +169,9 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
+import TemplateImportDropZone from '@/components/TemplateImportDropZone.vue'
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 const config = reactive({
   llm: {
@@ -205,7 +211,7 @@ const messageType = ref('success')
 
 function changeLanguage() {
   locale.value = selectedLanguage.value
-  localStorage.setItem('mirofish-lang', selectedLanguage.value)
+  localStorage.setItem('3c-lang', selectedLanguage.value)
 }
 
 function saveSettings() {
@@ -219,11 +225,11 @@ function saveSettings() {
       graphdb: { ...config.graphdb },
       language: selectedLanguage.value
     }
-    localStorage.setItem('mirofish-settings', JSON.stringify(settings))
-    message.value = 'Settings saved successfully'
+    localStorage.setItem('3c-settings', JSON.stringify(settings))
+    message.value = t('settings.saveSuccess')
     messageType.value = 'success'
   } catch (e) {
-    message.value = 'Failed to save settings'
+    message.value = t('settings.saveFailed')
     messageType.value = 'error'
   } finally {
     saving.value = false
@@ -236,10 +242,10 @@ async function testConnection() {
   try {
     // Placeholder for actual connection test
     await new Promise(resolve => setTimeout(resolve, 1500))
-    message.value = 'Connection successful'
+    message.value = t('settings.connectionSuccess')
     messageType.value = 'success'
   } catch (e) {
-    message.value = 'Connection failed'
+    message.value = t('settings.connectionFailed')
     messageType.value = 'error'
   } finally {
     testing.value = false
@@ -248,7 +254,7 @@ async function testConnection() {
 
 // Load saved settings on mount
 try {
-  const saved = localStorage.getItem('mirofish-settings')
+  const saved = localStorage.getItem('3c-settings')
   if (saved) {
     const parsed = JSON.parse(saved)
     Object.assign(config.llm, parsed.llm || {})
@@ -268,127 +274,150 @@ try {
 <style scoped>
 .settings-page {
   min-height: 100vh;
-  background: #fff;
-  font-family: 'Space Grotesk', 'Noto Sans SC', system-ui, sans-serif;
-  color: #000;
+  background: var(--bg-canvas);
+  font-family: var(--font-sans);
+  color: var(--text-secondary);
 }
 
 .navbar {
-  height: 60px;
-  background: #000;
-  color: #fff;
+  min-height: 64px;
+  background: rgba(var(--bg-canvas-rgb), 0.78);
+  color: var(--text-primary);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 40px;
+  padding: 0 clamp(18px, 4vw, 48px);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .nav-brand {
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 800;
-  letter-spacing: 1px;
-  font-size: 1.2rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0;
+  font-size: var(--text-lg);
 }
 
 .nav-links {
   display: flex;
-  gap: 24px;
+  gap: var(--space-3);
+  min-width: 0;
+  flex-wrap: nowrap;
 }
 
 .nav-link {
-  color: #999;
+  flex: 0 0 auto;
+  color: var(--text-tertiary);
   text-decoration: none;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-  transition: color 0.2s;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  line-height: 1;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  transition: color var(--transition-fast), background var(--transition-fast);
 }
 
 .nav-link:hover,
 .nav-link.active {
-  color: #FF4500;
+  color: var(--text-primary);
+  background: var(--bg-elevated);
 }
 
 .settings-content {
-  max-width: 800px;
+  max-width: 980px;
   margin: 0 auto;
-  padding: 40px;
+  padding: clamp(32px, 5vw, 58px) clamp(18px, 4vw, 40px) 72px;
 }
 
 .page-title {
-  font-size: 2rem;
-  font-weight: 600;
-  margin-bottom: 32px;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, 3.3rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-8);
 }
 
 .config-section {
-  margin-bottom: 36px;
-  padding-bottom: 36px;
-  border-bottom: 1px solid #eee;
+  margin-bottom: var(--space-5);
+  padding: var(--space-6);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-card);
 }
 
 .section-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 20px;
-  color: #000;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-5);
+  color: var(--text-primary);
 }
 
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-2);
+  margin: 0;
 }
 
 .form-group label {
-  font-size: 0.8rem;
-  font-family: 'JetBrains Mono', monospace;
-  color: #666;
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0;
 }
 
 .form-group input,
 .form-group select {
-  padding: 10px 12px;
-  border: 1px solid #ddd;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-  background: #fafafa;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  background: var(--bg-panel);
+  color: var(--text-primary);
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .form-group input:focus,
 .form-group select:focus {
-  border-color: #FF4500;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
 }
 
 .action-row {
   display: flex;
-  gap: 16px;
-  margin-top: 24px;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  flex-wrap: wrap;
 }
 
 .btn-primary {
-  background: #000;
-  color: #fff;
-  border: none;
-  padding: 14px 32px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.9rem;
-  font-weight: 600;
+  background: var(--text-primary);
+  color: var(--text-inverse);
+  border: 1px solid var(--text-primary);
+  border-radius: var(--radius-md);
+  padding: 12px 24px;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 800;
   cursor: pointer;
-  letter-spacing: 0.5px;
+  letter-spacing: 0;
 }
 
 .btn-primary:hover {
-  background: #333;
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: #fff;
 }
 
 .btn-primary:disabled {
@@ -397,17 +426,20 @@ try {
 }
 
 .btn-secondary {
-  background: transparent;
-  color: #000;
-  border: 1px solid #ddd;
-  padding: 14px 32px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.9rem;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 12px 24px;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 800;
   cursor: pointer;
 }
 
 .btn-secondary:hover {
-  border-color: #000;
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary:disabled {
@@ -418,20 +450,21 @@ try {
 .message {
   margin-top: 20px;
   padding: 12px 16px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-sans);
   font-size: 0.85rem;
+  border-radius: var(--radius-md);
 }
 
 .message.success {
-  background: #f0fff4;
-  color: #2f855a;
-  border: 1px solid #c6f6d5;
+  background: var(--green-soft);
+  color: var(--green);
+  border: 1px solid color-mix(in srgb, var(--green) 28%, transparent);
 }
 
 .message.error {
-  background: #fff5f5;
-  color: #c53030;
-  border: 1px solid #fed7d7;
+  background: var(--red-soft);
+  color: var(--red);
+  border: 1px solid color-mix(in srgb, var(--red) 28%, transparent);
 }
 
 @media (max-width: 600px) {

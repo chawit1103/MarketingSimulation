@@ -1,14 +1,14 @@
-# MiroFish MultiLang — Production Stack
+# 3C Simulator — Production Stack
 # =============================================================
 # Two modes of operation:
 #
-# 1. FULL LOCAL (Neo4j + Ollama + MiroFish):
+# 1. FULL LOCAL (Neo4j + Ollama + 3C Simulator):
 #      docker compose --profile local up -d
 #    Then pull models:
 #      docker exec mirofish-ollama ollama pull qwen2.5:7b
 #      docker exec mirofish-ollama ollama pull nomic-embed-text
 #
-# 2. CLOUD LLM ONLY (Neo4j + MiroFish, no Ollama):
+# 2. CLOUD LLM ONLY (Neo4j + 3C Simulator, no Ollama):
 #      docker compose up -d
 #    Set LLM_PROVIDER and EMBEDDING_PROVIDER in .env to your
 #    cloud provider (openai, anthropic, google, deepseek, etc.)
@@ -21,11 +21,11 @@
 # =============================================================
 
 services:
-  mirofish:
+  3c-simulator:
     build: .
     # Or use pre-built image (when available):
-    # image: ghcr.io/nikmcfly/mirofish-multilang:latest
-    container_name: mirofish-multilang
+    # image: 3c-simulator:latest
+    container_name: 3c-simulator
     env_file:
       - .env
     ports:
@@ -40,7 +40,7 @@ services:
 
   neo4j:
     image: neo4j:5.18-community
-    container_name: mirofish-neo4j
+    container_name: 3c-neo4j
     ports:
       - "7474:7474"   # Neo4j Browser
       - "7687:7687"   # Bolt protocol
@@ -64,7 +64,7 @@ services:
   # Use this when you want fully local LLM inference (no cloud APIs)
   ollama:
     image: ollama/ollama:latest
-    container_name: mirofish-ollama
+    container_name: 3c-ollama
     profiles: ["local"]
     ports:
       - "11434:11434"

@@ -1,6 +1,6 @@
 <div align="center">
 
-<!<img src="./static/image/image.png" alt="MiroFish MultiLang" width="30%"/>>
+<img src="./static/image/image.png" alt="MiroFish MultiLang" width="30%"/>
 
 # MarketingSimulation (MSaaS)
 
@@ -140,8 +140,8 @@ cd MarketingSimulation
 cp .env.example .env
 
 docker compose --profile local up -d
-docker exec mirofish-ollama ollama pull qwen2.5:7b
-docker exec mirofish-ollama ollama pull nomic-embed-text
+docker exec 3c-ollama ollama pull qwen2.5:7b
+docker exec 3c-ollama ollama pull nomic-embed-text
 ```
 
 Open `http://localhost:3000`.

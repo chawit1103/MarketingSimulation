@@ -1,0 +1,736 @@
+{
+    "id": "insurance_insurtech_th",
+    "name_th": "ประกันภัย และ InsurTech ไทย",
+    "name_en": "Thai Insurance and InsurTech",
+    "description_th": "อุตสาหกรรมประกันภัยไทยหลังวิกฤตความเชื่อมั่น เน้นประกันสุขภาพ ประกันรถยนต์ EV และเทคโนโลยีการพิจารณาสินไหม",
+    "description_en": "Thai insurance industry post-trust crisis, focusing on health, EV insurance, and underwriting technology",
+    "icon": "🛡️",
+    "color": "#1e40af",
+    "objectives": [
+        "crisis_simulation",
+        "brand_perception",
+        "product_launch",
+        "competitor_response",
+        "message_testing"
+    ],
+    "default_objective": "crisis_simulation",
+    "default_platform": "both",
+    "default_max_rounds": 25,
+    "default_language": "th",
+    "target_audience": {
+        "age_range": [
+            20,
+            70
+        ],
+        "gender": "all",
+        "regions": [
+            "bangkok",
+            "central",
+            "north",
+            "northeast",
+            "east",
+            "south",
+            "west"
+        ],
+        "persona_count": 100
+    },
+    "persona_segments": [
+        {
+            "id": "insurance_buyers",
+            "name_th": "ผู้ซื้อประกัน",
+            "name_en": "Insurance Buyers",
+            "count": 30,
+            "interests": [
+                "ลดหย่อนภาษี",
+                "ความมั่นคงครอบครัว",
+                "ประกันสุขภาพ",
+                "ประกันรถยนต์"
+            ],
+            "archetypes": [
+                {
+                    "id": "tax_saver_worker",
+                    "name_th": "มนุษย์เงินเดือนซื้อประกันลดหย่อนภาษี",
+                    "name_en": "Tax-Saving Office Worker",
+                    "age_range": [
+                        28,
+                        45
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "bangkok",
+                        "central"
+                    ],
+                    "occupation_th": "พนักงานบริษัทเอกชน",
+                    "channels": [
+                        "facebook",
+                        "line",
+                        "youtube"
+                    ],
+                    "narrative_th": "พนักงานออฟฟิศเงินเดือน 35,000 บาท ต้องการซื้อประกันชีวิตและสุขภาพเพื่อลดหย่อนภาษีและป้องกันความเสี่ยงส่วนตัว",
+                    "purchase_style": "researcher"
+                },
+                {
+                    "id": "health_focused_parent",
+                    "name_th": "พ่อแม่สายเปย์ประกันสุขภาพลูก",
+                    "name_en": "Health-Conscious Parent",
+                    "age_range": [
+                        30,
+                        50
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok",
+                        "central",
+                        "east"
+                    ],
+                    "occupation_th": "เจ้าของกิจการ/ผู้บริหาร",
+                    "channels": [
+                        "facebook",
+                        "tiktok",
+                        "instagram"
+                    ],
+                    "narrative_th": "กังวลเรื่องค่ารักษาพยาบาลเด็กที่พุ่งสูงขึ้น ยอมจ่ายเบี้ยแพงเพื่อแผน OPD/IPD ที่ดีที่สุด",
+                    "purchase_style": "social_proof"
+                },
+                {
+                    "id": "senior_legacy_planner",
+                    "name_th": "ผู้สูงอายุวางแผนมรดก",
+                    "name_en": "Senior Legacy Planner",
+                    "age_range": [
+                        55,
+                        70
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok",
+                        "north",
+                        "south"
+                    ],
+                    "occupation_th": "เกษียณอายุ",
+                    "channels": [
+                        "line",
+                        "tv",
+                        "facebook"
+                    ],
+                    "narrative_th": "ต้องการฝากเงินในรูปแบบประกันชีวิตเพื่อเป็นมรดกให้ลูกหลาน เน้นความชัวร์และชื่อเสียงบริษัท",
+                    "purchase_style": "traditional"
+                },
+                {
+                    "id": "ev_car_owner",
+                    "name_th": "เจ้าของรถยนต์ไฟฟ้าป้ายแดง",
+                    "name_en": "EV Car Owner",
+                    "age_range": [
+                        25,
+                        45
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "bangkok",
+                        "central",
+                        "west"
+                    ],
+                    "occupation_th": "อาชีพอิสระ/พนักงานบริษัท",
+                    "channels": [
+                        "twitter_x",
+                        "tiktok",
+                        "youtube"
+                    ],
+                    "narrative_th": "เพิ่งซื้อรถ EV มาใหม่ กังวลเรื่องความคุ้มครองแบตเตอรี่และอู่ซ่อมที่ได้มาตรฐาน",
+                    "purchase_style": "early_adopter"
+                },
+                {
+                    "id": "gen_z_digital_buyer",
+                    "name_th": "Gen Z นักล่าประกันออนไลน์",
+                    "name_en": "Gen Z Online Buyer",
+                    "age_range": [
+                        20,
+                        27
+                    ],
+                    "income": "lower_middle",
+                    "regions": [
+                        "bangkok",
+                        "northeast"
+                    ],
+                    "occupation_th": "First Jobber",
+                    "channels": [
+                        "tiktok",
+                        "twitter_x",
+                        "shopee_live"
+                    ],
+                    "narrative_th": "ชอบเปรียบเทียบราคาประกันผ่านแอป ซื้อประกันเดินทางหรือประกันอุบัติเหตุรายเดือน เน้นราคาถูกและซื้อง่าย",
+                    "purchase_style": "price_sensitive"
+                }
+            ]
+        },
+        {
+            "id": "disappointed_claimants",
+            "name_th": "ผู้เคลมผิดหวัง",
+            "name_en": "Disappointed Claimants",
+            "count": 20,
+            "interests": [
+                "การคุ้มครองผู้บริโภค",
+                "กฎหมายประกันภัย",
+                "การร้องเรียน"
+            ],
+            "archetypes": [
+                {
+                    "id": "health_claim_denied",
+                    "name_th": "ผู้ป่วยที่ถูกปฏิเสธโรคเก่า",
+                    "name_en": "Pre-existing Condition Denied",
+                    "age_range": [
+                        35,
+                        60
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "central",
+                        "west"
+                    ],
+                    "occupation_th": "พนักงานรัฐวิสาหกิจ",
+                    "channels": [
+                        "facebook",
+                        "line"
+                    ],
+                    "narrative_th": "เข้าโรงพยาบาลแต่ประกันไม่จ่าย อ้างว่าเป็นโรคที่เป็นมาก่อนการทำประกัน ทั้งที่ตรวจร่างกายผ่านแล้ว",
+                    "purchase_style": "researcher"
+                },
+                {
+                    "id": "car_accident_victim",
+                    "name_th": "เจ้าของรถที่เจออู่ดองงาน",
+                    "name_en": "Delayed Car Repair Victim",
+                    "age_range": [
+                        25,
+                        50
+                    ],
+                    "income": "lower_middle",
+                    "regions": [
+                        "east",
+                        "south"
+                    ],
+                    "occupation_th": "พนักงานทั่วไป",
+                    "channels": [
+                        "facebook",
+                        "tiktok"
+                    ],
+                    "narrative_th": "รถชนหนักแต่บริษัทประกันบ่ายเบี่ยงการอนุมัติอะไหล่แท้ ทำให้นอนอู่นานกว่า 3 เดือน",
+                    "purchase_style": "social_proof"
+                },
+                {
+                    "id": "covid_unpaid_victim",
+                    "name_th": "เหยื่อโควิดเจอจ่ายจบที่ไม่ได้เงิน",
+                    "name_en": "COVID Found-Paid-Done Victim",
+                    "age_range": [
+                        22,
+                        55
+                    ],
+                    "income": "low",
+                    "regions": [
+                        "northeast",
+                        "north"
+                    ],
+                    "occupation_th": "รับจ้างทั่วไป",
+                    "channels": [
+                        "facebook",
+                        "tiktok",
+                        "youtube"
+                    ],
+                    "narrative_th": "ติดโควิดในช่วงวิกฤตแต่บริษัทปิดตัวหรือประวิงเวลาจ่ายเงิน จนปัจจุบันยังไม่ได้เงินชดเชย",
+                    "purchase_style": "price_sensitive"
+                },
+                {
+                    "id": "life_beneficiary_dispute",
+                    "name_th": "ทายาทผู้เสียชีวิตที่เคลมไม่ได้",
+                    "name_en": "Bereaved Life Claim Disputer",
+                    "age_range": [
+                        30,
+                        65
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "north",
+                        "central"
+                    ],
+                    "occupation_th": "แม่บ้าน/พ่อบ้าน",
+                    "channels": [
+                        "facebook",
+                        "line",
+                        "tv"
+                    ],
+                    "narrative_th": "หัวหน้าครอบครัวเสียชีวิต แต่ประกันอ้างเหตุไม่เปิดเผยข้อมูลสุขภาพเพื่อบอกล้างสัญญา",
+                    "purchase_style": "traditional"
+                }
+            ]
+        },
+        {
+            "id": "agents_and_brokers",
+            "name_th": "ตัวแทนและนายหน้า",
+            "name_en": "Agents and Brokers",
+            "count": 15,
+            "interests": [
+                "คอมมิชชั่น",
+                "Product Training",
+                "ยอดขาย"
+            ],
+            "archetypes": [
+                {
+                    "id": "traditional_agent",
+                    "name_th": "ตัวแทนประกันชีวิตรุ่นใหญ่",
+                    "name_en": "Senior Life Agent",
+                    "age_range": [
+                        40,
+                        60
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok",
+                        "central",
+                        "south"
+                    ],
+                    "occupation_th": "ตัวแทนประกันชีวิต",
+                    "channels": [
+                        "line",
+                        "facebook",
+                        "tv"
+                    ],
+                    "narrative_th": "เน้นขายผ่านสายสัมพันธ์และการเข้าพบตัวต่อตัว กำลังปรับตัวเข้าสู่ระบบดิจิทัล",
+                    "purchase_style": "brand_loyal"
+                },
+                {
+                    "id": "telesales_agent",
+                    "name_th": "เจ้าหน้าที่ขายผ่านโทรศัพท์",
+                    "name_en": "Telesales Agent",
+                    "age_range": [
+                        22,
+                        35
+                    ],
+                    "income": "lower_middle",
+                    "regions": [
+                        "bangkok"
+                    ],
+                    "occupation_th": "พนักงานขาย",
+                    "channels": [
+                        "tiktok",
+                        "instagram"
+                    ],
+                    "narrative_th": "ต้องทำยอดโทรต่อวันสูงมาก เผชิญกับการถูกลูกค้าปฏิเสธและกฎหมาย PDPA",
+                    "purchase_style": "price_sensitive"
+                },
+                {
+                    "id": "independent_broker",
+                    "name_th": "นายหน้าอิสระสายเปรียบเทียบ",
+                    "name_en": "Independent Broker",
+                    "age_range": [
+                        30,
+                        50
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "central",
+                        "east"
+                    ],
+                    "occupation_th": "ตัวแทนวินาศภัย",
+                    "channels": [
+                        "facebook",
+                        "youtube",
+                        "line"
+                    ],
+                    "narrative_th": "ขายประกันหลายบริษัท เน้นให้ข้อมูลที่เป็นกลางเพื่อหาดีลที่ดีที่สุดให้ลูกค้า",
+                    "purchase_style": "researcher"
+                },
+                {
+                    "id": "digital_influencer_agent",
+                    "name_th": "ตัวแทนสายคอนเทนต์โซเชียล",
+                    "name_en": "Social Content Agent",
+                    "age_range": [
+                        24,
+                        38
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "bangkok",
+                        "central"
+                    ],
+                    "occupation_th": "Content Creator/Agent",
+                    "channels": [
+                        "tiktok",
+                        "facebook",
+                        "instagram"
+                    ],
+                    "narrative_th": "สร้างตัวตนบน TikTok เพื่อให้ความรู้เรื่องประกันและดึงดูดลูกค้า Gen Y/Z",
+                    "purchase_style": "early_adopter"
+                }
+            ]
+        },
+        {
+            "id": "insurtech_innovators",
+            "name_th": "นวัตกรรม InsurTech",
+            "name_en": "InsurTech Innovators",
+            "count": 12,
+            "interests": [
+                "AI",
+                "Blockchain",
+                "Digital Transformation"
+            ],
+            "archetypes": [
+                {
+                    "id": "startup_founder",
+                    "name_th": "ผู้ก่อตั้ง InsurTech Startup",
+                    "name_en": "InsurTech Founder",
+                    "age_range": [
+                        28,
+                        45
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok"
+                    ],
+                    "occupation_th": "Entrepreneur",
+                    "channels": [
+                        "twitter_x",
+                        "youtube",
+                        "facebook"
+                    ],
+                    "narrative_th": "ต้องการแก้ Pain point การเคลมที่ล่าช้าด้วยการใช้ระบบ Automation และ AI",
+                    "purchase_style": "early_adopter"
+                },
+                {
+                    "id": "ai_underwriter",
+                    "name_th": "นักพัฒนา AI พิจารณาสินไหม",
+                    "name_en": "AI Underwriting Developer",
+                    "age_range": [
+                        25,
+                        40
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok"
+                    ],
+                    "occupation_th": "Software Engineer",
+                    "channels": [
+                        "twitter_x",
+                        "youtube"
+                    ],
+                    "narrative_th": "สร้าง Algorithm เพื่อแยกแยะการเคลมที่สุจริตและการทุจริตประกันภัย",
+                    "purchase_style": "researcher"
+                },
+                {
+                    "id": "aggregator_owner",
+                    "name_th": "เจ้าของแพลตฟอร์มรวมประกัน",
+                    "name_en": "Insurance Aggregator Owner",
+                    "age_range": [
+                        35,
+                        50
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok"
+                    ],
+                    "occupation_th": "Business Owner",
+                    "channels": [
+                        "facebook",
+                        "google",
+                        "youtube"
+                    ],
+                    "narrative_th": "เน้น SEO และ UX เพื่อให้คนไทยค้นหาและซื้อประกันได้จบในเว็บเดียว",
+                    "purchase_style": "early_adopter"
+                },
+                {
+                    "id": "embedded_insurance_partner",
+                    "name_th": "พันธมิตรประกันฝังตัว",
+                    "name_en": "Embedded Insurance Partner",
+                    "age_range": [
+                        30,
+                        45
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "bangkok",
+                        "central"
+                    ],
+                    "occupation_th": "Partnership Manager",
+                    "channels": [
+                        "line",
+                        "facebook"
+                    ],
+                    "narrative_th": "นำประกันไปใส่ในแอปเดลิเวอรี่หรืออีคอมเมิร์ซเพื่อให้ลูกค้าซื้อพ่วงได้ทันที",
+                    "purchase_style": "impulsive"
+                }
+            ]
+        },
+        {
+            "id": "regulators_and_law",
+            "name_th": "ภาครัฐและกฎหมาย",
+            "name_en": "Regulators and Law",
+            "count": 13,
+            "interests": [
+                "กฎระเบียบ คปภ.",
+                "ความคุ้มครองสิทธิ",
+                "ความมั่นคงระบบ"
+            ],
+            "archetypes": [
+                {
+                    "id": "oic_official",
+                    "name_th": "เจ้าหน้าที่ คปภ. สายกำกับ",
+                    "name_en": "OIC Regulatory Officer",
+                    "age_range": [
+                        30,
+                        55
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "bangkok"
+                    ],
+                    "occupation_th": "ข้าราชการ",
+                    "channels": [
+                        "facebook",
+                        "tv",
+                        "radio"
+                    ],
+                    "narrative_th": "ดูแลเรื่องความมั่นคงของเงินกองทุนบริษัทประกันและรับเรื่องร้องเรียนจากประชาชน",
+                    "purchase_style": "traditional"
+                },
+                {
+                    "id": "insurance_lawyer",
+                    "name_th": "นักกฎหมายประกันภัย",
+                    "name_en": "Insurance Lawyer",
+                    "age_range": [
+                        35,
+                        60
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok",
+                        "central"
+                    ],
+                    "occupation_th": "ทนายความ",
+                    "channels": [
+                        "facebook",
+                        "youtube",
+                        "line"
+                    ],
+                    "narrative_th": "เชี่ยวชาญการฟ้องร้องคดีประกันภัย ทั้งฝั่งผู้บริโภคและฝั่งบริษัท",
+                    "purchase_style": "researcher"
+                },
+                {
+                    "id": "insurance_economist",
+                    "name_th": "นักเศรษฐศาสตร์ประกันภัย",
+                    "name_en": "Insurance Economist",
+                    "age_range": [
+                        35,
+                        55
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok"
+                    ],
+                    "occupation_th": "อาจารย์/นักวิจัย",
+                    "channels": [
+                        "twitter_x",
+                        "facebook"
+                    ],
+                    "narrative_th": "วิเคราะห์แนวโน้มตลาดและผลกระทบของโรคระบาดหรือภัยพิบัติต่ออุตสาหกรรมประกัน",
+                    "purchase_style": "researcher"
+                },
+                {
+                    "id": "consumer_advocate",
+                    "name_th": "นักรณรงค์สิทธิผู้บริโภค",
+                    "name_en": "Consumer Rights Advocate",
+                    "age_range": [
+                        28,
+                        50
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "bangkok",
+                        "northeast",
+                        "south"
+                    ],
+                    "occupation_th": "NGO",
+                    "channels": [
+                        "facebook",
+                        "twitter_x",
+                        "tiktok"
+                    ],
+                    "narrative_th": "เป็นกระบอกเสียงให้ผู้เอาประกันที่ถูกเอาเปรียบจากเงื่อนไขกรมธรรม์ที่ไม่เป็นธรรม",
+                    "purchase_style": "social_proof"
+                }
+            ]
+        },
+        {
+            "id": "executives_and_partners",
+            "name_th": "ผู้บริหารและพันธมิตร",
+            "name_en": "Executives and Partners",
+            "count": 10,
+            "interests": [
+                "กำไรสุทธิ",
+                "Market Share",
+                "การจัดการความเสี่ยง"
+            ],
+            "archetypes": [
+                {
+                    "id": "insurance_ceo",
+                    "name_th": "CEO บริษัทประกันภัย",
+                    "name_en": "Insurance CEO",
+                    "age_range": [
+                        45,
+                        65
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok"
+                    ],
+                    "occupation_th": "Executive",
+                    "channels": [
+                        "facebook",
+                        "youtube",
+                        "tv"
+                    ],
+                    "narrative_th": "บริหารความสมดุลระหว่างความพึงพอใจลูกค้าและความอยู่รอดทางการเงินของบริษัท",
+                    "purchase_style": "brand_loyal"
+                },
+                {
+                    "id": "stock_investor",
+                    "name_th": "นักลงทุนหุ้นประกันภัย",
+                    "name_en": "Insurance Stock Investor",
+                    "age_range": [
+                        30,
+                        60
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok",
+                        "central"
+                    ],
+                    "occupation_th": "Full-time Investor",
+                    "channels": [
+                        "facebook",
+                        "youtube",
+                        "twitter_x"
+                    ],
+                    "narrative_th": "วิเคราะห์งบการเงินและอัตราการเคลม (Loss Ratio) เพื่อตัดสินใจลงทุน",
+                    "purchase_style": "researcher"
+                },
+                {
+                    "id": "hospital_admin",
+                    "name_th": "ผู้บริหารโรงพยาบาลคู่สัญญา",
+                    "name_en": "Hospital Administrator",
+                    "age_range": [
+                        40,
+                        60
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok",
+                        "central",
+                        "east"
+                    ],
+                    "occupation_th": "Hospital Admin",
+                    "channels": [
+                        "line",
+                        "facebook"
+                    ],
+                    "narrative_th": "ดูแลการเบิกจ่ายค่ารักษาพยาบาลระหว่างโรงพยาบาลและบริษัทประกัน",
+                    "purchase_style": "brand_loyal"
+                },
+                {
+                    "id": "risk_management_consultant",
+                    "name_th": "ที่ปรึกษาการบริหารความเสี่ยง",
+                    "name_en": "Risk Consultant",
+                    "age_range": [
+                        35,
+                        55
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok"
+                    ],
+                    "occupation_th": "Consultant",
+                    "channels": [
+                        "facebook",
+                        "youtube"
+                    ],
+                    "narrative_th": "ให้คำแนะนำบริษัทประกันในการสำรองเงินและเตรียมรับมือวิกฤตที่อาจเกิดขึ้น",
+                    "purchase_style": "researcher"
+                }
+            ]
+        }
+    ],
+    "crisis_scenarios": [
+        {
+            "id": "covid_payout_crisis",
+            "name_th": "เจอ จ่าย จบ ไม่จ่าย",
+            "name_en": "COVID Found-Paid-Done Non-payment",
+            "trigger": "ผู้เอาประกัน 1,000 รายโพสต์โซเชียลพร้อมกันว่าเคลม COVID ไม่ได้ #ประกันไม่จ่าย ติดเทรนด์ Twitter อันดับ 1",
+            "impact": "negative",
+            "intensity": 10
+        },
+        {
+            "id": "elderly_scam_agent",
+            "name_th": "ตัวแทนประกันหลอกขาย",
+            "name_en": "Agent Scamming Elderly",
+            "trigger": "ข่าวสะพัดว่าตัวแทนบริษัทใหญ่หลอกคนแก่ถอนเงินเก็บทั้งชีวิตมาลงประกันออมทรัพย์ที่ไม่มีจริง",
+            "impact": "negative",
+            "intensity": 9
+        },
+        {
+            "id": "insurer_bankruptcy",
+            "name_th": "บริษัทประกันล้มละลาย",
+            "name_en": "Insurance Company Bankruptcy",
+            "trigger": "คปภ. สั่งปิดบริษัทประกันชื่อดัง กรมธรรม์กว่า 500,000 ฉบับกลายเป็นเศษกระดาษชั่วคราว",
+            "impact": "negative",
+            "intensity": 10
+        },
+        {
+            "id": "health_data_leak",
+            "name_th": "ข้อมูลสุขภาพลูกค้าหลุด",
+            "name_en": "Health Data Breach",
+            "trigger": "พบฐานข้อมูลลูกค้าประกัน 100,000 ราย รวมถึงประวัติการรักษา ถูกประกาศขายใน Dark Web",
+            "impact": "negative",
+            "intensity": 9
+        },
+        {
+            "id": "mass_covid_rejection",
+            "name_th": "COVID claim โดนปฏิเสธยกกลุ่ม",
+            "name_en": "Collective COVID Claim Rejection",
+            "trigger": "บริษัทประกันอ้างคำสั่งใหม่ปฏิเสธการจ่ายค่าชดเชยรายวันกรณี Home Isolation ทำให้เกิดการประท้วง",
+            "impact": "negative",
+            "intensity": 8
+        },
+        {
+            "id": "ai_underwriting_error",
+            "name_th": "AI ปฏิเสธสินไหมมะเร็งผิดพลาด",
+            "name_en": "AI Underwriting Cancer Error",
+            "trigger": "ระบบ AI ของบริษัทตัดสิทธิ์การเคลมผู้ป่วยมะเร็งระยะสุดท้ายโดยอ้างเงื่อนไขผิดพลาดจนเป็นข่าวดัง",
+            "impact": "negative",
+            "intensity": 8
+        },
+        {
+            "id": "ev_insurance_dispute",
+            "name_th": "ประกันรถ EV ไม่คุ้มครองแบตเตอรี่",
+            "name_en": "EV Battery Insurance Dispute",
+            "trigger": "ดราม่ารถ EV ชนเบาแต่แบตพัง ประกันปฏิเสธการเปลี่ยนแบตเตอรี่ใหม่ อ้างว่าซ่อมได้แต่เจ้าของไม่ยอม",
+            "impact": "negative",
+            "intensity": 7
+        }
+    ],
+    "document_seeds": [
+        {
+            "id": "new_health_ev_product",
+            "name_th": "ข่าวเปิดตัวผลิตภัณฑ์ประกันใหม่",
+            "description_th": "ข่าวประชาสัมพันธ์การเปิดตัวประกันสุขภาพและประกันรถยนต์ EV",
+            "content": "บริษัท ประกันไทย จำกัด (มหาชน) เปิดตัว 'Health Plus & EV Protect' ตอบโจทย์คนเมืองยุคใหม่ด้วยความคุ้มครองสุขภาพเหมาจ่าย 10 ล้านบาท และประกันรถ EV ที่คุ้มครองแบตเตอรี่ 100% เบี้ยเริ่มต้นเพียง 1,500 บาท/เดือน มั่นใจด้วยเครือข่ายอู่ซ่อมมาตรฐานระดับสากล"
+        },
+        {
+            "id": "claim_dispute_statement",
+            "name_th": "แถลงการณ์ claim dispute",
+            "description_th": "จดหมายชี้แจงกรณีข้อพิพาทการเคลมสินไหม",
+            "content": "ตามที่มีกระแสข่าวในโซเชียลมีเดียกรณีการปฏิเสธสินไหมเลขที่ [เลขกรมธรรม์] บริษัทขอชี้แจงว่าจากการตรวจสอบพบข้อมูลสุขภาพที่ไม่สอดคล้องกับข้อเท็จจริงในขณะสมัครประกัน อย่างไรก็ตาม บริษัทพร้อมเปิดรับข้อมูลเพิ่มเติมเพื่อพิจารณาใหม่ตามกระบวนการของ คปภ."
+        },
+        {
+            "id": "oic_regulatory_order",
+            "name_th": "ประกาศ คปภ. เรื่องเกณฑ์การเคลม",
+            "description_th": "คำสั่งจากสำนักงาน คปภ. เกี่ยวกับการคุ้มครองสิทธิผู้เอาประกัน",
+            "content": "สำนักงาน คปภ. ออกคำสั่งนายทะเบียนที่ 12/2569 เรื่อง หลักเกณฑ์การให้ความคุ้มครองและการจ่ายค่าสินไหมทดแทนกรณีโรคระบาดและเทคโนโลยีรถยนต์ไฟฟ้า เพื่อให้บริษัทประกันภัยถือปฏิบัติอย่างเคร่งครัดและเป็นธรรมต่อผู้บริโภค หากฝ่าฝืนมีโทษปรับสูงสุดตามกฎหมาย"
+        }
+    ]
+}

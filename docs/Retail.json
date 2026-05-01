@@ -1,0 +1,754 @@
+{
+    "id": "retail_ecommerce_th",
+    "name_th": "ค้าปลีก / E-Commerce",
+    "name_en": "Retail / E-Commerce",
+    "description_th": "เทมเพลตสำหรับอุตสาหกรรมค้าปลีกและ E-Commerce ในไทย ยุคกำลังซื้อหด แพลตฟอร์มแข่งตัดราคา",
+    "description_en": "Template for retail and E-Commerce industry in Thailand during purchasing power decline and platform price wars",
+    "icon": "🛒",
+    "color": "#e67e22",
+    "objectives": [
+        "brand_perception",
+        "competitor_response",
+        "crisis_simulation",
+        "product_launch",
+        "message_testing"
+    ],
+    "default_objective": "crisis_simulation",
+    "default_platform": "both",
+    "default_max_rounds": 20,
+    "default_language": "th",
+    "target_audience": {
+        "age_range": [
+            15,
+            65
+        ],
+        "gender": "all",
+        "regions": [
+            "bangkok",
+            "central",
+            "north",
+            "northeast",
+            "east",
+            "south",
+            "west"
+        ],
+        "persona_count": 100
+    },
+    "persona_segments": [
+        {
+            "id": "online_shoppers",
+            "name_th": "ผู้บริโภคออนไลน์",
+            "name_en": "Online Shoppers",
+            "count": 30,
+            "interests": [
+                "โปรโมชั่น",
+                "โค้ดส่วนลด",
+                "ส่งฟรี",
+                "รีวิวสินค้า"
+            ],
+            "archetypes": [
+                {
+                    "id": "mega_sale_hunter",
+                    "name_th": "นักช้อป 11.11 / 9.9",
+                    "name_en": "Mega Sale Hunter",
+                    "age_range": [
+                        25,
+                        40
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "bangkok",
+                        "central"
+                    ],
+                    "occupation_th": "พนักงานออฟฟิศ",
+                    "channels": [
+                        "shopee_live",
+                        "facebook",
+                        "twitter_x"
+                    ],
+                    "narrative_th": "รอโปรลดแรง ซื้อทีเดียวหมดทั้งปี งบ 10,000-30,000 เก็บของในตะกร้าไว้ก่อน รอวันโปรกดซื้อทีเดียว",
+                    "purchase_style": "price_sensitive"
+                },
+                {
+                    "id": "fmcg_housewife",
+                    "name_th": "แม่บ้านซื้อของใช้ประจำเดือน",
+                    "name_en": "Monthly FMCG Housewife",
+                    "age_range": [
+                        30,
+                        50
+                    ],
+                    "income": "lower_middle",
+                    "regions": [
+                        "central",
+                        "east"
+                    ],
+                    "occupation_th": "แม่บ้าน",
+                    "channels": [
+                        "facebook",
+                        "line",
+                        "shopee_live"
+                    ],
+                    "narrative_th": "รอ Shopee/Lazada โค้ดส่งฟรี ซื้อผ้าอ้อม น้ำยาซักผ้า ของใช้ในบ้าน เน้นความคุ้มค่า",
+                    "purchase_style": "researcher"
+                },
+                {
+                    "id": "tiktok_impulsive_teen",
+                    "name_th": "วัยรุ่นตาม TikTok Shop",
+                    "name_en": "TikTok Shop Teen",
+                    "age_range": [
+                        15,
+                        22
+                    ],
+                    "income": "low",
+                    "regions": [
+                        "bangkok",
+                        "north"
+                    ],
+                    "occupation_th": "นักศึกษา",
+                    "channels": [
+                        "tiktok",
+                        "instagram"
+                    ],
+                    "narrative_th": "ซื้อของตามไลฟ์สด โดนป้ายยา ใจง่าย ซื้อก่อนคิด ซื้อตามกระแส",
+                    "purchase_style": "impulsive"
+                },
+                {
+                    "id": "secondhand_buyer",
+                    "name_th": "คนซื้อของมือสอง",
+                    "name_en": "Secondhand Buyer",
+                    "age_range": [
+                        20,
+                        35
+                    ],
+                    "income": "lower_middle",
+                    "regions": [
+                        "northeast",
+                        "south"
+                    ],
+                    "occupation_th": "พนักงานบริษัท",
+                    "channels": [
+                        "facebook",
+                        "line"
+                    ],
+                    "narrative_th": "ตามตลาดนัดออนไลน์ Facebook Marketplace และ Kaidee ต่อราคาเก่ง หาราคาถูกที่สุด",
+                    "purchase_style": "price_sensitive"
+                },
+                {
+                    "id": "upcountry_shopper",
+                    "name_th": "ผู้บริโภคต่างจังหวัด",
+                    "name_en": "Upcountry Shopper",
+                    "age_range": [
+                        25,
+                        60
+                    ],
+                    "income": "lower_middle",
+                    "regions": [
+                        "north",
+                        "northeast",
+                        "south"
+                    ],
+                    "occupation_th": "เกษตรกร/รับจ้าง",
+                    "channels": [
+                        "facebook",
+                        "youtube",
+                        "tiktok"
+                    ],
+                    "narrative_th": "ซื้อของออนไลน์เพราะห้างไกล รอ Kerry/Flash ส่งถึงบ้าน ชอบจ่ายเงินปลายทาง (COD)",
+                    "purchase_style": "traditional"
+                },
+                {
+                    "id": "installment_shopper",
+                    "name_th": "มนุษย์เงินเดือนสายผ่อน",
+                    "name_en": "Installment Shopper",
+                    "age_range": [
+                        22,
+                        35
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "bangkok",
+                        "central"
+                    ],
+                    "occupation_th": "พนักงานเอกชน",
+                    "channels": [
+                        "facebook",
+                        "twitter_x"
+                    ],
+                    "narrative_th": "ชอบซื้อของชิ้นใหญ่ผ่าน SpayLater หรือบัตรเครดิตผ่อน 0% กำลังซื้อต่อเดือนจำกัด",
+                    "purchase_style": "researcher"
+                }
+            ]
+        },
+        {
+            "id": "online_sellers",
+            "name_th": "ผู้ขายออนไลน์",
+            "name_en": "Online Sellers",
+            "count": 25,
+            "interests": [
+                "ค่าคอมมิชชั่น",
+                "ยอดขาย",
+                "ยิงแอด",
+                "ตัดราคา"
+            ],
+            "archetypes": [
+                {
+                    "id": "tiktok_live_seller",
+                    "name_th": "แม่ค้า TikTok Shop",
+                    "name_en": "TikTok Live Seller",
+                    "age_range": [
+                        20,
+                        35
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "bangkok",
+                        "central"
+                    ],
+                    "occupation_th": "แม่ค้าออนไลน์",
+                    "channels": [
+                        "tiktok",
+                        "instagram"
+                    ],
+                    "narrative_th": "ไลฟ์ขายของทุกคืน แข่งกันปิดยอด Flash Sale ทำคอนเทนต์ดึงความสนใจเก่ง",
+                    "purchase_style": "early_adopter"
+                },
+                {
+                    "id": "shopee_mall_seller",
+                    "name_th": "Top Seller Shopee Mall",
+                    "name_en": "Shopee Mall Top Seller",
+                    "age_range": [
+                        30,
+                        45
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok"
+                    ],
+                    "occupation_th": "เจ้าของธุรกิจ",
+                    "channels": [
+                        "facebook",
+                        "shopee_live"
+                    ],
+                    "narrative_th": "แบรนด์ทางการ ลงทุนยิงแอด ADS หลักแสน/เดือน รักษาภาพลักษณ์แบรนด์",
+                    "purchase_style": "brand_loyal"
+                },
+                {
+                    "id": "small_seller",
+                    "name_th": "ร้านค้า small seller",
+                    "name_en": "Small Seller",
+                    "age_range": [
+                        25,
+                        40
+                    ],
+                    "income": "lower_middle",
+                    "regions": [
+                        "central",
+                        "east"
+                    ],
+                    "occupation_th": "ผู้ค้ารายย่อย",
+                    "channels": [
+                        "facebook",
+                        "line"
+                    ],
+                    "narrative_th": "โดนกดค่าคอมมิชชั่น 10-15% ไม่มีทุนยิงแอด กำไรบาง ต้องสู้ด้วยบริการและการแพ็คของไว",
+                    "purchase_style": "price_sensitive"
+                },
+                {
+                    "id": "dropshipper",
+                    "name_th": "Dropshipper",
+                    "name_en": "Dropshipper",
+                    "age_range": [
+                        20,
+                        35
+                    ],
+                    "income": "lower_middle",
+                    "regions": [
+                        "bangkok",
+                        "northeast"
+                    ],
+                    "occupation_th": "พ่อค้าคนกลาง",
+                    "channels": [
+                        "facebook",
+                        "tiktok"
+                    ],
+                    "narrative_th": "ไม่มีสต็อก รับออเดอร์จากจีน ส่งตรงลูกค้า เน้นกินส่วนต่างราคา หาของกระแสมาขายรวดเร็ว",
+                    "purchase_style": "researcher"
+                },
+                {
+                    "id": "o2o_store",
+                    "name_th": "ร้าน O2O",
+                    "name_en": "O2O Store",
+                    "age_range": [
+                        35,
+                        55
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "bangkok",
+                        "north"
+                    ],
+                    "occupation_th": "เจ้าของร้านค้า",
+                    "channels": [
+                        "line",
+                        "facebook"
+                    ],
+                    "narrative_th": "มีหน้าร้าน + ขายออนไลน์ ส่งผ่าน Grab/LINEMAN ปรับตัวยุคดิจิทัลเพื่อเพิ่มช่องทางรายได้",
+                    "purchase_style": "traditional"
+                },
+                {
+                    "id": "preorder_shop",
+                    "name_th": "ร้านค้าพรีออเดอร์",
+                    "name_en": "Pre-order Shop",
+                    "age_range": [
+                        20,
+                        35
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "bangkok",
+                        "south"
+                    ],
+                    "occupation_th": "แม่ค้าพรีออเดอร์",
+                    "channels": [
+                        "twitter_x",
+                        "instagram"
+                    ],
+                    "narrative_th": "รับกดของจากจีนหรือเกาหลี ลูกค้าต้องรอ 15-20 วัน เน้นกลุ่มของสะสมและติ่งเกาหลี",
+                    "purchase_style": "social_proof"
+                }
+            ]
+        },
+        {
+            "id": "logistics_workforce",
+            "name_th": "โลจิสติกส์/ขนส่ง",
+            "name_en": "Logistics Workforce",
+            "count": 15,
+            "interests": [
+                "รอบจัดส่ง",
+                "ค่าน้ำมัน",
+                "โบนัส",
+                "ความปลอดภัย"
+            ],
+            "archetypes": [
+                {
+                    "id": "delivery_rider",
+                    "name_th": "ไรเดอร์ขนส่ง",
+                    "name_en": "Delivery Rider",
+                    "age_range": [
+                        20,
+                        45
+                    ],
+                    "income": "lower_middle",
+                    "regions": [
+                        "bangkok",
+                        "central",
+                        "east"
+                    ],
+                    "occupation_th": "พนักงานส่งพัสดุ",
+                    "channels": [
+                        "facebook",
+                        "tiktok",
+                        "line"
+                    ],
+                    "narrative_th": "ส่งของวันละ 100+ ชิ้น peak season ทำงาน 14 ชม. รีบทำยอดเพื่อให้ได้อินเซนทีฟ",
+                    "purchase_style": "price_sensitive"
+                },
+                {
+                    "id": "warehouse_manager",
+                    "name_th": "ผู้จัดการคลังสินค้า",
+                    "name_en": "Warehouse Manager",
+                    "age_range": [
+                        35,
+                        50
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "central",
+                        "east"
+                    ],
+                    "occupation_th": "ผู้จัดการคลัง",
+                    "channels": [
+                        "line",
+                        "facebook"
+                    ],
+                    "narrative_th": "บริหารคน+ของ peak season 11.11 ของค้าง 500,000 ชิ้น รับความกดดันสูงจากเบื้องบน",
+                    "purchase_style": "traditional"
+                },
+                {
+                    "id": "logistics_owner",
+                    "name_th": "เจ้าของบริษัทขนส่ง",
+                    "name_en": "Logistics Owner",
+                    "age_range": [
+                        40,
+                        60
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok"
+                    ],
+                    "occupation_th": "เจ้าของกิจการขนส่ง",
+                    "channels": [
+                        "line",
+                        "facebook",
+                        "youtube"
+                    ],
+                    "narrative_th": "ต้นทุนน้ำมัน+ค่าแรงงานขึ้น ต้องปรับราคาค่าขนส่ง แข่งกับเจ้าใหญ่ที่มีนายทุนหนุนหลัง",
+                    "purchase_style": "researcher"
+                },
+                {
+                    "id": "parcel_sorter",
+                    "name_th": "พนักงานคัดแยกพัสดุ",
+                    "name_en": "Parcel Sorter",
+                    "age_range": [
+                        18,
+                        35
+                    ],
+                    "income": "low",
+                    "regions": [
+                        "central",
+                        "east"
+                    ],
+                    "occupation_th": "พนักงานรายวัน",
+                    "channels": [
+                        "tiktok",
+                        "facebook"
+                    ],
+                    "narrative_th": "ทำงานกะดึก แกะ-คัด-แพ็ค ซ้ำๆ วันละ 2,000 ชิ้น เสี่ยงอุบัติเหตุ เหนื่อยล้าสะสม",
+                    "purchase_style": "price_sensitive"
+                }
+            ]
+        },
+        {
+            "id": "modern_trade_retail",
+            "name_th": "Modern Trade / ห้างค้าปลีก",
+            "name_en": "Modern Trade / Retail",
+            "count": 10,
+            "interests": [
+                "ทราฟฟิกหน้าร้าน",
+                "ยอดขายสาขา",
+                "โปรโมชั่นดึงดูด"
+            ],
+            "archetypes": [
+                {
+                    "id": "mall_manager",
+                    "name_th": "ผู้จัดการห้าง",
+                    "name_en": "Mall Manager",
+                    "age_range": [
+                        35,
+                        55
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok",
+                        "central",
+                        "north"
+                    ],
+                    "occupation_th": "ผู้จัดการสาขา",
+                    "channels": [
+                        "line",
+                        "facebook"
+                    ],
+                    "narrative_th": "ต้องแข่งกับออนไลน์ จัดโปรลดแรง ดึงคนเข้าร้าน สร้างประสบการณ์หน้าร้านให้อยู่รอด",
+                    "purchase_style": "brand_loyal"
+                },
+                {
+                    "id": "retail_staff",
+                    "name_th": "พนักงาน Lotus's/Big C",
+                    "name_en": "Hypermarket Staff",
+                    "age_range": [
+                        25,
+                        45
+                    ],
+                    "income": "low",
+                    "regions": [
+                        "bangkok",
+                        "northeast",
+                        "south"
+                    ],
+                    "occupation_th": "พนักงานห้างสรรพสินค้า",
+                    "channels": [
+                        "facebook",
+                        "tiktok",
+                        "line"
+                    ],
+                    "narrative_th": "กลัวห้างปิดสาขา ลูกค้าหายไปซื้อออนไลน์ ยอดขายหน้าร้านตก กังวลความมั่นคงในอาชีพ",
+                    "purchase_style": "price_sensitive"
+                },
+                {
+                    "id": "brand_manager_modern_trade",
+                    "name_th": "Brand Manager ใน Modern Trade",
+                    "name_en": "Modern Trade Brand Manager",
+                    "age_range": [
+                        30,
+                        45
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok"
+                    ],
+                    "occupation_th": "ผู้จัดการแบรนด์",
+                    "channels": [
+                        "facebook",
+                        "instagram"
+                    ],
+                    "narrative_th": "จ่ายค่า shelf space + GP ให้ห้าง แพงขึ้นทุกปี ต้องรักษา margin ท่ามกลางต้นทุนที่สูง",
+                    "purchase_style": "researcher"
+                },
+                {
+                    "id": "local_grocery_owner",
+                    "name_th": "เจ้าของร้านโชห่วย",
+                    "name_en": "Local Grocery Owner",
+                    "age_range": [
+                        40,
+                        65
+                    ],
+                    "income": "lower_middle",
+                    "regions": [
+                        "central",
+                        "northeast",
+                        "west"
+                    ],
+                    "occupation_th": "เจ้าของร้านชำ",
+                    "channels": [
+                        "line",
+                        "facebook",
+                        "tv"
+                    ],
+                    "narrative_th": "รับของจากแม็คโครมาขายต่อ สู้กับร้านสะดวกซื้อและออนไลน์ด้วยความคุ้นเคยกับคนในชุมชน",
+                    "purchase_style": "traditional"
+                }
+            ]
+        },
+        {
+            "id": "government_regulators",
+            "name_th": "ภาครัฐ/ผู้กำกับ",
+            "name_en": "Government & Regulators",
+            "count": 10,
+            "interests": [
+                "ร้องเรียนผู้บริโภค",
+                "ภาษี",
+                "นโยบายการค้า"
+            ],
+            "archetypes": [
+                {
+                    "id": "ocpb_officer",
+                    "name_th": "เจ้าหน้าที่ สคบ.",
+                    "name_en": "OCPB Officer",
+                    "age_range": [
+                        30,
+                        50
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "bangkok"
+                    ],
+                    "occupation_th": "ข้าราชการ",
+                    "channels": [
+                        "facebook",
+                        "line",
+                        "tv"
+                    ],
+                    "narrative_th": "รับเรื่องร้องเรียนซื้อของออนไลน์ไม่ได้ของ/ของไม่ตรงปก งานล้นมือทุกวัน",
+                    "purchase_style": "researcher"
+                },
+                {
+                    "id": "customs_officer",
+                    "name_th": "เจ้าหน้าที่กรมศุลกากร",
+                    "name_en": "Customs Officer",
+                    "age_range": [
+                        30,
+                        55
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "bangkok",
+                        "central",
+                        "east"
+                    ],
+                    "occupation_th": "ข้าราชการ",
+                    "channels": [
+                        "facebook",
+                        "line"
+                    ],
+                    "narrative_th": "เก็บภาษีสินค้านำเข้าราคาต่ำกว่า 1,500 บาท ป้องกันการหลบเลี่ยงภาษีจากสินค้าทุนจีน",
+                    "purchase_style": "traditional"
+                },
+                {
+                    "id": "ecommerce_association",
+                    "name_th": "สมาคมผู้ประกอบการ E-Commerce ไทย",
+                    "name_en": "Thai E-Commerce Association",
+                    "age_range": [
+                        35,
+                        60
+                    ],
+                    "income": "upper_middle",
+                    "regions": [
+                        "bangkok"
+                    ],
+                    "occupation_th": "กรรมการสมาคม",
+                    "channels": [
+                        "twitter_x",
+                        "facebook"
+                    ],
+                    "narrative_th": "ผลักดันนโยบายแข่งขันที่เป็นธรรม ปกป้อง SME ไทยจากการรุกรานของแพลตฟอร์มต่างชาติ",
+                    "purchase_style": "researcher"
+                }
+            ]
+        },
+        {
+            "id": "influencers_creators",
+            "name_th": "Influencer/Content Creator",
+            "name_en": "Influencer / Content Creator",
+            "count": 10,
+            "interests": [
+                "ยอดวิว",
+                "สปอนเซอร์",
+                "เตือนภัยสังคม",
+                "เทคนิคช้อปปิ้ง"
+            ],
+            "archetypes": [
+                {
+                    "id": "unboxing_reviewer",
+                    "name_th": "รีวิวสินค้าแกะกล่อง",
+                    "name_en": "Unboxing Reviewer",
+                    "age_range": [
+                        20,
+                        35
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "bangkok",
+                        "central"
+                    ],
+                    "occupation_th": "นักรีวิวสินค้า",
+                    "channels": [
+                        "youtube",
+                        "tiktok",
+                        "instagram"
+                    ],
+                    "narrative_th": "ทดลองใช้จริง ถ่ายวิดีโอ รายได้จากสปอนเซอร์+Affiliate สร้างความน่าเชื่อถือให้ฐานแฟนคลับ",
+                    "purchase_style": "early_adopter"
+                },
+                {
+                    "id": "pro_shopper_influencer",
+                    "name_th": "นักช้อปมือโปร",
+                    "name_en": "Pro Shopper Influencer",
+                    "age_range": [
+                        25,
+                        40
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "bangkok"
+                    ],
+                    "occupation_th": "เพจเจอร์รีวิวโปรโมชั่น",
+                    "channels": [
+                        "facebook",
+                        "twitter_x",
+                        "tiktok"
+                    ],
+                    "narrative_th": "สอนเทคนิคเก็บโค้ดลด ซื้อของถูก สะสมแต้ม Cashback มีผู้ติดตามรอซื้อตามเยอะมาก",
+                    "purchase_style": "price_sensitive"
+                },
+                {
+                    "id": "consumer_watchdog",
+                    "name_th": "Consumer watchdog",
+                    "name_en": "Consumer Watchdog",
+                    "age_range": [
+                        28,
+                        45
+                    ],
+                    "income": "middle",
+                    "regions": [
+                        "bangkok"
+                    ],
+                    "occupation_th": "นักเคลื่อนไหวสังคมออนไลน์",
+                    "channels": [
+                        "facebook",
+                        "twitter_x"
+                    ],
+                    "narrative_th": "แฉร้านค้าหลอกลวง สินค้าปลอม ไม่ส่งของ เตือนภัยสังคมออนไลน์ให้คนระวังตัว",
+                    "purchase_style": "researcher"
+                }
+            ]
+        }
+    ],
+    "crisis_scenarios": [
+        {
+            "id": "platform_crash_mega_sale",
+            "name_th": "แพลตฟอร์มล่มวัน Mega Sale",
+            "name_en": "Platform Crash on Mega Sale Day",
+            "trigger": "9.9 / 11.11 ระบบล่มทั้งวัน ผู้ขายเสียหายหลักล้าน #Shopeeล่ม ติดเทรนด์อันดับ 1",
+            "impact": "negative",
+            "intensity": 10
+        },
+        {
+            "id": "customer_credit_card_leak",
+            "name_th": "ข้อมูลบัตรเครดิตลูกค้ารั่ว",
+            "name_en": "Customer Credit Card Data Leak",
+            "trigger": "แฮกเกอร์เจาะระบบ 100,000 ราย ข้อมูลบัตรเครดิตหลุดไปขายบน Dark Web อย่างโจ่งแจ้ง",
+            "impact": "negative",
+            "intensity": 10
+        },
+        {
+            "id": "fake_products_outbreak",
+            "name_th": "สินค้าปลอมระบาดบนแพลตฟอร์ม",
+            "name_en": "Fake Products Outbreak",
+            "trigger": "อย. ตรวจพบเครื่องสำอางปลอม อาหารเสริมเถื่อน ขายระบาดหนักบน Shopee/Lazada",
+            "impact": "negative",
+            "intensity": 9
+        },
+        {
+            "id": "influencer_exposes_scam",
+            "name_th": "Influencer แฉร้านค้าโกง",
+            "name_en": "Influencer Exposes Scam Shop",
+            "trigger": "ส่งของไม่ตรงปก รับเงินแล้วเงียบ Influencer ยอดติดตาม 2 ล้านคน ออกมาแฉจนเป็นไวรัล",
+            "impact": "negative",
+            "intensity": 8
+        },
+        {
+            "id": "platform_commission_hike",
+            "name_th": "แพลตฟอร์มขึ้นค่าคอมมิชชั่น",
+            "name_en": "Platform Commission Hike",
+            "trigger": "ผู้ขายรายย่อยรวมตัวประท้วงหยุดขาย ขู่ย้ายไป platform อื่น หลังโดนปรับค่า GP พุ่งกระฉูด",
+            "impact": "negative",
+            "intensity": 7
+        },
+        {
+            "id": "logistics_collapse_festival",
+            "name_th": "ระบบขนส่งล่มช่วงเทศกาล",
+            "name_en": "Logistics Collapse During Festival",
+            "trigger": "ของค้างคลัง 500,000 ชิ้น ส่งไม่ทันปีใหม่ ลูกค้าแห่ cancel สินค้าและด่าทอผ่านโซเชียล",
+            "impact": "negative",
+            "intensity": 8
+        },
+        {
+            "id": "warehouse_workers_strike",
+            "name_th": "แรงงานคลังสินค้าประท้วง",
+            "name_en": "Warehouse Workers Strike",
+            "trigger": "เรียกร้องค่าแรงขั้นต่ำ 600 บาท/วัน และสภาพการทำงานที่ดีขึ้น มีการหยุดงานประท้วงหน้าคลัง",
+            "impact": "mixed",
+            "intensity": 7
+        }
+    ],
+    "document_seeds": [
+        {
+            "id": "mega_sale_campaign",
+            "name_th": "ข่าวเปิดตัวแคมเปญ Mega Sale",
+            "description_th": "เอกสารข่าวประชาสัมพันธ์การจัดแคมเปญลดราคาระดับประเทศ",
+            "content": "ประกาศจัดแคมเปญ Mega Sale วันที่ 11.11 ลดสูงสุด 90% พร้อมแจกโค้ดส่งฟรีทั่วประเทศทุกๆ ชั่วโมง มีร้านค้าเข้าร่วมกว่า 50,000 ร้าน และสินค้าลดราคากว่า 1 ล้านรายการ หวังกระตุ้นกำลังซื้อปลายปี"
+        },
+        {
+            "id": "customer_data_leak_statement",
+            "name_th": "แถลงการณ์ข้อมูลลูกค้ารั่ว",
+            "description_th": "จดหมายชี้แจงจากบริษัทกรณีข้อมูลรั่วไหลสู่สาธารณะ",
+            "content": "ทางบริษัทขออภัยเป็นอย่างยิ่งสำหรับเหตุการณ์ข้อมูลบัตรรั่วไหล เรากำลังตรวจสอบช่องโหว่และร่วมมือกับตำรวจไซเบอร์ ลูกค้าที่ได้รับผลกระทบจะได้รับการชดเชยและอายัดบัตรโดยไม่มีค่าใช้จ่ายเพิ่มเติม"
+        },
+        {
+            "id": "seller_policy_update_announcement",
+            "name_th": "ประกาศปรับนโยบายผู้ขาย",
+            "description_th": "ประกาศแจ้งผู้ขายในระบบถึงโครงสร้างค่าธรรมเนียมใหม่",
+            "content": "เรียน ผู้ขายทุกท่าน ทางแพลตฟอร์มขอแจ้งปรับโครงสร้างค่าธรรมเนียมการขาย (Commission Fee) เพิ่มขึ้น 2% ในทุกหมวดหมู่สินค้า เพื่อนำไปพัฒนาระบบและสนับสนุนแคมเปญการตลาด มีผลตั้งแต่วันที่ 1 ของเดือนหน้าเป็นต้นไป"
+        }
+    ]
+}

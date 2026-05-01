@@ -3,7 +3,7 @@
     <!-- Header -->
     <header class="app-header">
       <div class="header-left">
-        <div class="brand" @click="router.push('/')">MIROFISH OFFLINE</div>
+        <div class="brand" @click="router.push('/')">{{ $t('process.brand') }}</div>
       </div>
       
       <div class="header-center">
@@ -15,14 +15,14 @@
             :class="{ active: viewMode === mode }"
             @click="viewMode = mode"
           >
-            {{ { graph: 'Graph', split: 'Split', workbench: 'Workbench' }[mode] }}
+            {{ viewModeLabel(mode) }}
           </button>
         </div>
       </div>
 
       <div class="header-right">
         <div class="workflow-step">
-          <span class="step-num">Step {{ currentStep }}/5</span>
+          <span class="step-num">{{ $t('process.workflowStep', {current: currentStep}) }}</span>
           <span class="step-name">{{ stepNames[currentStep - 1] }}</span>
         </div>
         <div class="step-divider"></div>
@@ -77,6 +77,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import GraphPanel from '../components/GraphPanel.vue'
 import Step1GraphBuild from '../components/Step1GraphBuild.vue'
 import Step2EnvSetup from '../components/Step2EnvSetup.vue'
@@ -85,13 +86,20 @@ import { getPendingUpload, clearPendingUpload } from '../store/pendingUpload'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
+
+const viewModeLabel = (mode) => ({
+  graph: t('process.viewGraph'),
+  split: t('process.viewSplit'),
+  workbench: t('process.viewWorkbench')
+}[mode] || mode)
 
 // Layout State
 const viewMode = ref('split') // graph | split | workbench
 
 // Step State
 const currentStep = ref(1) // 1: Graph Build, 2: Env Setup, 3: Simulation, 4: Report, 5: Interaction
-const stepNames = ['Graph Build', 'Env Setup', 'Simulation', 'Report', 'Interaction']
+const stepNames = computed(() => [t('steps.graphBuild'), t('steps.envSetup'), t('steps.simulation'), t('steps.report'), t('steps.interaction')])
 
 // Data State
 const currentProjectId = ref(route.params.projectId)
@@ -536,5 +544,100 @@ onUnmounted(() => {
 
 .panel-wrapper.left {
   border-right: 1px solid #EAEAEA;
+}
+
+/* Premium workflow shell */
+.main-view {
+  background: var(--bg-canvas);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+}
+
+.app-header {
+  min-height: 64px;
+  background: rgba(var(--bg-canvas-rgb), 0.82);
+  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(18px) saturate(1.12);
+}
+
+.brand {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  letter-spacing: 0;
+}
+
+.view-switcher {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.switch-btn {
+  color: var(--text-tertiary);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-weight: 800;
+}
+
+.switch-btn.active {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.workflow-step,
+.status-indicator {
+  color: var(--text-secondary);
+}
+
+.step-num {
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+
+.step-name {
+  color: var(--text-primary);
+}
+
+.step-divider,
+.panel-wrapper.left {
+  background-color: var(--border-subtle);
+  border-color: var(--border-subtle);
+}
+
+.status-indicator.processing .dot { background: var(--accent); }
+.status-indicator.completed .dot { background: var(--green); }
+.status-indicator.error .dot { background: var(--red); }
+
+.content-area {
+  background: var(--bg-canvas);
+}
+
+@media (max-width: 760px) {
+  .app-header {
+    align-items: flex-start;
+    flex-direction: column;
+    height: auto;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .header-center {
+    position: static;
+    transform: none;
+    width: 100%;
+  }
+
+  .view-switcher {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 </style>

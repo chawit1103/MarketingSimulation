@@ -214,6 +214,9 @@ def create_simulation():
             enable_twitter=data.get('enable_twitter', True),
             enable_reddit=data.get('enable_reddit', True),
             language=language,
+            platform_mode=data.get('platform_mode', 'auto'),
+            audience_channels=data.get('audience_channels', []),
+            oasis_preset=data.get('oasis_preset'),
         )
         
         return jsonify({

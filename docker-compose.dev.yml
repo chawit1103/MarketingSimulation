@@ -1,6 +1,6 @@
-# MiroFish MultiLang — Development Stack
+# 3C Simulator — Development Stack
 # =============================================================
-# Cloud-only stack: Neo4j + MiroFish with hot-reload.
+# Development stack: Neo4j + 3C Simulator with hot-reload.
 # No Ollama — uses cloud LLM providers configured in .env.dev.
 #
 # Usage:
@@ -17,9 +17,9 @@
 # =============================================================
 
 services:
-  mirofish-dev:
+  3c-simulator-dev:
     build: .
-    container_name: mirofish-multilang-dev
+    container_name: 3c-simulator-dev
     env_file:
       - .env.dev
     ports:
@@ -37,7 +37,7 @@ services:
 
   neo4j-dev:
     image: neo4j:5.18-community
-    container_name: mirofish-neo4j-dev
+    container_name: 3c-neo4j-dev
     ports:
       - "7475:7474"
       - "7688:7687"

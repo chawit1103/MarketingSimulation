@@ -29,6 +29,9 @@ class CampaignTarget(BaseModel):
     age_range: tuple[int, int] = (18, 65)
     gender: str = "all"  # male, female, all
     regions: List[str] = Field(default_factory=lambda: ["Bangkok"])
+    channels: List[str] = Field(
+        default_factory=lambda: ["twitter_x", "reddit", "facebook", "instagram", "tiktok"]
+    )
     income_level: str = "all"
     interests: List[str] = Field(default_factory=list)
     persona_count: int = 100
@@ -37,6 +40,9 @@ class CampaignTarget(BaseModel):
 class SimulationConfig(BaseModel):
     """Simulation parameters for a campaign."""
     platform: str = "twitter"               # twitter, reddit, both
+    audience_channels: List[str] = Field(default_factory=list)  # Context channels; native engine remains twitter/reddit
+    platform_mode: str = "auto"             # auto, microblog, community_forum, group_chat, creator_feed, commerce_intent
+    oasis_preset: Dict[str, Any] = Field(default_factory=dict)
     max_rounds: int = 20                    # Simulation hours
     language: str = "th"                    # Agent communication language
     injection_event: Optional[str] = None   # Crisis/event injected at round N

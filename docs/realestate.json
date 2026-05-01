@@ -1,0 +1,693 @@
+{
+  "id": "realestate",
+  "name_th": "อสังหาริมทรัพย์ไทย ยุคดอกเบี้ยสูง กำลังซื้อหด",
+  "name_en": "Thai Real Estate in High Interest Era",
+  "description_th": "จำลองสภาวะตลาดอสังหาริมทรัพย์ไทยที่เผชิญวิกฤติซ้อนวิกฤติ ทั้งหนี้ครัวเรือนทะลุ 90% ของ GDP ดอกเบี้ยขาขึ้น ยอดกู้ไม่ผ่าน (Rejection Rate) พุ่งสูง โครงการล้นตลาด และปัญหาข้อกฎหมาย EIA",
+  "description_en": "Simulates the Thai real estate market facing multiple crises: over 90% household debt to GDP, rising interest rates, high mortgage rejection rates, oversupply, and EIA legal issues.",
+  "icon": "🏢",
+  "color": "#2e4053",
+  "objectives": [
+    "crisis_simulation"
+  ],
+  "default_objective": "crisis_simulation",
+  "default_platform": "both",
+  "default_max_rounds": 25,
+  "default_language": "th",
+  "target_audience": {
+    "age_range": [
+      18,
+      70
+    ],
+    "gender": "all",
+    "regions": [
+      "bangkok"
+    ],
+    "persona_count": 100
+  },
+  "persona_segments": [
+    {
+      "id": "buyers",
+      "name_th": "ผู้ซื้อ",
+      "name_en": "Buyers",
+      "count": 25,
+      "interests": [
+        "ดอกเบี้ยบ้าน",
+        "ทำเล BTS/MRT",
+        "ราคาตารางเมตร",
+        "LTV",
+        "โปรโมชั่นอยู่ฟรี"
+      ],
+      "archetypes": [
+        {
+          "id": "first_jobber_condo",
+          "name_th": "คนรุ่นใหม่ซื้อคอนโด",
+          "name_en": "First Jobber Condo Buyer",
+          "age_range": [
+            25,
+            30
+          ],
+          "income": "middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "พนักงานบริษัทเอกชน",
+          "channels": [
+            "facebook",
+            "tiktok",
+            "twitter_x"
+          ],
+          "narrative_th": "อายุ 27 ปี เงินเดือน 32,000 บาท เช่าอพาร์ทเมนต์อยู่ย่านพระราม 9 เดือนละ 8,000 บาท อยากมีคอนโดใกล้ MRT ราคา 2.5 ล้านบาท แต่ไปยื่นกู้ 3 แบงก์แล้วไม่ผ่านเพราะติดผ่อนรถและบัตรเครดิต",
+          "purchase_style": "price_sensitive"
+        },
+        {
+          "id": "family_house_buyer",
+          "name_th": "ครอบครัวซื้อบ้านเดี่ยว",
+          "name_en": "Family Single House Buyer",
+          "age_range": [
+            35,
+            45
+          ],
+          "income": "upper_middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "ผู้จัดการแผนก",
+          "channels": [
+            "facebook",
+            "line"
+          ],
+          "narrative_th": "รายได้รวมสามีภรรยา 90,000 บาท ซื้อบ้านเดี่ยวย่านราชพฤกษ์ราคา 7 ล้านบาทเมื่อ 3 ปีก่อน ตอนนี้หมดโปรโมชั่นดอกเบี้ยต่ำ ค่างวดพุ่งจาก 28,000 เป็น 35,000 บาทต่อเดือน เริ่มหมุนเงินไม่ทัน",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "investor_for_rent",
+          "name_th": "นักลงทุนซื้อปล่อยเช่า",
+          "name_en": "Investor for Rent",
+          "age_range": [
+            40,
+            55
+          ],
+          "income": "upper_middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "เจ้าของธุรกิจส่วนตัว",
+          "channels": [
+            "facebook",
+            "youtube"
+          ],
+          "narrative_th": "มีพอร์ตคอนโดปล่อยเช่าย่านสุขุมวิท 5 ห้อง ช่วงนี้หาคนเช่ายากขึ้น ต้องลดราคาลง 20% ทำให้ Rental Yield ลดลงเหลือแค่ 3% ไม่คุ้มกับดอกเบี้ยแบงก์ที่ต้องจ่าย",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "upcountry_house_buyer",
+          "name_th": "คนซื้อบ้านต่างจังหวัด",
+          "name_en": "Upcountry House Buyer",
+          "age_range": [
+            30,
+            50
+          ],
+          "income": "middle",
+          "regions": [
+            "northeast",
+            "north",
+            "south"
+          ],
+          "occupation_th": "ข้าราชการ/พนักงานโรงงาน",
+          "channels": [
+            "facebook",
+            "tiktok"
+          ],
+          "narrative_th": "ซื้อทาวน์โฮมที่ระยองราคา 1.8 ล้านบาท กู้ผ่านฉลุยเพราะใช้สวัสดิการ แต่ตอนนี้อยากย้ายงานกลับบ้านเกิดที่อีสาน ประกาศขายมา 8 เดือนแล้วยังขายไม่ออก ต้องแบกภาระผ่อนฟรีๆ",
+          "purchase_style": "price_sensitive"
+        },
+        {
+          "id": "foreign_condo_buyer",
+          "name_th": "ชาวต่างชาติซื้อคอนโด",
+          "name_en": "Foreign Condo Buyer",
+          "age_range": [
+            35,
+            60
+          ],
+          "income": "upper_middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "นักธุรกิจต่างชาติ/Expat",
+          "channels": [
+            "line",
+            "facebook"
+          ],
+          "narrative_th": "ชาวจีนที่อยากโอนเงินมาซื้อคอนโดหรูย่านสาทรเพื่อลงทุนและพักอาศัย แต่ติดปัญหาเรื่องโควตาต่างชาติ 49% เต็ม และขั้นตอนการโอนเงินข้ามประเทศที่ซับซ้อนขึ้นมาก",
+          "purchase_style": "brand_loyal"
+        }
+      ]
+    },
+    {
+      "id": "affected",
+      "name_th": "ผู้ได้รับผลกระทบ",
+      "name_en": "Affected Groups",
+      "count": 25,
+      "interests": [
+        "กฎหมายควบคุมอาคาร",
+        "สิทธิผู้บริโภค",
+        "ค่าส่วนกลาง",
+        "การประท้วง"
+      ],
+      "archetypes": [
+        {
+          "id": "surrounding_community",
+          "name_th": "ชุมชนรอบโครงการ",
+          "name_en": "Surrounding Community",
+          "age_range": [
+            45,
+            70
+          ],
+          "income": "middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "คนในพื้นที่เดิม/ผู้สูงอายุ",
+          "channels": [
+            "facebook",
+            "line"
+          ],
+          "narrative_th": "อาศัยในซอยแคบๆ ย่านอารีย์มา 30 ปี ตอนนี้เดือดร้อนหนักจากโครงการคอนโด High-rise 30 ชั้น ทั้งเสียงดังตอนดึก ฝุ่นคลุ้ง ถนนพัง และตึกบังแสงแดดมิด ร้องเรียนเขตก็ไม่มีความคืบหน้า",
+          "purchase_style": "traditional"
+        },
+        {
+          "id": "old_project_resident",
+          "name_th": "ลูกบ้านโครงการเก่า",
+          "name_en": "Old Project Resident",
+          "age_range": [
+            30,
+            50
+          ],
+          "income": "middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "มนุษย์เงินเดือน",
+          "channels": [
+            "facebook"
+          ],
+          "narrative_th": "อยู่คอนโดสร้างเสร็จมา 7 ปี สระว่ายน้ำกระเบื้องหลุด ลิฟต์เสียบ่อย แต่นิติบุคคลบริหารงานไม่โปร่งใส เก็บค่าส่วนกลางไม่ได้เกิน 30% ของลูกบ้านทั้งหมด ทำให้ไม่มีเงินซ่อมบำรุง",
+          "purchase_style": "price_sensitive"
+        },
+        {
+          "id": "condo_tenant",
+          "name_th": "ผู้เช่าคอนโด",
+          "name_en": "Condo Tenant",
+          "age_range": [
+            22,
+            30
+          ],
+          "income": "low",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "นักศึกษา/จบใหม่",
+          "channels": [
+            "twitter_x",
+            "tiktok"
+          ],
+          "narrative_th": "เช่าคอนโดใกล้ BTS อ่อนนุช เดือนละ 12,000 บาท จู่ๆ เจ้าของห้องขอขึ้นค่าเช่าเป็น 14,000 บาทอ้างว่าดอกเบี้ยแบงก์ขึ้น เลยต้องจำใจย้ายออกไปหาหอพักที่ไกลออกไปและถูกกว่า",
+          "purchase_style": "price_sensitive"
+        },
+        {
+          "id": "land_tenant_evicted",
+          "name_th": "คนเช่าที่ดินถูกไล่รื้อ",
+          "name_en": "Evicted Land Tenant",
+          "age_range": [
+            40,
+            60
+          ],
+          "income": "low",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "พ่อค้าแม่ค้า/รับจ้าง",
+          "channels": [
+            "facebook"
+          ],
+          "narrative_th": "เช่าที่ดินทำมาหากินและปลูกบ้านสังกะสีอยู่ย่านพระราม 4 มา 20 ปี ถูกนายทุนใหญ่ซื้อที่ดินไปทำ Mixed-use project โดนบอกเลิกสัญญาและให้ย้ายออกภายใน 3 เดือน ไม่รู้จะไปอยู่ที่ไหน",
+          "purchase_style": "traditional"
+        },
+        {
+          "id": "stuck_downpayment",
+          "name_th": "ลูกค้าถูกยึดเงินดาวน์",
+          "name_en": "Stuck Downpayment Buyer",
+          "age_range": [
+            28,
+            35
+          ],
+          "income": "middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "ฟรีแลนซ์",
+          "channels": [
+            "facebook"
+          ],
+          "narrative_th": "ผ่อนดาวน์คอนโดไปแล้ว 300,000 บาท แต่พอตึกเสร็จ ยื่นกู้ไม่ผ่านเพราะรายได้ไม่สม่ำเสมอ โครงการไม่ยอมคืนเงินดาวน์ และขู่จะริบเงินทั้งหมดถ้าไม่หาคนมาซื้อดาวน์ต่อภายใน 1 เดือน",
+          "purchase_style": "price_sensitive"
+        }
+      ]
+    },
+    {
+      "id": "developers",
+      "name_th": "ผู้ประกอบการอสังหาฯ",
+      "name_en": "Developers",
+      "count": 25,
+      "interests": [
+        "ต้นทุนก่อสร้าง",
+        "ยอด Presale",
+        "การอนุมัติสินเชื่อโครงการ",
+        "EIA"
+      ],
+      "archetypes": [
+        {
+          "id": "major_dev_ceo",
+          "name_th": "CEO อสังหาฯรายใหญ่",
+          "name_en": "Major Developer CEO",
+          "age_range": [
+            45,
+            60
+          ],
+          "income": "upper_middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "ผู้บริหารระดับสูง",
+          "channels": [
+            "facebook"
+          ],
+          "narrative_th": "ต้องบริหารบริษัทในตลาดหลักทรัพย์ ท่ามกลางยอดปฏิเสธสินเชื่อลูกค้าที่สูงถึง 60% มีหนี้หุ้นกู้หมื่นล้านที่ใกล้ครบกำหนด ต้องอัดโปรโมชั่นลดแลกแจกแถมเพื่อระบายสต็อกสร้างเสร็จพร้อมอยู่",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "mid_tier_dev",
+          "name_th": "Developer รายกลาง",
+          "name_en": "Mid-tier Developer",
+          "age_range": [
+            35,
+            50
+          ],
+          "income": "upper_middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "เจ้าของกิจการ",
+          "channels": [
+            "facebook",
+            "line"
+          ],
+          "narrative_th": "ทำโครงการทาวน์โฮม 50 ยูนิต แต่แบงก์เข้มงวดการปล่อยสินเชื่อ Pre-finance (สินเชื่อโครงการ) ทำให้ขาดสภาพคล่อง จ่ายเงินผู้รับเหมาล่าช้า โครงการเสี่ยงสร้างไม่เสร็จตามกำหนด",
+          "purchase_style": "price_sensitive"
+        },
+        {
+          "id": "real_estate_agent",
+          "name_th": "เอเจนต์/นายหน้า",
+          "name_en": "Real Estate Agent",
+          "age_range": [
+            25,
+            40
+          ],
+          "income": "middle",
+          "regions": [
+            "northeast",
+            "north",
+            "south",
+            "bangkok"
+          ],
+          "occupation_th": "นายหน้าอิสระ",
+          "channels": [
+            "facebook",
+            "tiktok"
+          ],
+          "narrative_th": "ทำอาชีพนายหน้ามา 5 ปี ช่วงนี้ตลาดซบเซาหนัก พาคนไปดูบ้าน 10 คน กู้ผ่านแค่ 2 คน ค่าคอมมิชชั่นหายไปกว่าครึ่ง ต้องหันไปเน้นทำตลาดปล่อยเช่าแทนเพื่อประคองตัว",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "contractor",
+          "name_th": "ผู้รับเหมาก่อสร้าง",
+          "name_en": "Contractor",
+          "age_range": [
+            40,
+            60
+          ],
+          "income": "middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "เจ้าของบริษัทรับเหมา",
+          "channels": [
+            "line"
+          ],
+          "narrative_th": "รับงานสร้างคอนโดให้รายกลาง ประสบปัญหาต้นทุนเหล็กและปูนแพงขึ้น แถมยังเบิกงวดงานจากเจ้าของโครงการไม่ได้ตามกำหนด ลูกน้องแรงงานต่างด้าวเริ่มทิ้งงานเพราะไม่ได้ค่าแรง",
+          "purchase_style": "price_sensitive"
+        },
+        {
+          "id": "material_supplier",
+          "name_th": "ซัพพลายเออร์วัสดุก่อสร้าง",
+          "name_en": "Material Supplier",
+          "age_range": [
+            35,
+            55
+          ],
+          "income": "middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "เจ้าของร้านวัสดุก่อสร้าง",
+          "channels": [
+            "line"
+          ],
+          "narrative_th": "ส่งกระเบื้องและสุขภัณฑ์ให้โครงการหมู่บ้านจัดสรร แต่ถูกขอยืดเครดิตเทอมจาก 30 วันเป็น 90 วัน บางเจ้าหนีหายทำให้เกิดหนี้สูญ กำลังคิดจะฟ้องร้องอายัดทรัพย์สินโครงการ",
+          "purchase_style": "researcher"
+        }
+      ]
+    },
+    {
+      "id": "finance",
+      "name_th": "สถาบันการเงิน",
+      "name_en": "Financial Institutions",
+      "count": 25,
+      "interests": [
+        "NPL",
+        "นโยบายแบงก์ชาติ",
+        "เครดิตบูโร",
+        "ราคาประเมิน"
+      ],
+      "archetypes": [
+        {
+          "id": "mortgage_analyst",
+          "name_th": "นักวิเคราะห์สินเชื่อบ้าน",
+          "name_en": "Mortgage Credit Analyst",
+          "age_range": [
+            28,
+            40
+          ],
+          "income": "middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "พนักงานธนาคาร",
+          "channels": [
+            "line",
+            "facebook"
+          ],
+          "narrative_th": "ทำงานฝ่ายสินเชื่อสำนักงานใหญ่ ต้องปัดตกคำขอกู้ของลูกค้ากว่า 50% เพราะนโยบายแบงก์ชาติให้คุมเข้ม DSR (ภาระหนี้ต่อรายได้) ไม่ให้เกิน 60% เห็นใจลูกค้าแต่ต้องทำตามกฎเพื่อกัน NPL",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "bank_branch_manager",
+          "name_th": "ผู้จัดการสาขาแบงก์",
+          "name_en": "Bank Branch Manager",
+          "age_range": [
+            45,
+            55
+          ],
+          "income": "upper_middle",
+          "regions": [
+            "northeast",
+            "north",
+            "south",
+            "bangkok"
+          ],
+          "occupation_th": "ผู้จัดการธนาคาร",
+          "channels": [
+            "line"
+          ],
+          "narrative_th": "ถูกกดดันจากเบื้องบนให้ทำยอดปล่อยสินเชื่อบ้านให้ถึงเป้า แต่ส่งเคสไปสำนักงานใหญ่ก็โดนตีกลับหมด ต้องพยายามหาลูกค้ากลุ่ม VIP ที่ไม่มีหนี้เสียมาทดแทน ซึ่งหายากมากในเศรษฐกิจแบบนี้",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "debt_management_officer",
+          "name_th": "เจ้าหน้าที่บริหารหนี้ (NPL)",
+          "name_en": "Debt Management Officer",
+          "age_range": [
+            30,
+            45
+          ],
+          "income": "middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "พนักงานธนาคาร",
+          "channels": [
+            "line"
+          ],
+          "narrative_th": "งานล้นมือเพราะลูกค้าผ่อนบ้านไม่ไหวเพิ่มขึ้น 30% ในไตรมาสเดียว ต้องคอยโทรเจรจาเสนอให้ประนอมหนี้ ยืดหนี้ หรือพักชำระต้นเงิน ก่อนที่จะต้องส่งฟ้องยึดทรัพย์ขายทอดตลาด",
+          "purchase_style": "price_sensitive"
+        },
+        {
+          "id": "land_appraiser",
+          "name_th": "นักประเมินราคาที่ดิน",
+          "name_en": "Appraiser",
+          "age_range": [
+            35,
+            50
+          ],
+          "income": "middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "บริษัทประเมินอิสระ",
+          "channels": [
+            "line"
+          ],
+          "narrative_th": "ถูกแบงก์สั่งให้ประเมินราคาทรัพย์สินแบบอนุรักษ์นิยมสุดๆ คอนโดที่ราคาขาย 3 ล้าน ประเมินได้แค่ 2.5 ล้าน ทำให้ลูกค้ากู้ได้น้อยลงไปอีก ฝั่ง Developer ก็โทรมาด่าว่ากดราคา",
+          "purchase_style": "price_sensitive"
+        }
+      ]
+    },
+    {
+      "id": "government_academic",
+      "name_th": "ภาครัฐและนักวิชาการ",
+      "name_en": "Government & Academics",
+      "count": 25,
+      "interests": [
+        "ภาษีที่ดิน",
+        "ผังเมือง",
+        "นโยบายรัฐ",
+        "EIA"
+      ],
+      "archetypes": [
+        {
+          "id": "land_department_officer",
+          "name_th": "เจ้าหน้าที่กรมที่ดิน/กทม.",
+          "name_en": "Land Dept / BMA Officer",
+          "age_range": [
+            40,
+            55
+          ],
+          "income": "middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "ข้าราชการ",
+          "channels": [
+            "line",
+            "facebook"
+          ],
+          "narrative_th": "รับผิดชอบการออกใบอนุญาตก่อสร้างและตรวจรับรอง EIA ช่วงนี้ทำงานเครียดมากเพราะมีคดีฟ้องร้องจากชาวบ้านบ่อยครั้ง ต้องตรวจสอบเอกสารของ Developer อย่างละเอียด ห้ามพลาดเด็ดขาด",
+          "purchase_style": "price_sensitive"
+        },
+        {
+          "id": "urban_planner",
+          "name_th": "นักผังเมือง",
+          "name_en": "Urban Planner",
+          "age_range": [
+            35,
+            50
+          ],
+          "income": "middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "นักวิชาการ/อาจารย์มหาวิทยาลัย",
+          "channels": [
+            "twitter_x",
+            "facebook"
+          ],
+          "narrative_th": "วิจารณ์การเติบโตของเมืองที่ไร้ทิศทาง มองว่ารัฐบาลปล่อยให้กลุ่มทุนใหญ่สร้างตึกสูงตามแนวรถไฟฟ้าโดยไม่สนใจโครงสร้างพื้นฐานรอบข้าง ทำให้เกิดปัญหารถติดและน้ำท่วมขัง",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "real_estate_economist",
+          "name_th": "นักเศรษฐศาสตร์อสังหาฯ",
+          "name_en": "Real Estate Economist",
+          "age_range": [
+            40,
+            60
+          ],
+          "income": "upper_middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "นักวิเคราะห์เศรษฐกิจ",
+          "channels": [
+            "youtube",
+            "facebook"
+          ],
+          "narrative_th": "ออกรายงานเตือนเรื่องฟองสบู่อสังหาฯในกลุ่มราคาต่ำกว่า 3 ล้านบาท ที่มี Over-supply กว่าแสนยูนิต เสนอให้รัฐบาลออกมาตรการกระตุ้นที่ตรงจุด ไม่ใช่แค่อุ้ม Developer",
+          "purchase_style": "researcher"
+        }
+      ]
+    },
+    {
+      "id": "media_influencer",
+      "name_th": "สื่อและผู้มีอิทธิพล",
+      "name_en": "Media & Influencers",
+      "count": 25,
+      "interests": [
+        "รีวิวคอนโด",
+        "ดราม่าก่อสร้าง",
+        "ราคาพรีเซล",
+        "หุ้นอสังหาฯ"
+      ],
+      "archetypes": [
+        {
+          "id": "condo_reviewer",
+          "name_th": "Youtuber รีวิวคอนโด",
+          "name_en": "Condo Reviewer Youtuber",
+          "age_range": [
+            25,
+            35
+          ],
+          "income": "upper_middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "Content Creator",
+          "channels": [
+            "youtube",
+            "tiktok",
+            "facebook"
+          ],
+          "narrative_th": "ทำช่องรีวิวอสังหาฯ มีผู้ติดตาม 5 แสนคน รับเงินสปอนเซอร์จาก Developer รีวิวแต่ข้อดี เลี่ยงพูดถึงปัญหาชุมชนหรือวัสดุไม่ได้มาตรฐาน ตอนนี้โดนลูกบ้านตามไปแหกในคอมเมนต์ว่าหลอกให้ซื้อ",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "real_estate_guru",
+          "name_th": "กูรูอสังหาฯ",
+          "name_en": "Real Estate Guru",
+          "age_range": [
+            45,
+            60
+          ],
+          "income": "upper_middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "นักลงทุน/วิทยากร",
+          "channels": [
+            "facebook",
+            "youtube"
+          ],
+          "narrative_th": "จัดสัมมนาสอนลงทุนอสังหาฯ วิเคราะห์เจาะลึกทำเล ฟันธงว่าโครงการไหนควรซื้อเก็บ โครงการไหนควรหนีให้ไกล ช่วงนี้แนะนำให้ลูกศิษย์ถือเงินสด ร้อนถึงค่ายอสังหาฯที่ถูกพาดพิง",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "real_estate_journalist",
+          "name_th": "นักข่าวสายอสังหาฯ",
+          "name_en": "Real Estate Journalist",
+          "age_range": [
+            30,
+            45
+          ],
+          "income": "middle",
+          "regions": [
+            "bangkok"
+          ],
+          "occupation_th": "ผู้สื่อข่าว",
+          "channels": [
+            "twitter_x",
+            "facebook"
+          ],
+          "narrative_th": "ตามขุดคุ้ยประเด็นการเพิกถอนใบอนุญาต EIA ของคอนโดหรู และคอยเช็คข่าวลือผู้บริหารบริษัทอสังหาฯ ทุจริต ต้องแข่งกับสำนักข่าวอื่นในการปล่อย Scoop ข่าวลึก",
+          "purchase_style": "price_sensitive"
+        }
+      ]
+    }
+  ],
+  "crisis_scenarios": [
+    {
+      "id": "eia_revoked",
+      "name_th": "ใบอนุญาต EIA ถูกเพิกถอนย้อนหลัง",
+      "name_en": "EIA Permit Revoked",
+      "trigger": "ศาลปกครองสูงสุดมีคำพิพากษาเพิกถอนใบอนุญาตก่อสร้างคอนโดหรูใจกลางเมือง มูลค่า 6,000 ล้านบาท เนื่องจากทางเข้าออกไม่ถึง 12 เมตรตามกฎหมาย ลูกบ้านกว่า 500 ครอบครัวเคว้ง ไม่รู้ชะตากรรม",
+      "impact": "negative",
+      "intensity": 10
+    },
+    {
+      "id": "project_abandoned",
+      "name_th": "โครงการสร้างไม่เสร็จ ลูกค้ารวมตัวฟ้อง",
+      "name_en": "Project Delayed/Abandoned",
+      "trigger": "บริษัทอสังหาฯ ขาดสภาพคล่อง ทิ้งงานก่อสร้างคอนโดย่านนนทบุรีเกินกำหนด 2 ปี ลูกค้ากว่า 300 คนบุกไปที่สำนักงานใหญ่ ร้อง สคบ. และเตรียมฟ้องศาลผู้บริโภคเพื่อขอเงินดาวน์คืน",
+      "impact": "negative",
+      "intensity": 9
+    },
+    {
+      "id": "ceo_scandal",
+      "name_th": "ผู้บริหารข่าวฉาว หุ้นดิ่ง",
+      "name_en": "CEO Scandal",
+      "trigger": "สำนักข่าวแฉเอกสารลับ ผู้บริหารระดับสูงของบริษัทอสังหาฯ Top 5 มีส่วนเกี่ยวข้องกับการติดสินบนเจ้าหน้าที่เพื่อข้ามขั้นตอน EIA ส่งผลให้นักลงทุนเทขาย หุ้นร่วง 10% ภายในวันเดียว",
+      "impact": "negative",
+      "intensity": 9
+    },
+    {
+      "id": "bot_strict_ltv",
+      "name_th": "แบงก์ชาติเข้ม LTV",
+      "name_en": "BOT Strict LTV Policy",
+      "trigger": "ธนาคารแห่งประเทศไทยประกาศยกเลิกมาตรการผ่อนปรน LTV (Loan-to-Value) คุมเข้มการปล่อยสินเชื่อบ้านหลังที่ 2 ต้องวางดาวน์ 20% ทำให้ยอดคนกู้ไม่ผ่านของโครงการพุ่งขึ้นทันที 30%",
+      "impact": "negative",
+      "intensity": 8
+    },
+    {
+      "id": "material_defect",
+      "name_th": "ดราม่าวัสดุไม่ได้มาตรฐาน",
+      "name_en": "Material Defect Drama",
+      "trigger": "ลูกบ้านโครงการบ้านเดี่ยวราคา 10 ล้านบาทพร้อมใจกันแชร์ภาพกำแพงร้าว น้ำรั่วซึม และดินทรุดลงโซเชียลมีเดีย จนเกิดเป็นกระแสไวรัลข้ามคืน ยอดจองเฟสใหม่หยุดชะงัก",
+      "impact": "negative",
+      "intensity": 8
+    },
+    {
+      "id": "competitor_price_war",
+      "name_th": "คู่แข่งตัดหน้า สงครามราคา",
+      "name_en": "Competitor Price War",
+      "trigger": "คู่แข่งรายใหญ่เปิดตัวคอนโดใหม่ห่างออกไปแค่ 200 เมตร พร้อมประกาศลดราคาล้างสต็อก 20% แถมฟรีรถยนต์ EV ตัดหน้าโครงการของคุณที่กำลังเปิดพรีเซลในสัปดาห์หน้า",
+      "impact": "negative",
+      "intensity": 7
+    },
+    {
+      "id": "community_protest",
+      "name_th": "ชุมชนประท้วง โครงการชะงัก",
+      "name_en": "Community Protest",
+      "trigger": "ชาวบ้านในซอยรวมตัวประท้วงปิดทางเข้าออกไซต์งานก่อสร้าง อ้างว่ารถบรรทุกทำถนนพังและเศษวัสดุตกใส่หลังคาบ้าน ร้องเรียนสำนักงานเขตจนมีคำสั่งระงับการก่อสร้างชั่วคราว 30 วัน",
+      "impact": "negative",
+      "intensity": 7
+    }
+  ],
+  "document_seeds": [
+    {
+      "id": "launch_pr",
+      "name_th": "ข่าวเปิดตัวโครงการใหม่",
+      "description_th": "ร่างข่าวประชาสัมพันธ์ (Press Release) เปิดตัวโครงการอสังหาริมทรัพย์ใหม่ ท่ามกลางตลาดท้าทาย",
+      "content": "ข่าวประชาสัมพันธ์\nวันที่: [วันที่]\nเรื่อง: [ชื่อบริษัท] เปิดตัวโครงการ [ชื่อโครงการ] สวนกระแสตลาด ชูจุดเด่น [จุดเด่นหลัก]\n\n[ชื่อบริษัท] ผู้นำด้านการพัฒนาอสังหาริมทรัพย์ ประกาศเปิดตัว [ชื่อโครงการ] โครงการ [ประเภทอสังหาฯ] ระดับ [Segment] มูลค่าโครงการรวมกว่า [มูลค่า] ล้านบาท บนทำเลศักยภาพ [ทำเล] มั่นใจตอบโจทย์ดีมานด์ที่แท้จริง (Real Demand) ท่ามกลางสภาวะเศรษฐกิจท้าทาย\n\nนาย/นาง [ชื่อผู้บริหาร] ตำแหน่ง [ตำแหน่ง] กล่าวว่า \"แม้ภาพรวมตลาดจะมีปัจจัยกดดันจากอัตราดอกเบี้ย แต่เราเชื่อมั่นว่าโครงการ [ชื่อโครงการ] จะได้รับการตอบรับที่ดีด้วยราคาเริ่มต้นเพียง [ราคาเริ่มต้น] ล้านบาท พร้อมโปรโมชั่นพิเศษ [รายละเอียดโปรโมชั่น] เพื่อช่วยเหลือลูกค้าลดภาระในการกู้ธนาคาร\"\n\nสอบถามข้อมูลเพิ่มเติมได้ที่ [เบอร์ติดต่อ] หรือเว็บไซต์ [Website]"
+    },
+    {
+      "id": "delay_statement",
+      "name_th": "แถลงการณ์กรณีโครงการล่าช้า",
+      "description_th": "จดหมายชี้แจงลูกค้า กรณีการก่อสร้างและส่งมอบล่าช้ากว่ากำหนดในสัญญา",
+      "content": "จดหมายชี้แจงความคืบหน้าโครงการ [ชื่อโครงการ]\nวันที่: [วันที่]\nเรียน: ท่านเจ้าของร่วม / ลูกค้าโครงการ [ชื่อโครงการ]\n\nบริษัท [ชื่อบริษัท] ขออภัยเป็นอย่างยิ่งที่ต้องแจ้งให้ท่านทราบว่า การก่อสร้างโครงการ [ชื่อโครงการ] มีความจำเป็นต้องเลื่อนกำหนดการส่งมอบออกไปจากเดิมเดือน [เดือนเดิม] เป็นเดือน [เดือนใหม่]\n\nเนื่องจากสถานการณ์ [ระบุสาเหตุ เช่น ขาดแคลนแรงงาน / ปัญหาจากผู้รับเหมา / ขั้นตอนการพิจารณา EIA ล่าช้า] ซึ่งอยู่นอกเหนือการควบคุม อย่างไรก็ตาม บริษัทมิได้นิ่งนอนใจและกำลังเร่งดำเนินการแก้ไขปัญหาอย่างสุดความสามารถ\n\nเพื่อเป็นการแสดงความรับผิดชอบ บริษัทขอมอบข้อเสนอชดเชยดังนี้: [ระบุข้อเสนอชดเชย เช่น ยกเว้นค่าส่วนกลาง 1 ปี / คืนเงินดาวน์พร้อมดอกเบี้ย] \n\nทางบริษัทกราบขออภัยในความไม่สะดวกที่เกิดขึ้น และขอยืนยันความมุ่งมั่นที่จะส่งมอบที่อยู่อาศัยที่มีคุณภาพสูงสุดแก่ท่าน\n\nขอแสดงความนับถือ\n[ชื่อผู้บริหาร/ฝ่ายลูกค้าสัมพันธ์]\nบริษัท [ชื่อบริษัท]"
+    },
+    {
+      "id": "bot_policy",
+      "name_th": "ประกาศมาตรการ LTV/สินเชื่อ",
+      "description_th": "ประกาศนโยบายการควบคุมสินเชื่อบ้านจากหน่วยงานกำกับดูแล (จำลอง)",
+      "content": "ประกาศ [ชื่อหน่วยงาน เช่น ธนาคารแห่งประเทศไทย]\nเรื่อง: มาตรการกำกับดูแลสินเชื่อเพื่อที่อยู่อาศัย (Macroprudential Policy)\n\nด้วยสถานการณ์หนี้ครัวเรือนต่อ GDP ที่อยู่ในระดับสูงถึง [ตัวเลข]% และพบสัญญาณการเก็งกำไรในตลาดอสังหาริมทรัพย์ [ชื่อหน่วยงาน] จึงเห็นควรปรับปรุงมาตรการ LTV (Loan-to-Value) เพื่อรักษาเสถียรภาพของระบบเศรษฐกิจ ดังนี้:\n\n1. การกู้เพื่อซื้อที่อยู่อาศัยสัญญาที่ 2 (ราคาต่ำกว่า [ราคา] ล้านบาท) กำหนดให้เพดาน LTV อยู่ที่ร้อยละ [ตัวเลข]% (ต้องวางเงินดาวน์ [ตัวเลข]%)\n2. ขอให้สถาบันการเงินเพิ่มความเข้มงวดในการพิจารณาภาระหนี้ต่อรายได้ (DSR) ของผู้กู้ ให้อยู่ในระดับที่ไม่เกินร้อยละ [ตัวเลข]%\n\nมาตรการนี้ให้มีผลบังคับใช้ตั้งแต่วันที่ [วันที่] เป็นต้นไป ทั้งนี้ [ชื่อหน่วยงาน] จะติดตามสถานการณ์อย่างใกล้ชิด และพร้อมปรับเปลี่ยนมาตรการหากมีความจำเป็น\n\nประกาศ ณ วันที่ [วันที่]"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-# MiroFish-Offline Roadmap
+# 3C Simulator Roadmap
 
 ## Current State (v0.2.0)
 

@@ -1,0 +1,126 @@
+{
+  "id": "energy",
+  "name_th": "พลังงาน / น้ำมัน / สาธารณูปโภค",
+  "name_en": "Energy / Oil / Utilities",
+  "description_th": "Template สำหรับบริษัทพลังงาน: วิกฤตราคาน้ำมัน, CSR สิ่งแวดล้อม, การขึ้นค่าไฟ, น้ำมันรั่ว, การต่อต้านโรงไฟฟ้า ครบทุกสถานการณ์ที่เกิดขึ้นจริงในไทย",
+  "description_en": "Energy sector template: fuel price crisis, environmental CSR, electricity tariff hikes, oil spills, power plant opposition — all real scenarios in Thailand",
+  "icon": "⚡",
+  "color": "#FF4500",
+  "objectives": ["crisis_simulation", "brand_perception", "competitor_response"],
+  "default_objective": "crisis_simulation",
+  "default_platform": "both",
+  "default_max_rounds": 20,
+  "default_language": "th",
+  "target_audience": {
+    "age_range": [18, 65],
+    "gender": "all",
+    "regions": ["bangkok", "central", "east", "south", "northeast"],
+    "persona_count": 100
+  },
+  "persona_segments": [
+    {
+      "id": "commuters",
+      "name_th": "ผู้ใช้รถยนต์-มอเตอร์ไซค์ (Commuters)",
+      "name_en": "Vehicle Commuters & Motorists",
+      "count": 25,
+      "interests": ["ราคาน้ำมัน", "การเดินทาง", "รถ EV", "ขนส่งสาธารณะ"],
+      "archetypes": [
+        {"id": "office_driver", "name_th": "มนุษย์เงินเดือนขับรถ", "name_en": "Office Worker Driver", "age_range": [25, 40], "income": "middle", "regions": ["bangkok"], "occupation_th": "พนักงานออฟฟิศ", "channels": ["twitter_x", "facebook", "tiktok"], "narrative_th": "พนักงานออฟฟิศในกรุงเทพ ขับรถไปทำงานทุกวัน เส้นทางบางนา-สีลม ค่าน้ำมันเดือนละ 5,500-6,500 บาท น้ำมันขึ้นทีโกรธที บ่นในกลุ่ม LINE เพื่อนที่ทำงาน", "purchase_style": "price_sensitive"},
+        {"id": "delivery_rider", "name_th": "ไรเดอร์ส่งอาหาร", "name_en": "Delivery Rider", "age_range": [20, 35], "income": "lower_middle", "regions": ["bangkok", "central"], "occupation_th": "ไรเดอร์ Grab/LINEMAN", "channels": ["tiktok", "facebook", "line"], "narrative_th": "ขี่มอเตอร์ไซค์ส่งอาหารวันละ 10-12 ชม. น้ำมันคือต้นทุนชีวิต — ขึ้นทีละ 80 สตางค์ กำไรหายทันที ดู TikTok ระหว่างพักรอออเดอร์ บ่นในกลุ่ม LINE ไรเดอร์", "purchase_style": "price_sensitive"},
+        {"id": "truck_fleet_owner", "name_th": "เจ้าของรถบรรทุก", "name_en": "Truck Fleet Owner", "age_range": [35, 55], "income": "upper_middle", "regions": ["central", "east", "south"], "occupation_th": "เจ้าของกิจการขนส่ง", "channels": ["facebook", "line", "youtube"], "narrative_th": "มีรถบรรทุก 5-10 คัน วิ่งส่งของทั่วประเทศ น้ำมันคือต้นทุนอันดับหนึ่ง ขึ้นที = กำไรหายหลักแสนต่อเดือน ติดตามนโยบายพลังงานภาครัฐตลอดเวลา", "purchase_style": "researcher"},
+        {"id": "student_motorcyclist", "name_th": "นศ.ใช้มอเตอร์ไซค์", "name_en": "Student Motorcyclist", "age_range": [18, 24], "income": "low", "regions": ["bangkok", "north", "northeast"], "occupation_th": "นักศึกษา", "channels": ["tiktok", "instagram", "twitter_x"], "narrative_th": "นักศึกษามหาวิทยาลัย ขี่มอเตอร์ไซค์ไปเรียน ค่าน้ำมันอาทิตย์ละ 200-300 จากเงินที่พ่อแม่ให้ โกรธที่น้ำมันแพงแต่รู้สึกทำอะไรไม่ได้ แชร์มีมบ่นราคาน้ำมันใน Twitter", "purchase_style": "impulsive"}
+      ]
+    },
+    {
+      "id": "households",
+      "name_th": "ครัวเรือน-ผู้ใช้ไฟฟ้า (Households)",
+      "name_en": "Households & Electricity Consumers",
+      "count": 25,
+      "interests": ["ค่าไฟฟ้า", "ค่าก๊าซหุงต้ม", "พลังงานทดแทน", "โซลาร์รูฟ", "ค่าครองชีพ"],
+      "archetypes": [
+        {"id": "budget_mom", "name_th": "แม่บ้านจัดการค่าใช้จ่าย", "name_en": "Household Budget Manager", "age_range": [30, 50], "income": "middle", "regions": ["bangkok", "central", "north"], "occupation_th": "แม่บ้าน/ข้าราชการ", "channels": ["facebook", "line", "youtube"], "narrative_th": "จัดการค่าใช้จ่ายทั้งบ้าน ค่าไฟ 3,500-5,000/เดือน + ค่าก๊าซหุงต้ม เวลาค่าไฟขึ้นต้องตัดงบอย่างอื่น อยู่ในกลุ่ม LINE ชุมชน บ่นกับเพื่อนบ้านเรื่องค่าไฟแพง อยากติดโซลาร์แต่ไม่มีเงินก้อน", "purchase_style": "researcher"},
+        {"id": "rural_family", "name_th": "ครอบครัวต่างจังหวัด", "name_en": "Rural Family", "age_range": [35, 60], "income": "lower_middle", "regions": ["northeast", "north", "south"], "occupation_th": "เกษตรกร/รับจ้าง", "channels": ["facebook", "tv", "line"], "narrative_th": "ครอบครัวเกษตรกร ใช้ไฟฟ้าพื้นฐาน พัดลม ตู้เย็น ทีวี ค่าไฟ 800-1,500/เดือน ค่า Ft ขึ้นทีก็กระทบ ใช้ก๊าซหุงต้มทำกับข้าว จ่ายค่าไฟไม่ทันโดนตัดบ่อย", "purchase_style": "price_sensitive"},
+        {"id": "eco_millennial", "name_th": "คนรุ่นใหม่รักษ์โลก", "name_en": "Eco-Conscious Millennial", "age_range": [25, 35], "income": "upper_middle", "regions": ["bangkok", "north"], "occupation_th": "พนักงานบริษัท/ฟรีแลนซ์", "channels": ["twitter_x", "instagram", "youtube"], "narrative_th": "คนรุ่นใหม่ใส่ใจสิ่งแวดล้อม ติดโซลาร์รูฟที่บ้าน ใช้รถ EV วิจารณ์ PTT เรื่องผูกขาดและสิ่งแวดล้อม ติดตามเพจพลังงานสะอาด สนับสนุน Net Zero แต่ไม่เชื่อว่ารัฐบาลจะทำได้จริง", "purchase_style": "early_adopter"},
+        {"id": "restaurant_owner", "name_th": "ผู้ประกอบการร้านอาหาร", "name_en": "Restaurant Owner", "age_range": [30, 50], "income": "middle", "regions": ["bangkok", "central", "south"], "occupation_th": "เจ้าของร้านอาหาร", "channels": ["facebook", "line", "tiktok"], "narrative_th": "มีร้านอาหารตามสั่ง/ก๋วยเตี๋ยว ใช้ก๊าซหุงต้มทำอาหารทุกวัน แก๊สขึ้นราคาต้นทุนพุ่ง แต่ขึ้นราคาอาหารไม่ได้ — ลูกค้าประจำจะว่าเอา ติตตามข่าวสารพลังงานตลอด", "purchase_style": "price_sensitive"}
+      ]
+    },
+    {
+      "id": "ngo_activist",
+      "name_th": "NGO / นักวิชาการ / นักเคลื่อนไหว",
+      "name_en": "NGOs / Academics / Activists",
+      "count": 15,
+      "interests": ["สิ่งแวดล้อม", "พลังงานสะอาด", "ธรรมาภิบาล", "ชุมชน", "Climate Change"],
+      "archetypes": [
+        {"id": "environmental_activist", "name_th": "นักสิ่งแวดล้อม", "name_en": "Environmental Activist", "age_range": [25, 45], "income": "middle", "regions": ["bangkok", "south"], "occupation_th": "นักวิชาการ/NGO", "channels": ["twitter_x", "facebook", "youtube"], "narrative_th": "ทำงาน NGO ด้านสิ่งแวดล้อม ต่อต้านโครงการพลังงานที่กระทบชุมชน สนับสนุนพลังงานหมุนเวียน โพสต์ข้อมูลวิชาการเรื่องผลกระทบน้ำมันรั่ว ฟ้องร้อง EIA โครงการใหญ่", "purchase_style": "early_adopter"},
+        {"id": "energy_economist", "name_th": "นักเศรษฐศาสตร์พลังงาน", "name_en": "Energy Economist", "age_range": [35, 55], "income": "upper_middle", "regions": ["bangkok"], "occupation_th": "อาจารย์/ที่ปรึกษา", "channels": ["twitter_x", "youtube", "facebook"], "narrative_th": "อาจารย์/ที่ปรึกษาด้านเศรษฐศาสตร์พลังงาน วิพากษ์โครงสร้างราคาพลังงานไทย — ผูกขาด, ขาดความโปร่งใส, สูตรราคาไม่เป็นธรรม ออกรายการทีวีวิเคราะห์ค่า Ft และการนำเข้า LNG มองว่าประเทศไทยต้องปฏิรูประบบพลังงาน", "purchase_style": "researcher"},
+        {"id": "env_lawyer", "name_th": "นักกฎหมายสิ่งแวดล้อม", "name_en": "Environmental Lawyer", "age_range": [30, 50], "income": "upper_middle", "regions": ["bangkok"], "occupation_th": "ทนายความ", "channels": ["twitter_x", "facebook"], "narrative_th": "ทนายความด้านสิ่งแวดล้อม ฟ้องคดีแบบกลุ่มให้ชุมชนที่ได้รับผลกระทบจากโรงไฟฟ้า/ท่อก๊าซ/น้ำมันรั่ว เน้นสิทธิชุมชนและความยุติธรรมทางสิ่งแวดล้อม", "purchase_style": "researcher"}
+      ]
+    },
+    {
+      "id": "politicians",
+      "name_th": "นักการเมือง / ข้าราชการ / หน่วยงานรัฐ",
+      "name_en": "Politicians / Government Officials",
+      "count": 10,
+      "interests": ["นโยบายพลังงาน", "เลือกตั้ง", "ค่าไฟ", "ความมั่นคงทางพลังงาน"],
+      "archetypes": [
+        {"id": "opposition_mp", "name_th": "นักการเมืองฝ่ายค้าน", "name_en": "Opposition Politician", "age_range": [40, 65], "income": "upper_middle", "regions": ["bangkok", "northeast"], "occupation_th": "สมาชิกสภาผู้แทนราษฎร", "channels": ["twitter_x", "facebook", "tv"], "narrative_th": "สส. ฝ่ายค้าน ใช้ประเด็นราคาพลังงานโจมตีรัฐบาล — 'บริหารพลังงานล้มเหลว' 'ปตท.กำไรเป็นแสนล้านแต่ค่าไฟแพง' อภิปรายในสภาเรื่องค่า Ft ทุกสมัยประชุม", "purchase_style": "researcher"},
+        {"id": "energy_ministry", "name_th": "ข้าราชการกระทรวงพลังงาน", "name_en": "Energy Ministry Official", "age_range": [40, 60], "income": "upper_middle", "regions": ["bangkok"], "occupation_th": "ข้าราชการระดับสูง", "channels": ["line", "facebook"], "narrative_th": "ปลัด/อธิบดีกระทรวงพลังงาน รับผิดชอบนโยบายพลังงานประเทศ ต้อง balance ระหว่างความมั่นคงทางพลังงาน ราคาที่ประชาชนรับได้ และแรงกดดัน Net Zero หลีกเลี่ยง social media", "purchase_style": "traditional"},
+        {"id": "local_politician", "name_th": "นักการเมืองท้องถิ่น", "name_en": "Local Politician", "age_range": [40, 60], "income": "middle", "regions": ["northeast", "north", "south"], "occupation_th": "นายก อบต./สมาชิก อบจ.", "channels": ["facebook", "line", "radio"], "narrative_th": "นักการเมืองท้องถิ่น ใกล้ชิดประชาชน รับเรื่องร้องเรียนชาวบ้านเรื่องค่าไฟ ค่าก๊าซหุงต้ม โรงไฟฟ้าชุมชน ต้องสร้างผลงาน — ช่วยประสานลดค่าไฟ/ขอส่วนลด โพสต์ Facebook Live ตลอด", "purchase_style": "social_proof"}
+      ]
+    },
+    {
+      "id": "media_influencer",
+      "name_th": "สื่อ / Influencer / นักวิเคราะห์",
+      "name_en": "Media / Influencers / Analysts",
+      "count": 15,
+      "interests": ["ข่าวเศรษฐกิจ", "ราคาน้ำมัน", "สิ่งแวดล้อม", "หุ้นพลังงาน"],
+      "archetypes": [
+        {"id": "economic_reporter", "name_th": "นักข่าวสายเศรษฐกิจ", "name_en": "Economic Journalist", "age_range": [28, 45], "income": "middle", "regions": ["bangkok"], "occupation_th": "นักข่าว/บรรณาธิการ", "channels": ["twitter_x", "facebook", "youtube"], "narrative_th": "ผู้สื่อข่าวสายเศรษฐกิจ/พลังงาน ติดตาม กพช., กกพ., บอร์ดปตท. ทุกนัด แกะสูตรราคาน้ำมัน+ค่า Ft ได้ทะลุปรุโปร่ง ทวีต breaking news เวลามีมติขึ้นราคา เป็น trusted source ในวงการ", "purchase_style": "researcher"},
+        {"id": "viral_page_admin", "name_th": "แอดมินเพจดราม่า/ไวรัล", "name_en": "Drama/Viral Page Admin", "age_range": [22, 35], "income": "middle", "regions": ["bangkok"], "occupation_th": "Content Creator", "channels": ["twitter_x", "facebook", "tiktok"], "narrative_th": "แอดมินเพจดัง/ทวิตเตอร์มีม ทำคอนเทนต์ viral — 'ปตท.กำไรแสนล้านแต่ค่าน้ำมันแพง' 'คนกรุงเทพแห่เติมน้ำมันก่อนขึ้นราคา' ไลค์เป็นแสน แชร์เป็นล้าน focus ที่ engagement มากกว่า fact", "purchase_style": "impulsive"},
+        {"id": "energy_finfluencer", "name_th": "Finfluencer พลังงาน", "name_en": "Energy Finfluencer", "age_range": [28, 40], "income": "upper_middle", "regions": ["bangkok"], "occupation_th": "นักลงทุน/Content Creator", "channels": ["youtube", "twitter_x", "facebook"], "narrative_th": "YouTuber/นักวิเคราะห์ ทำคอนเทนต์ 'หุ้น PTT น่าลงทุนไหม' 'วิเคราะห์หุ้นพลังงาน 2026' มีผู้ติดตามหลักแสน อิทธิพลต่อนักลงทุนรายย่อยสูง วิเคราะห์ทั้ง financials และ ESG", "purchase_style": "researcher"},
+        {"id": "env_journalist", "name_th": "นักข่าวสิ่งแวดล้อมอิสระ", "name_en": "Independent Environmental Journalist", "age_range": [25, 40], "income": "middle", "regions": ["bangkok", "south"], "occupation_th": "นักข่าวอิสระ", "channels": ["twitter_x", "facebook", "instagram"], "narrative_th": "นักข่าวอิสระสายสิ่งแวดล้อม ลงพื้นที่รายงานน้ำมันรั่ว มลพิษโรงงาน เล่าเรื่องด้วยภาพ drone + ข้อมูลวิทยาศาสตร์แน่น follower หลักแสน เป็น trusted voice ด้านสิ่งแวดล้อม", "purchase_style": "researcher"}
+      ]
+    },
+    {
+      "id": "industry_executive",
+      "name_th": "ผู้บริหาร / ภาคอุตสาหกรรม",
+      "name_en": "Executives / Industrial Sector",
+      "count": 10,
+      "interests": ["ต้นทุนพลังงาน", "นโยบายรัฐ", "การลงทุน", "ESG", "Net Zero"],
+      "archetypes": [
+        {"id": "energy_exec", "name_th": "ผู้บริหารบริษัทพลังงาน", "name_en": "Energy Company Executive", "age_range": [45, 60], "income": "upper_middle", "regions": ["bangkok"], "occupation_th": "ผู้บริหารระดับสูง", "channels": ["line", "youtube"], "narrative_th": "ผู้บริหารระดับสูงบมจ.พลังงาน ต้องรับผิดชอบทั้งกำไรและภาพลักษณ์ ทุกครั้งที่ราคาน้ำมันขึ้น = โดนด่าทั้งประเทศ สั่งทีม PR ทำ crisis communication ทุกเดือน", "purchase_style": "traditional"},
+        {"id": "factory_owner", "name_th": "เจ้าของโรงงานขนาดกลาง", "name_en": "Mid-Size Factory Owner", "age_range": [40, 55], "income": "upper_middle", "regions": ["east", "central", "south"], "occupation_th": "เจ้าของโรงงาน", "channels": ["facebook", "line", "youtube"], "narrative_th": "เจ้าของโรงงานพลาสติก/ชิ้นส่วนยานยนต์ 200 คน ค่าไฟเดือนละ 2-5 แสนบาท Ft ขึ้นที = กำไรหาย กำลังตัดสินใจลงทุน solar rooftop เพื่อลดต้นทุน แต่คืนทุนนาน กลัวนโยบายรัฐเปลี่ยน", "purchase_style": "researcher"},
+        {"id": "stock_investor", "name_th": "นักลงทุนหุ้นพลังงาน", "name_en": "Energy Stock Investor", "age_range": [30, 55], "income": "upper_middle", "regions": ["bangkok", "central"], "occupation_th": "นักลงทุน/ธุรกิจส่วนตัว", "channels": ["twitter_x", "youtube", "facebook"], "narrative_th": "นักลงทุน VI ถือหุ้น PTT, PTTEP, BANPU, GPSC มองพลังงานเป็น defensive stock ติดตามราคาน้ำมันโลกและนโยบายพลังงานไทยทุกวัน Active ในกลุ่มนักลงทุน", "purchase_style": "researcher"}
+      ]
+    }
+  ],
+  "crisis_scenarios": [
+    {"id": "fuel_price_hike", "name_th": "ขึ้นราคาน้ำมัน 1-2 บาท/ลิตร", "name_en": "Fuel price hike 1-2 THB/liter", "trigger": "กบง. มีมติขึ้นราคาน้ำมันดีเซล 2 บาท/ลิตร มีผลพรุ่งนี้ 05:00 น.", "event_tag": "น้ำมันขึ้นราคา", "impact": "negative", "intensity": 8},
+    {"id": "oil_spill_rayong", "name_th": "น้ำมันรั่วกลางทะเล", "name_en": "Offshore oil spill", "trigger": "ท่อส่งน้ำมันดิบกลางทะเลรั่ว 50,000 ลิตร คราบน้ำมันเข้าถึงชายฝั่งระยอง กระทบประมงและท่องเที่ยว", "event_tag": "น้ำมันรั่ว", "impact": "negative", "intensity": 10},
+    {"id": "electricity_tariff", "name_th": "ขึ้นค่า Ft / ค่าไฟฟ้า", "name_en": "Electricity Ft tariff hike", "trigger": "กกพ. ประกาศปรับขึ้นค่า Ft งวดใหม่ ค่าไฟฟ้าเฉลี่ยเพิ่มขึ้น 5-10%", "event_tag": "ค่าไฟแพง", "impact": "negative", "intensity": 9},
+    {"id": "power_plant_opposition", "name_th": "ชุมชนต่อต้านโรงไฟฟ้า", "name_en": "Community power plant opposition", "trigger": "กลุ่มอนุรักษ์ + ชาวบ้านประท้วงการสร้างโรงไฟฟ้าถ่านหิน/ชีวมวลในพื้นที่", "event_tag": "ต่อต้านโรงไฟฟ้า", "impact": "negative", "intensity": 8},
+    {"id": "ptt_monopoly", "name_th": "ดราม่าปตท. กำไร-ผูกขาด", "name_en": "PTT monopoly/profit controversy", "trigger": "ปตท. ประกาศกำไรรายไตรมาส 3.5 หมื่นล้าน สวนทางค่าครองชีพประชาชน", "event_tag": "ปตท.ผูกขาด", "impact": "negative", "intensity": 9},
+    {"id": "lpg_price_hike", "name_th": "ขึ้นราคาก๊าซหุงต้ม", "name_en": "LPG cooking gas price hike", "trigger": "ปรับราคาก๊าซหุงต้มขึ้น 15 บาท/ถัง กระทบครัวเรือนและร้านอาหารทั่วประเทศ", "event_tag": "แก๊สขึ้นราคา", "impact": "negative", "intensity": 7},
+    {"id": "clean_energy_policy", "name_th": "ประกาศนโยบายพลังงานสะอาด", "name_en": "Clean energy policy announcement", "trigger": "รัฐบาลประกาศแผน Net Zero 2050 + Solar Rooftop 1 ล้านหลังคาเรือน + ลดภาษีนำเข้า EV", "event_tag": "นโยบายพลังงานใหม่", "impact": "mixed", "intensity": 6}
+  ],
+  "document_seeds": [
+    {
+      "id": "fuel_price_press_release",
+      "name_th": "ข่าวประชาสัมพันธ์ — ปรับราคาน้ำมัน",
+      "description_th": "Template ข่าวแจ้งปรับราคาน้ำมัน — ใช้เป็น Reality Seed",
+      "content": "# ประกาศปรับราคาน้ำมัน\n## บริษัท [ชื่อบริษัท] จำกัด (มหาชน)\n\n**วันที่:** [วันที่]\n**เรื่อง:** การปรับราคาจำหน่ายน้ำมันเชื้อเพลิง\n\nบริษัทขอแจ้งการปรับราคาจำหน่ายน้ำมันเชื้อเพลิง โดยมีผลตั้งแต่วันพรุ่งนี้ เวลา 05:00 น.\n\n| ชนิดน้ำมัน | ราคาเดิม | ราคาใหม่ | เปลี่ยนแปลง |\n|------------|---------|---------|-------------|\n| ดีเซล | 29.94 | 31.94 | +2.00 |\n| แก๊สโซฮอล์ 91 | 35.45 | 36.45 | +1.00 |\n\n**เหตุผล:** ราคาน้ำมันดิบตลาดโลกปรับตัวสูงขึ้นจากปัจจัยภูมิรัฐศาสตร์\n\nบริษัทขออภัยในความไม่สะดวก\n\nสอบถามเพิ่มเติม: ฝ่ายสื่อสารองค์กร โทร 02-XXX-XXXX"
+    },
+    {
+      "id": "oil_spill_statement",
+      "name_th": "แถลงการณ์ฉุกเฉิน — น้ำมันรั่ว",
+      "description_th": "Template แถลงการณ์ฉุกเฉินกรณีน้ำมันรั่วกลางทะเล",
+      "content": "# แถลงการณ์ฉุกเฉิน — เหตุการณ์น้ำมันรั่วในทะเล\n## บริษัท [ชื่อบริษัท] จำกัด (มหาชน)\n\n**วันที่:** [วันที่] **เวลา:** [เวลา] น.\n**สถานที่:** แท่นผลิต [ชื่อแท่น] อ่าวไทย\n\nบริษัทขอแจ้งเหตุการณ์น้ำมันรั่วจากท่อส่งน้ำมันดิบ\n\n**ข้อเท็จจริง:**\n1. ปริมาณน้ำมันที่รั่ว: ประมาณ [XX,000] ลิตร\n2. สาเหตุเบื้องต้น: [ท่อส่งชำรุด/อุปกรณ์ขัดข้อง]\n3. มาตรการดำเนินการ: ระดมทีมฉุกเฉิน [XX] คน, ติดตั้งทุ่นกักเก็บน้ำมัน, ใช้สาร dispersant\n4. ประสานกรมเจ้าท่า, กรมทรัพยากรทางทะเลและชายฝั่ง\n\nบริษัทขออภัยอย่างสูง เราจะรับผิดชอบค่าใช้จ่ายในการฟื้นฟูทั้งหมด\n\n**สายด่วน:** [เบอร์] | www.[company].co.th/incident"
+    },
+    {
+      "id": "ft_announcement",
+      "name_th": "ประกาศ กกพ. — ปรับค่า Ft",
+      "description_th": "Template ประกาศปรับค่าไฟฟ้าอัตโนมัติ (Ft) จาก กกพ. งวดใหม่",
+      "content": "# ประกาศคณะกรรมการกำกับกิจการพลังงาน\n## การปรับอัตราค่าไฟฟ้าอัตโนมัติ (Ft) งวด [เดือน/ปี]\n\n**วันที่:** [วันที่]\n\nกกพ. มีมติเห็นชอบการปรับ Ft สำหรับงวด [เดือน-เดือน ปี]\n\n| รายการ | งวดก่อน | งวดใหม่ | เปลี่ยนแปลง |\n|--------|---------|---------|-------------|\n| ค่า Ft (สตางค์/หน่วย) | xx.xx | xx.xx | +/-xx.xx |\n| ค่าไฟฟ้าเฉลี่ย (บาท/หน่วย) | x.xx | x.xx | +/-x.xx |\n\n**ผลกระทบ:** บ้านอยู่อาศัย 300 หน่วย/เดือน: +xx บาท, ร้านค้า 1,000 หน่วย: +xx บาท\n\n**เหตุผล:** ต้นทุนก๊าซธรรมชาติ (LNG) ปรับตัวสูงขึ้น\n\n**มาตรการช่วยเหลือ:** กลุ่มเปราะบางใช้ไฟฟ้าไม่เกิน 300 หน่วย/เดือน ได้รับส่วนลด\n\nสอบถาม: ศูนย์บริการข้อมูล กกพ. โทร 1204"
+    }
+  ]
+}

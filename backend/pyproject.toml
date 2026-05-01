@@ -1,11 +1,11 @@
 [project]
-name = "mirofish-offline-backend"
+name = "3c-simulator-backend"
 version = "0.2.0"
-description = "MiroFish-Offline - Offline-first fork running on Neo4j + Ollama"
+description = "3C Simulator Backend — Campaign, Competitor & Crisis Simulation Engine"
 requires-python = ">=3.11"
 license = { text = "AGPL-3.0" }
 authors = [
-    { name = "MiroFish Team" }
+    { name = "3C Simulator Team" }
 ]
 
 dependencies = [
@@ -34,6 +34,9 @@ dependencies = [
     # Utilities
     "python-dotenv>=1.0.0",
     "pydantic>=2.0.0",
+
+    # Export / Documents
+    "python-pptx>=0.6.21",
 ]
 
 [project.optional-dependencies]

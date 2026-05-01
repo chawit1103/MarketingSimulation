@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // Create axios instance
 const service = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '',
   timeout: 300000, // 5 minute timeout (ontology generation may require longer time)
   headers: {
     'Content-Type': 'application/json'
@@ -12,6 +12,13 @@ const service = axios.create({
 // Request interceptor
 service.interceptors.request.use(
   config => {
+    const token = localStorage.getItem('3c-auth-token')
+    const apiKey = localStorage.getItem('3c-api-key')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    } else if (apiKey) {
+      config.headers['X-Api-Key'] = apiKey
+    }
     return config
   },
   error => {
@@ -34,16 +41,16 @@ service.interceptors.response.use(
     return res
   },
   error => {
-    console.error('Response error:', error)
+    console.warn('Response warning:', error?.response?.status || error?.code || error?.message)
 
     // Handle timeout
     if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
-      console.error('Request timeout')
+      console.warn('Request timeout')
     }
 
     // Handle network error
     if (error.message === 'Network Error') {
-      console.error('Network error - please check your connection')
+      console.warn('Network error - please check your connection')
     }
 
     return Promise.reject(error)

@@ -394,6 +394,27 @@ class TwitterSimulationRunner:
         ActionType.DO_NOTHING,
         ActionType.QUOTE_POST,
     ]
+
+    @staticmethod
+    def _resolve_actions(config: Dict[str, Any], default_actions: List[Any]) -> List[Any]:
+        preset = config.get("oasis_preset") or {}
+        action_names = preset.get("twitter_actions") or []
+        if not action_names:
+            return default_actions
+
+        resolved = []
+        missing = []
+        for name in action_names:
+            action = getattr(ActionType, name, None)
+            if action is None:
+                missing.append(name)
+                continue
+            resolved.append(action)
+
+        if missing:
+            print(f"[OASIS preset] twitter: unavailable actions skipped for installed OASIS version: {', '.join(missing)}")
+
+        return resolved or default_actions
     
     def __init__(self, config_path: str, wait_for_commands: bool = True):
         """
@@ -578,7 +599,7 @@ class TwitterSimulationRunner:
         self.agent_graph = await generate_twitter_agent_graph(
             profile_path=profile_path,
             model=model,
-            available_actions=self.AVAILABLE_ACTIONS,
+            available_actions=self._resolve_actions(self.config, self.AVAILABLE_ACTIONS),
         )
         
         # Databasepath

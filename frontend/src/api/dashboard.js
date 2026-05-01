@@ -15,3 +15,7 @@ export const getTimeline = (campaignId) => {
 export const getSegments = (campaignId) => {
   return service.get(`/api/dashboard/campaign/${campaignId}/segments`)
 }
+
+export const getInfluencers = (campaignId) => {
+  return service.get(`/api/dashboard/campaign/${campaignId}/timeline`)
+}

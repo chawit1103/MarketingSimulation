@@ -2,7 +2,7 @@
   <div class="process-page">
     <!-- Top navigation bar -->
     <nav class="navbar">
-      <div class="nav-brand" @click="goHome">MIROFISH OFFLINE</div>
+      <div class="nav-brand" @click="goHome">3C SIMULATOR</div>
       
       <!-- Center step indicator -->
       <div class="nav-center">
@@ -206,7 +206,7 @@
           
           <!-- Error state -->
           <div v-else-if="error" class="graph-error">
-            <span class="error-icon">⚠</span>
+            <span class="error-icon">!</span>
             <p>{{ error }}</p>
           </div>
         </div>
@@ -797,7 +797,7 @@ const pollTaskStatus = async (taskId) => {
       console.log('Task status:', task.status, 'Progress:', task.progress)
 
       if (task.status === 'completed') {
-        console.log('✅ Graph build complete, loading full data...')
+        console.log('Graph build complete, loading full data...')
         
         stopPolling()
         stopGraphPolling()
@@ -816,9 +816,9 @@ const pollTaskStatus = async (taskId) => {
 
           // Finally load complete graph data
           if (projectResponse.data.graph_id) {
-            console.log('📊 Loading complete graph:', projectResponse.data.graph_id)
+            console.log('Loading complete graph:', projectResponse.data.graph_id)
             await loadGraph(projectResponse.data.graph_id)
-            console.log('✅ Graph load complete')
+            console.log('Graph load complete')
           }
         }
 
@@ -1628,9 +1628,18 @@ onUnmounted(() => {
 }
 
 .error-icon {
-  font-size: 2rem;
-  display: block;
-  margin-bottom: 10px;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 10px;
+  border: 1px solid var(--red);
+  border-radius: 50%;
+  color: var(--red);
+  background: var(--red-soft);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 800;
 }
 
 /* Graph Legend */

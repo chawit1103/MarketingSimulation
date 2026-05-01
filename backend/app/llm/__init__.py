@@ -1,1 +1,1 @@
-"""MiroFish MultiLang — LLM Provider Package."""
+"""3C Simulator — LLM Provider Package."""

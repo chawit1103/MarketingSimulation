@@ -13,7 +13,7 @@
     <!-- Title section -->
     <div class="section-header">
       <div class="section-line"></div>
-      <span class="section-title">Simulation Records</span>
+      <span class="section-title">{{ $t('history.title') }}</span>
       <div class="section-line"></div>
     </div>
 
@@ -73,7 +73,7 @@
           <!-- Placeholder when no files -->
           <div class="files-empty" v-else>
             <span class="empty-file-icon">◇</span>
-            <span class="empty-file-text">No Files</span>
+            <span class="empty-file-text">{{ $t('history.noFiles') }}</span>
           </div>
         </div>
 
@@ -102,7 +102,7 @@
     <!-- Loading state -->
     <div v-if="loading" class="loading-state">
       <span class="loading-spinner"></span>
-      <span class="loading-text">Loading...</span>
+      <span class="loading-text">{{ $t('history.loading') }}</span>
     </div>
 
     <!-- Simulation playback details modal -->
@@ -139,7 +139,7 @@
                     <span class="modal-file-name">{{ file.filename }}</span>
                   </div>
                 </div>
-                <div class="modal-empty" v-else>No Associated Files</div>
+                <div class="modal-empty" v-else>{{ $t('history.noAssociatedFiles') }}</div>
               </div>
             </div>
 
@@ -157,7 +157,7 @@
                 @click="goToProject"
                 :disabled="!selectedProject.project_id"
               >
-                <span class="btn-step">Step1</span>
+                <span class="btn-step">{{ $t('history.step1') }}</span>
                 <span class="btn-icon">◇</span>
                 <span class="btn-text">Graph Construction</span>
               </button>
@@ -165,7 +165,7 @@
                 class="modal-btn btn-simulation"
                 @click="goToSimulation"
               >
-                <span class="btn-step">Step2</span>
+                <span class="btn-step">{{ $t('history.step2') }}</span>
                 <span class="btn-icon">◈</span>
                 <span class="btn-text">Environment Setup</span>
               </button>
@@ -174,14 +174,14 @@
                 @click="goToReport"
                 :disabled="!selectedProject.report_id"
               >
-                <span class="btn-step">Step4</span>
+                <span class="btn-step">{{ $t('history.step4') }}</span>
                 <span class="btn-icon">◆</span>
                 <span class="btn-text">Analysis Report</span>
               </button>
             </div>
             <!-- Playback unavailable notice -->
             <div class="modal-playback-hint">
-              <span class="hint-text">Step3 "Start Simulation" and Step5 "Deep Interaction" must be launched during execution and do not support history playback</span>
+              <span class="hint-text">{{ $t('history.step3') }} "{{ $t('history.startSimulation') }}" and {{ $t('history.step5') }} "{{ $t('history.deepInteraction') }}" must be launched during execution and do not support history playback</span>
             </div>
           </div>
         </div>
@@ -438,16 +438,25 @@ const goToReport = () => {
 const loadHistory = async () => {
   try {
     loading.value = true
+    if (shouldUseEmptyHistory()) {
+      projects.value = []
+      return
+    }
     const response = await getSimulationHistory(20)
     if (response.success) {
       projects.value = response.data || []
     }
   } catch (error) {
-    console.error('Failed to load history projects:', error)
+    console.warn('Failed to load history projects:', error?.message || error)
     projects.value = []
   } finally {
     loading.value = false
   }
+}
+
+function shouldUseEmptyHistory() {
+  if (!import.meta.env.DEV) return false
+  return !localStorage.getItem('3c-auth-token') && !localStorage.getItem('3c-api-key')
 }
 
 // Initialize IntersectionObserver
@@ -1336,5 +1345,145 @@ onUnmounted(() => {
   letter-spacing: 0.3px;
   text-align: center;
   line-height: 1.5;
+}
+
+/* Premium theme alignment */
+.history-database {
+  margin-top: var(--space-12);
+}
+
+.grid-pattern {
+  background-image:
+    linear-gradient(to right, rgba(61, 51, 37, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(61, 51, 37, 0.05) 1px, transparent 1px);
+}
+
+.gradient-overlay {
+  background:
+    linear-gradient(to right, var(--bg-canvas) 0%, transparent 16%, transparent 84%, var(--bg-canvas) 100%),
+    linear-gradient(to bottom, var(--bg-canvas) 0%, transparent 22%, transparent 82%, var(--bg-canvas) 100%);
+}
+
+.section-line {
+  background: linear-gradient(90deg, transparent, var(--border-default), transparent);
+}
+
+.section-title {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  letter-spacing: 0;
+}
+
+.project-card,
+.modal-content,
+.modal-header,
+.modal-divider,
+.modal-actions,
+.modal-playback-hint {
+  background: var(--bg-surface);
+  border-color: var(--border-default);
+}
+
+.project-card {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.project-card:hover {
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-elevated);
+}
+
+.card-header,
+.card-footer,
+.modal-header {
+  border-color: var(--border-subtle);
+}
+
+.card-id,
+.card-footer,
+.modal-create-time,
+.modal-label,
+.divider-text,
+.btn-step,
+.hint-text,
+.empty-file-text,
+.files-more {
+  color: var(--text-tertiary);
+}
+
+.card-files-wrapper,
+.modal-requirement,
+.modal-empty {
+  background: var(--bg-panel);
+  border-color: var(--border-subtle);
+}
+
+.project-card:hover .card-files-wrapper {
+  border-color: var(--border-default);
+  background: var(--bg-panel);
+}
+
+.file-item,
+.modal-file-item {
+  background: var(--bg-surface);
+  border-color: var(--border-subtle);
+}
+
+.file-name,
+.modal-file-name,
+.modal-requirement,
+.btn-text,
+.card-desc {
+  color: var(--text-secondary);
+}
+
+.card-title,
+.modal-id {
+  color: var(--text-primary);
+}
+
+.project-card:hover .card-title {
+  color: var(--accent);
+}
+
+.card-bottom-line {
+  background: var(--accent);
+}
+
+.modal-overlay {
+  background: rgba(25, 23, 19, 0.42);
+  backdrop-filter: blur(10px);
+}
+
+.modal-content {
+  box-shadow: var(--shadow-modal);
+}
+
+.modal-close {
+  color: var(--text-tertiary);
+}
+
+.modal-close:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.divider-line {
+  background: linear-gradient(90deg, transparent, var(--border-default), transparent);
+}
+
+.modal-btn {
+  background: var(--bg-surface);
+  border-color: var(--border-default);
+}
+
+.modal-btn:hover:not(:disabled) {
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.modal-btn:disabled {
+  background: var(--bg-elevated);
 }
 </style>
