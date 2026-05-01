@@ -25,6 +25,7 @@ class RateLimitMiddleware:
         ("decision", ("/api/decision",), "RATE_LIMIT_DECISION_PER_WINDOW"),
         ("brief", ("/api/brief",), "RATE_LIMIT_DECISION_PER_WINDOW"),
         ("competitor", ("/api/competitor",), "RATE_LIMIT_SIMULATION_PER_WINDOW"),
+        ("settings", ("/api/settings/readiness", "/api/settings/providers"), "RATE_LIMIT_STATUS_PER_WINDOW"),
         ("simulation", ("/api/simulation",), "RATE_LIMIT_SIMULATION_PER_WINDOW"),
     )
 

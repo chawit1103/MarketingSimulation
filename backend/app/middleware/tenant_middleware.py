@@ -38,6 +38,8 @@ class TenantMiddleware:
         "/api/decision",
         "/api/brief",
         "/api/competitor",
+        "/api/settings/providers",
+        "/api/settings/readiness",
         "/api/impact/scenarios",
         "/api/auth/",
         "/api/persona/archetypes",

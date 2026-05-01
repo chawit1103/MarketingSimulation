@@ -15,3 +15,7 @@ export function getProviders() {
 export function testLLMConnection(config) {
   return service.post('/api/settings/test-llm', config)
 }
+
+export function checkSettingsReadiness(config) {
+  return service.post('/api/settings/readiness', config)
+}

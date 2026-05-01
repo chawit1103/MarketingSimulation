@@ -1,4 +1,6 @@
 """Settings API — read/update runtime configuration at /api/settings."""
+import re
+
 from flask import Blueprint, request, jsonify
 from ..models.settings import SettingsManager, ProviderType, EmbeddingProviderType, GraphDBMode
 
@@ -10,6 +12,120 @@ def _mask_key(key: str) -> str:
     if not key or len(key) < 5:
         return '••••' if key else ''
     return '••••' + key[-4:]
+
+
+def _sanitize_error(error: Exception | str) -> str:
+    """Return an actionable error without leaking keys/tokens/long internals."""
+    message = str(error)
+    message = re.sub(r"(sk-[A-Za-z0-9_\-]{8,})", "sk-***", message)
+    message = re.sub(r"([A-Za-z0-9_\-]{24,})", "***", message)
+    message = message.replace("\n", " ")
+    return message[:220] or "Connection failed"
+
+
+def _is_masked_secret(value: str | None) -> bool:
+    return bool(value) and ("••••" in value or "****" in value)
+
+
+def _safe_provider(provider: str, enum_cls) -> str:
+    try:
+        return enum_cls(provider).value
+    except Exception:
+        return ""
+
+
+def _check_provider_config(config: dict, enum_cls, *, local_provider: str = "ollama") -> dict:
+    provider = _safe_provider(str(config.get("provider") or ""), enum_cls)
+    model = str(config.get("model") or "").strip()
+    api_key = str(config.get("api_key") or config.get("apiKey") or "").strip()
+    api_key_present = bool(config.get("api_key_present") or config.get("has_api_key") or api_key)
+    base_url = str(config.get("base_url") or config.get("baseUrl") or "").strip()
+    issues = []
+
+    if not provider:
+        issues.append("Unsupported provider selected.")
+    if not model:
+        issues.append("Model name is required.")
+    if provider == local_provider and not base_url:
+        issues.append("Local provider requires a base URL.")
+    if provider and provider != local_provider and not api_key_present:
+        issues.append("Cloud provider requires an API key.")
+    if _is_masked_secret(api_key):
+        issues.append("Saved API key is masked; enter the key again before testing or saving.")
+
+    return {
+        "status": "ready" if not issues else "needs_attention",
+        "provider": provider or config.get("provider") or "unknown",
+        "model": model or "not set",
+        "issues": issues,
+        "safe_detail": "Configuration is complete." if not issues else issues[0],
+    }
+
+
+def _check_graph_config(config: dict) -> dict:
+    uri = str(config.get("uri") or "").strip()
+    user = str(config.get("user") or "").strip()
+    password = str(config.get("password") or "").strip()
+    password_present = bool(config.get("password_present") or config.get("has_password") or password)
+    mode = str(config.get("mode") or "local")
+    issues = []
+
+    if mode not in ("local", "cloud", "neo4j", "bolt"):
+        issues.append("Unsupported graph mode selected.")
+    if not uri:
+        issues.append("Neo4j URI is required.")
+    if not user:
+        issues.append("Neo4j user is required.")
+    if not password_present:
+        issues.append("Neo4j password is required.")
+    if _is_masked_secret(password):
+        issues.append("Saved graph password is masked; enter it again before testing or saving.")
+
+    return {
+        "status": "ready" if not issues else "needs_attention",
+        "mode": mode,
+        "uri": uri or "not set",
+        "issues": issues,
+        "safe_detail": "Neo4j configuration is complete." if not issues else issues[0],
+    }
+
+
+def _readiness_payload(data: dict) -> dict:
+    mode = data.get("mode") or "demo"
+    llm = data.get("llm") or {}
+    embedding = data.get("embedding") or {}
+    graph = data.get("graph_db") or data.get("graphdb") or {}
+
+    if mode == "demo":
+        checks = {
+            "llm": {"status": "skipped", "safe_detail": "Demo mode does not require an LLM provider."},
+            "embedding": {"status": "skipped", "safe_detail": "Demo mode does not require an embedding provider."},
+            "neo4j": {"status": "skipped", "safe_detail": "Demo mode does not require Neo4j."},
+        }
+    else:
+        checks = {
+            "llm": _check_provider_config(llm, ProviderType),
+            "embedding": _check_provider_config(embedding, EmbeddingProviderType),
+            "neo4j": _check_graph_config(graph),
+        }
+
+    ready = all(item["status"] in ("ready", "skipped") for item in checks.values())
+    return {
+        "mode": mode,
+        "ready": ready,
+        "checks": checks,
+        "sample_simulation": {
+            "status": "available" if ready else "blocked",
+            "label": "Try Sample Campaign",
+            "detail": "Use a deterministic demo campaign to verify the UI flow before live spend.",
+        },
+        "cost_estimate": {
+            "label": "Directional estimate only",
+            "currency": "USD",
+            "per_100_personas": 0 if mode in ("demo", "local") else 1.2,
+            "disclaimer": "Estimate only. Actual model costs depend on provider pricing, tokens, retries, and prompt length.",
+        },
+    }
 
 
 @settings_bp.route('', methods=['GET'])
@@ -40,7 +156,7 @@ def update_settings():
         mgr.update(data)
         return jsonify({'success': True, 'message': 'Settings updated and providers reinitialized'})
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
+        return jsonify({'success': False, 'error': _sanitize_error(e)}), 400
 
 
 @settings_bp.route('/providers', methods=['GET'])
@@ -290,6 +406,13 @@ def list_providers():
     })
 
 
+@settings_bp.route('/readiness', methods=['POST'])
+def check_readiness():
+    """Validate setup readiness without making live provider/network calls."""
+    data = request.get_json(silent=True) or {}
+    return jsonify({'success': True, 'data': _readiness_payload(data)})
+
+
 @settings_bp.route('/test-llm', methods=['POST'])
 def test_llm_connection():
     """Test LLM provider connection with a simple ping message."""
@@ -377,4 +500,4 @@ def test_llm_connection():
             return jsonify({'success': False, 'error': f'Provider {provider_type} not supported yet'}), 400
 
     except Exception as e:
-        return jsonify({'success': False, 'error': f'Connection failed: {str(e)}'}), 400
+        return jsonify({'success': False, 'error': f'Connection failed: {_sanitize_error(e)}'}), 400
