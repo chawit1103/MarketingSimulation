@@ -45,9 +45,24 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          tracked_env_files="$(git ls-files '.env*' | grep -vE '^\.env(\.example|\.dev\.example)$' || true)"
+          if [ -n "$tracked_env_files" ]; then
+            echo "::error::Tracked local environment file(s) detected. Keep only .env.example and .env.dev.example in Git."
+            echo "$tracked_env_files"
+            exit 1
+          fi
+
+          tracked_runtime_files="$(git ls-files 'backend/uploads/**' 'backend/app/uploads/**' || true)"
+          if [ -n "$tracked_runtime_files" ]; then
+            echo "::error::Tracked runtime upload/settings/report files detected. Move generated runtime data out of Git."
+            echo "$tracked_runtime_files"
+            exit 1
+          fi
+
           pattern='(sk-[A-Za-z0-9_=-]{20,}|sk-ant-[A-Za-z0-9_=-]{20,}|gsk_[A-Za-z0-9_=-]{20,}|sk-or-[A-Za-z0-9_=-]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN (RSA|OPENSSH|EC|DSA)? ?PRIVATE KEY-----)'
           if git grep -nE "$pattern" -- \
             ':!.env.example' \
+            ':!.env.dev.example' \
             ':!frontend/package-lock.json'
           then
             echo "::error::Potential committed secret found. Replace it with a placeholder or move it to GitHub Secrets."

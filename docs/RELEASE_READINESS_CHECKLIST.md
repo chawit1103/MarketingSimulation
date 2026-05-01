@@ -47,6 +47,7 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 
 ## Security And Abuse Protection
 
+- [x] SEC-001 repository secret hygiene is partially remediated: `.env.dev` is removed from Git tracking, safe `.env.dev.example` placeholders are provided, and CI blocks tracked local env/runtime files plus common secret-like token patterns. Remaining manual action: rotate any provider/API/graph credentials that may have been committed before this PR.
 - [x] Production refuses known fallback auth/session secrets.
 - [x] New passwords use Werkzeug adaptive hashes.
 - [x] Legacy salted SHA256 hashes are rehashed on successful login.

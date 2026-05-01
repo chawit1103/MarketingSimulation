@@ -47,6 +47,7 @@ For demo, release validation, known limitations, and recommended next actions, s
 - [docs/SCREENSHOT_GUIDE.md](docs/SCREENSHOT_GUIDE.md)
 - [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md)
 - [docs/RELEASE_READINESS_CHECKLIST.md](docs/RELEASE_READINESS_CHECKLIST.md)
+- [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md)
 - [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md)
 - [docs/POST_IMPLEMENTATION_ACTION_PLAN.md](docs/POST_IMPLEMENTATION_ACTION_PLAN.md)
 - [docs/PILOT_PLAN.md](docs/PILOT_PLAN.md)
@@ -411,18 +412,18 @@ Example `.env`:
 
 ```bash
 LLM_PROVIDER=deepseek
-LLM_API_KEY=sk-your-key
+LLM_API_KEY=replace-with-provider-api-key
 LLM_MODEL_NAME=deepseek-chat
 
 EMBEDDING_PROVIDER=openai
-EMBEDDING_API_KEY=sk-your-key
+EMBEDDING_API_KEY=replace-with-embedding-api-key
 
 NEO4J_URI=bolt://localhost:7687
 NEO4J_USER=neo4j
-NEO4J_PASSWORD=password
+NEO4J_PASSWORD=replace-with-neo4j-password
 ```
 
-The Settings page can manage runtime provider values, task-specific model overrides, language, and system health.
+The Settings page can manage runtime provider values, per-task model overrides, language, and system health.
 
 ---
 

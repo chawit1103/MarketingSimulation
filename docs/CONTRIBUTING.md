@@ -13,6 +13,25 @@ MarketingSimulation is a product-trust-sensitive decision simulator. Keep change
 - Do not fabricate live simulation results. Demo fixtures and local estimates must stay visibly labeled.
 - Add or update tests for changed backend routes and critical frontend journeys.
 
+## Secret Hygiene
+
+Real secrets must never be committed. Keep local provider keys, graph
+passwords, auth secrets, customer data, runtime settings, uploads, and generated
+reports out of Git.
+
+For local development:
+
+```bash
+cp .env.dev.example .env.dev
+```
+
+Then edit `.env.dev` locally. Do not commit it. If any real provider/API/graph
+credential was previously committed, rotate it manually in the provider console
+or Neo4j environment. Removing it from Git does not revoke the credential.
+
+CI blocks tracked local `.env*` files except `.env.example` and
+`.env.dev.example`, and scans for common provider-key patterns.
+
 ## Local Validation
 
 Run the checks that match your change:
