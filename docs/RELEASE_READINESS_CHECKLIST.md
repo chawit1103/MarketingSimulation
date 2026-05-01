@@ -137,6 +137,16 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] CI-equivalent secret hygiene scan passed on 2026-05-01.
 - [x] `git diff --check` passed on 2026-05-01.
 
+### PR T Go/No-Go Verification Run
+
+- [x] Source-of-truth docs re-read: `SECURITY_REVIEW.md`, `RELEASE_READINESS_CHECKLIST.md`, `KNOWN_LIMITATIONS.md`, `PILOT_PLAN.md`, and `DEPLOYMENT.md`.
+- [x] `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-01: 56 passed, 39 warnings.
+- [x] `backend/.venv/bin/python -m pytest backend/tests/test_rbac.py backend/tests/test_tenant_isolation.py backend/tests/test_settings_readiness.py backend/tests/test_dashboard_provenance.py backend/tests/test_production_hardening.py backend/tests/test_security_controls.py -q` passed on 2026-05-01: 39 passed, 21 warnings.
+- [x] `cd frontend && npm run build` passed on 2026-05-01.
+- [x] `cd frontend && npm run test:e2e -- --project=chromium --workers=1` passed on 2026-05-01: 9 passed.
+- [x] CI-equivalent secret hygiene scan passed on 2026-05-01.
+- [x] `git diff --check` passed on 2026-05-01.
+
 ## Manual Demo Flow Checks
 
 - [ ] Open `/dashboard/demo-premium-water` and confirm KPIs, confidence/evidence, source badge, and action plan render.
@@ -155,4 +165,8 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 
 ## Release Decision
 
-This repository is suitable for local demo use and conditionally suitable for a controlled private pilot after manual demo-flow verification and credential rotation. It is not ready for a public pilot, public internet exposure, or production customer deployment.
+This repository is suitable for local demo use with synthetic data and no real secrets.
+
+Controlled private pilot remains conditional: it is acceptable only for trusted participants after manual credential rotation is evidenced, deployment secrets come from environment variables or a secret manager, demo/source labels remain visible, and pilot data-retention expectations are approved.
+
+Public pilot, public internet exposure, and production customer deployment are blocked. The current blockers are missing manual credential-rotation evidence, lack of shared/edge production rate limiting, mitigated-but-not-fully-hardened browser auth storage, incomplete external pilot data-retention/deletion approval, and unresolved production storage/legacy-record review work.

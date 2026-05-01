@@ -45,6 +45,7 @@ This document separates what the system currently does from what should not yet 
 - Browser auth tokens now use `sessionStorage` and legacy `localStorage` auth/API-key entries are removed, but the token is still readable by JavaScript if an XSS bug exists. Public or customer production deployments should use HttpOnly cookies, short-lived access tokens with refresh flow, or an equivalent hardened auth design.
 - Browser API keys are treated as ephemeral session-only credentials for explicit admin/API workflows. Normal users should not store provider keys or API keys in the browser.
 - 5xx API responses are sanitized globally, but long-tail route-specific validation/error messages should continue to be reviewed for internal-detail leakage.
+- PR T verification keeps public pilot and public internet exposure blocked until manual credential rotation is evidenced, edge/shared rate limiting is deployed, browser auth storage is production-hardened or explicitly risk-accepted, and external data-retention/deletion expectations are approved.
 
 ## Testing
 

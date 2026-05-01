@@ -125,3 +125,5 @@ Before public internet exposure, complete or explicitly risk-accept:
 - safer browser auth storage strategy,
 - deployment logging, backup, retention, and deletion policies,
 - review of legacy local JSON records without `org_id`.
+
+PR T verification keeps public internet exposure as a no-go. Local demo is acceptable with synthetic data. Controlled private pilot is conditional and should not proceed until credential rotation is evidenced and the deployment owner has added the required operational controls.

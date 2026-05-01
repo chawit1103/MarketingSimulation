@@ -125,6 +125,30 @@ Before broader release:
 - Confirm production environment has no default secrets.
 - Confirm data-retention and deletion expectations are documented for external users.
 
+## Go/No-Go Gate
+
+Current PR T verification decision:
+
+| Pilot path | Status | Gate |
+| --- | --- | --- |
+| Local demo | Go | Use synthetic demo data and no real provider secrets. |
+| Controlled private pilot | Conditional go | Limit to trusted users. Confirm credential rotation, environment-provided secrets, no confidential briefs unless explicitly approved, and deployment-owned logging/rate-limit controls. |
+| Public pilot | No-go | Blocked until manual credential rotation is evidenced, edge/shared rate limiting is deployed, browser auth storage is hardened or formally risk-accepted, and external data-retention/deletion expectations are approved. |
+
+Do not invite untrusted public users or publish a public demo URL until the public-pilot gate is green.
+
+## Screenshot Review Before Public Use
+
+PR T did not change visible UI/security labels, so screenshots do not need recapture solely because of this verification pass. Before any public demo, re-review or recapture:
+
+- `docs/screenshots/demo-dashboard-overview.png`
+- `docs/screenshots/simulation-dashboard-kpis.png`
+- `docs/screenshots/war-room.png`
+- `docs/screenshots/action-plan.png`
+- `docs/screenshots/settings-wizard.png`
+
+Confirm every result screenshot shows the correct source label and that settings screenshots do not show API keys, passwords, auth tokens, private URLs, or customer data.
+
 ## Follow-Up
 
 After each pilot:

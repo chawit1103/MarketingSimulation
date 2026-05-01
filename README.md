@@ -46,6 +46,7 @@ For demo, release validation, known limitations, and recommended next actions, s
 - [docs/ANALYTICS.md](docs/ANALYTICS.md)
 - [docs/SCREENSHOT_GUIDE.md](docs/SCREENSHOT_GUIDE.md)
 - [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md)
+- [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md)
 - [docs/RELEASE_READINESS_CHECKLIST.md](docs/RELEASE_READINESS_CHECKLIST.md)
 - [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md)
 - [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md)

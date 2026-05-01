@@ -248,6 +248,6 @@ Concerns:
 
 For controlled local demos, the current repository is acceptable if no real secrets are used and demo/local labels remain visible.
 
-For a controlled private pilot, the repository is conditionally acceptable only with trusted users, rotated credentials, no confidential customer briefs, explicit source labels, environment-provided secrets, and deployment controls around rate limiting/CORS/logging. This is not a production-readiness claim.
+For a controlled private pilot, the repository is conditionally acceptable only with trusted users, rotated credentials, no confidential customer briefs, explicit source labels, environment-provided secrets, and deployment controls around rate limiting/CORS/logging. PR T did not find evidence that manual credential rotation has been completed, so this remains a conditional gate rather than a blanket go decision. This is not a production-readiness claim.
 
 For a public pilot, public internet exposure, or customer production deployment, the release is not ready while manual SEC-001 credential rotation lacks evidence, SEC-009 still lacks shared/edge enforcement, and SEC-012 remains only partially fixed.
