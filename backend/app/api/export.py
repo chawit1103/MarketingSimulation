@@ -63,6 +63,24 @@ def export_csv():
         for pt in timeline:
             writer.writerow([pt.get("round_num", ""), pt.get("avg_sentiment", ""), pt.get("action_count", "")])
 
+    action_plan = data.get("action_plan") or {}
+    sections = action_plan.get("sections") or {}
+    if sections:
+        writer.writerow([])
+        writer.writerow(["Action Plan Source", (action_plan.get("source") or {}).get("type", "unknown")])
+        writer.writerow(["Action Plan Disclaimer", action_plan.get("disclaimer", "")])
+        writer.writerow([])
+        writer.writerow(["Section", "Recommendation", "Reason", "Expected Impact", "Risk"])
+        for section_key, section in sections.items():
+            for item in section.get("items", []):
+                writer.writerow([
+                    section.get("title", section_key),
+                    item.get("recommendation", ""),
+                    item.get("reason", ""),
+                    item.get("expected_impact", ""),
+                    item.get("risk", ""),
+                ])
+
     wrapper.detach()
     buffer.seek(0)
 

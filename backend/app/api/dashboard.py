@@ -7,6 +7,7 @@ import traceback
 from flask import request, jsonify, g
 
 from ..models.report import ExecutiveReport
+from ..services.action_plan import ActionPlanService
 from ..services.kpi_calculator import KPICalculator
 from ..utils.logger import get_logger
 
@@ -59,6 +60,13 @@ def get_campaign_kpi(campaign_id: str):
             "brand_perception_shift": report.brand_perception_shift,
             "opinion_polarization": report.opinion_polarization,
             "generated_at": report.generated_at,
+            "action_plan": ActionPlanService().generate(
+                campaign={"id": campaign_id},
+                kpis=report.model_dump(),
+                segments=[seg.model_dump() for seg in report.sentiment_by_segment],
+                evidence={},
+                source={"type": "backend_verified"},
+            ),
         }
         return jsonify({"success": True, "data": kpi_payload})
 
@@ -83,7 +91,16 @@ def get_campaign_report(campaign_id: str):
         calc = _get_calculator()
         report = calc.calculate(campaign_id=campaign_id, org_id=org_id)
 
-        return jsonify({"success": True, "data": report.to_dict()})
+        data = report.to_dict()
+        data["action_plan"] = ActionPlanService().generate(
+            campaign={"id": campaign_id},
+            kpis=data,
+            segments=data.get("sentiment_by_segment", []),
+            evidence={},
+            source={"type": "backend_verified"},
+        )
+
+        return jsonify({"success": True, "data": data})
 
     except Exception as e:
         logger.error(f"Report fetch failed for campaign {campaign_id}: {str(e)}")

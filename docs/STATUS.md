@@ -16,6 +16,7 @@ Updated: 2026-05-01
 - In-memory rate limiting protects auth login/register, demo, status, decision, and simulation endpoint groups.
 - Deterministic Brief Quality Score is available at `POST /api/brief/quality` and does not require an LLM.
 - War Room now defaults to the backend deterministic competitor simulation API at `POST /api/competitor/simulate`.
+- Structured Action Plan output is available for dashboards and demo dashboards, with source mode, sectioned recommendations, reasons, expected impact, and risks.
 - Frontend source badges identify result provenance: Demo Mode, Local Estimate, Live Backend, Backend Verified, or Unknown Source.
 
 ## Demo / Prototype
@@ -42,6 +43,8 @@ Updated: 2026-05-01
 - War Room calls the backend competitor API by default, exposes Local Estimate only as an explicit fallback, and labels fallback/backend source state visibly.
 - War Room scenario templates now include price war, influencer backlash, product recall, regulatory issue, ESG controversy, fake news/rumor amplification, and competitor launch.
 - War Room backend responses include expected sentiment movement, affected segments, amplification channels, key drivers, recommended response, and first 2h/24h/72h playbooks.
+- Dashboard Action Plans now include creative adjustment, channel allocation, crisis prevention, and validation plan sections.
+- Dashboard export payloads, CSV export, quick download, and PPTX action-plan slides can include structured action plan rows.
 
 ## Remaining Gaps
 
@@ -49,6 +52,7 @@ Updated: 2026-05-01
 - Legacy SHA256 password support should be removed after a migration window.
 - Brief Quality Score is deterministic completeness scoring only; it does not validate factual accuracy or calibrate confidence against real-world outcomes.
 - War Room should still be connected to full OASIS simulation records and real campaign calibration before being treated as measured market prediction.
+- Action Plan recommendations remain deterministic planning guidance and still need calibration against real campaign outcomes.
 - Comparator fallback should eventually be replaced by backend-provided demo comparator fixtures.
 - Demo dashboards should be expanded for every demo campaign instead of relying on one premium-water sample shape.
 - Production deployment still needs environment-specific secret rotation, TLS, backup, observability, and CI gates.

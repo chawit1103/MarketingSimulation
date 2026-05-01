@@ -113,6 +113,26 @@ function downloadClientSide() {
     }
   }
 
+  const actionPlan = props.data.action_plan
+  if (actionPlan?.sections) {
+    rows.push([])
+    rows.push(['Action Plan Source', actionPlan.source?.type || 'unknown'])
+    rows.push(['Action Plan Disclaimer', actionPlan.disclaimer || ''])
+    rows.push([])
+    rows.push(['Section', 'Recommendation', 'Reason', 'Expected Impact', 'Risk'])
+    for (const [sectionKey, section] of Object.entries(actionPlan.sections)) {
+      for (const item of section.items || []) {
+        rows.push([
+          section.title || sectionKey,
+          item.recommendation || '',
+          item.reason || '',
+          item.expected_impact || '',
+          item.risk || '',
+        ])
+      }
+    }
+  }
+
   const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n')
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })
   const url = URL.createObjectURL(blob)

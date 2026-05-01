@@ -6,6 +6,8 @@ can experience the value loop without configuring an LLM or creating an org.
 
 from flask import Blueprint, jsonify
 
+from ..services.action_plan import ActionPlanService
+
 
 demo_bp = Blueprint("demo", __name__)
 
@@ -142,13 +144,22 @@ DEMO_DASHBOARDS = {
 def _dashboard_for(demo_id: str) -> dict:
     campaign = next((item for item in DEMO_CAMPAIGNS if item["id"] == demo_id), DEMO_CAMPAIGNS[0])
     dashboard = DEMO_DASHBOARDS.get(demo_id, DEMO_DASHBOARDS["demo-premium-water"])
+    source = {
+        "type": "demo_mode",
+        "label": "Demo Mode",
+        "warning": "Synthetic demo data for product exploration; not a live simulation result.",
+    }
+    action_plan = ActionPlanService().generate(
+        campaign=campaign,
+        kpis=dashboard.get("kpis", {}),
+        segments=dashboard.get("segments", []),
+        evidence=dashboard.get("evidence", {}),
+        source=source,
+    )
     return {
         "campaign": campaign,
-        "source": {
-            "type": "demo_mode",
-            "label": "Demo Mode",
-            "warning": "Synthetic demo data for product exploration; not a live simulation result.",
-        },
+        "source": source,
+        "action_plan": action_plan,
         **dashboard,
     }
 

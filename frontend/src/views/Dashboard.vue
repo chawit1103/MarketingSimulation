@@ -397,7 +397,21 @@
 
       <!-- Action Plan: Think to Finish -->
       <section class="action-plan">
-        <h2 class="panel-title">{{ $t('dashboard.actionPlan') }}</h2>
+        <div class="action-plan-head">
+          <div>
+            <h2 class="panel-title">{{ $t('dashboard.actionPlan') }}</h2>
+            <p>{{ displayActionPlan.disclaimer }}</p>
+          </div>
+          <div class="action-plan-tools">
+            <ResultSourceBadge
+              :source="displayActionPlan.source.type"
+              :warning="displayActionPlan.source.warning"
+            />
+            <button class="copy-action-plan" type="button" @click="copyActionPlan">
+              {{ actionPlanCopied ? $t('dashboard.actionPlanCopied') : $t('dashboard.copyActionPlan') }}
+            </button>
+          </div>
+        </div>
 
         <div class="action-grid">
           <!-- Winning Strategy -->
@@ -430,6 +444,39 @@
           </div>
         </div>
 
+        <div class="structured-action-grid">
+          <div
+            v-for="section in actionPlanSections"
+            :key="section.key"
+            class="structured-action-section"
+          >
+            <div class="structured-section-head">
+              <span class="section-label">{{ section.title }}</span>
+            </div>
+            <div
+              v-for="(item, itemIdx) in section.items"
+              :key="`${section.key}-${itemIdx}`"
+              class="structured-action-item"
+            >
+              <strong>{{ item.recommendation }}</strong>
+              <dl>
+                <div>
+                  <dt>{{ $t('dashboard.actionReason') }}</dt>
+                  <dd>{{ item.reason }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.actionExpectedImpact') }}</dt>
+                  <dd>{{ item.expected_impact }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.actionRisk') }}</dt>
+                  <dd>{{ item.risk }}</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </div>
+
         <!-- Action Items -->
         <div class="action-items">
           <h3 class="action-items-title">{{ $t('dashboard.priorityActionItems') }}</h3>
@@ -440,7 +487,7 @@
                 <span class="action-item-priority" :style="{ color: priorityColor(item.priority) }">
                   {{ item.priority.toUpperCase() }}
                 </span>
-                <span class="action-item-desc">{{ item.description }}</span>
+                <span class="action-item-desc">{{ item.description || item.recommendation || item.action }}</span>
                 <span class="action-item-timeline">{{ item.timeline }}</span>
               </div>
             </div>
@@ -510,6 +557,7 @@ const exportData = computed(() => ({
     roi_pct: kpis.value.conversion_probability - 40,
   },
   timeline: timeline.value,
+  action_plan: displayActionPlan.value,
   recommendation: executiveSummaryTH.value || winningStrategy.value || 'Review action plan for next steps.',
   revenue_projection: {
     monthly: kpis.value.conversion_probability * 10000,
@@ -607,6 +655,8 @@ const winningHighlights = ref([])
 const riskSummary = ref('')
 const riskAreas = ref([])
 const actionItems = ref([])
+const structuredActionPlan = ref(null)
+const actionPlanCopied = ref(false)
 const executiveSummaryTH = ref('')
 const confidenceScore = ref(78)
 const assumptions = ref([])
@@ -641,6 +691,23 @@ const whatIfScenarios = [
     scenario: { competitor_launch: true, budget_increase_pct: 20 },
   },
 ]
+
+const displayActionPlan = computed(() => structuredActionPlan.value || buildLocalActionPlan())
+
+const actionPlanSections = computed(() => {
+  const plan = displayActionPlan.value
+  const sections = plan.sections || {}
+  return [
+    'creative_adjustment',
+    'channel_allocation',
+    'crisis_prevention',
+    'validation_plan',
+  ].map(key => ({
+    key,
+    title: sections[key]?.title || t(`dashboard.actionSection_${key}`),
+    items: sections[key]?.items || [],
+  }))
+})
 
 // --- Computed: Grade class ---
 const gradeClass = computed(() => {
@@ -956,6 +1023,9 @@ async function loadDashboard() {
       const kpiRes = await getKPIs(cid)
       if (kpiRes && kpiRes.data) {
         Object.assign(kpis.value, normalizeKpis(kpiRes.data))
+        if (kpiRes.data.action_plan) {
+          structuredActionPlan.value = normalizeActionPlan(kpiRes.data.action_plan)
+        }
       }
       if (kpiRes && kpiRes.campaign_name) campaignName.value = kpiRes.campaign_name
       if (kpiRes && kpiRes.grade) overallGrade.value = kpiRes.grade
@@ -1065,6 +1135,7 @@ function applyDemoDashboard(data) {
   scoreExplanations.value = evidence.why_this_score || []
   riskDrivers.value = evidence.risk_drivers || []
   simulatedQuotes.value = evidence.quotes || []
+  structuredActionPlan.value = data.action_plan ? normalizeActionPlan(data.action_plan) : null
 
   if (Array.isArray(evidence.recommended_actions)) {
     actionItems.value = evidence.recommended_actions
@@ -1108,9 +1179,152 @@ function applyDecision(data) {
   if (Array.isArray(data.actions) && data.actions.length) {
     actionItems.value = data.actions
   }
+  if (data.action_plan) {
+    structuredActionPlan.value = normalizeActionPlan(data.action_plan)
+  }
   if (data.primary_risk?.driver && !riskDrivers.value.includes(data.primary_risk.driver)) {
     riskDrivers.value = [data.primary_risk.driver, ...riskDrivers.value].slice(0, 4)
   }
+}
+
+function normalizeActionPlan(plan) {
+  const source = plan.source || resultSource.value || { type: 'unknown', warning: '' }
+  const sections = plan.sections || {}
+  return {
+    version: plan.version || 'structured_action_plan_v1',
+    source: {
+      type: source.type || 'unknown',
+      warning: source.warning || '',
+    },
+    headline: plan.headline || winningStrategy.value || t('dashboard.actionPlanDefaultHeadline'),
+    disclaimer: plan.disclaimer || t('dashboard.actionPlanDisclaimer'),
+    sections: {
+      creative_adjustment: normalizeActionSection('creative_adjustment', sections.creative_adjustment),
+      channel_allocation: normalizeActionSection('channel_allocation', sections.channel_allocation),
+      crisis_prevention: normalizeActionSection('crisis_prevention', sections.crisis_prevention),
+      validation_plan: normalizeActionSection('validation_plan', sections.validation_plan),
+    },
+    summary_items: Array.isArray(plan.summary_items) ? plan.summary_items : [],
+  }
+}
+
+function normalizeActionSection(key, section) {
+  const fallback = buildLocalActionSection(key)
+  const items = Array.isArray(section?.items) && section.items.length ? section.items : fallback.items
+  return {
+    title: section?.title || t(`dashboard.actionSection_${key}`),
+    items: items.map(normalizeActionItem),
+  }
+}
+
+function normalizeActionItem(item) {
+  return {
+    recommendation: item.recommendation || item.action || item.description || t('dashboard.actionPlanMissingRecommendation'),
+    reason: item.reason || item.rationale || t('dashboard.actionPlanMissingReason'),
+    expected_impact: item.expected_impact || item.impact || t('dashboard.actionPlanMissingImpact'),
+    risk: item.risk || t('dashboard.actionPlanMissingRisk'),
+    priority: item.priority || 'medium',
+  }
+}
+
+function buildLocalActionPlan() {
+  return {
+    version: 'structured_action_plan_v1',
+    source: {
+      type: resultSource.value?.type || 'unknown',
+      warning: resultSource.value?.warning || '',
+    },
+    headline: decisionStrategy.value?.headline || winningStrategy.value || t('dashboard.actionPlanDefaultHeadline'),
+    disclaimer: t('dashboard.actionPlanDisclaimer'),
+    sections: {
+      creative_adjustment: buildLocalActionSection('creative_adjustment'),
+      channel_allocation: buildLocalActionSection('channel_allocation'),
+      crisis_prevention: buildLocalActionSection('crisis_prevention'),
+      validation_plan: buildLocalActionSection('validation_plan'),
+    },
+  }
+}
+
+function buildLocalActionSection(key) {
+  const topPositive = topPositiveSegmentLabel()
+  const topRisk = topNegativeSegmentLabel()
+  const source = resultSource.value?.type || 'unknown'
+  const mapping = {
+    creative_adjustment: {
+      title: t('dashboard.actionSection_creative_adjustment'),
+      items: [{
+        recommendation: kpis.value.message_resonance >= 70
+          ? t('dashboard.actionCreativeKeep')
+          : t('dashboard.actionCreativeRewrite'),
+        reason: t('dashboard.actionCreativeReason', { resonance: kpis.value.message_resonance, segment: topPositive }),
+        expected_impact: t('dashboard.actionCreativeImpact'),
+        risk: t('dashboard.actionCreativeRisk'),
+        priority: kpis.value.message_resonance >= 70 ? 'medium' : 'high',
+      }],
+    },
+    channel_allocation: {
+      title: t('dashboard.actionSection_channel_allocation'),
+      items: [{
+        recommendation: t('dashboard.actionChannelRecommendation', { channels: campaignBrief.value.channels }),
+        reason: t('dashboard.actionChannelReason', { conversion: kpis.value.conversion_probability, influence: kpis.value.social_influence }),
+        expected_impact: t('dashboard.actionChannelImpact'),
+        risk: t('dashboard.actionChannelRisk'),
+        priority: 'high',
+      }],
+    },
+    crisis_prevention: {
+      title: t('dashboard.actionSection_crisis_prevention'),
+      items: [{
+        recommendation: crisisLevel.value >= 3 ? t('dashboard.actionCrisisContain') : t('dashboard.actionCrisisPrepare'),
+        reason: t('dashboard.actionCrisisReason', { risk: crisisLabel.value, driver: riskDrivers.value[0] || topRisk }),
+        expected_impact: t('dashboard.actionCrisisImpact'),
+        risk: t('dashboard.actionCrisisRisk'),
+        priority: crisisLevel.value >= 3 ? 'critical' : 'medium',
+      }],
+    },
+    validation_plan: {
+      title: t('dashboard.actionSection_validation_plan'),
+      items: [{
+        recommendation: ['demo_mode', 'local_estimate', 'unknown'].includes(source)
+          ? t('dashboard.actionValidationBackend')
+          : t('dashboard.actionValidationLive'),
+        reason: t('dashboard.actionValidationReason', { source, confidence: confidenceScore.value }),
+        expected_impact: t('dashboard.actionValidationImpact'),
+        risk: t('dashboard.actionValidationRisk'),
+        priority: ['demo_mode', 'local_estimate', 'unknown'].includes(source) ? 'high' : 'medium',
+      }],
+    },
+  }
+  return mapping[key]
+}
+
+async function copyActionPlan() {
+  const lines = actionPlanToLines(displayActionPlan.value)
+  try {
+    await navigator.clipboard.writeText(lines.join('\n'))
+    actionPlanCopied.value = true
+    setTimeout(() => { actionPlanCopied.value = false }, 1800)
+  } catch (e) {
+    console.warn('Copy action plan failed:', e.message)
+  }
+}
+
+function actionPlanToLines(plan) {
+  const lines = [
+    `${t('dashboard.actionPlan')}: ${plan.headline}`,
+    `${t('resultSource.unknownSource')}: ${plan.source.type}`,
+    plan.disclaimer,
+  ]
+  for (const section of actionPlanSections.value) {
+    lines.push('', section.title)
+    section.items.forEach((item, idx) => {
+      lines.push(`${idx + 1}. ${item.recommendation}`)
+      lines.push(`   ${t('dashboard.actionReason')}: ${item.reason}`)
+      lines.push(`   ${t('dashboard.actionExpectedImpact')}: ${item.expected_impact}`)
+      lines.push(`   ${t('dashboard.actionRisk')}: ${item.risk}`)
+    })
+  }
+  return lines
 }
 
 function localDecisionFallback() {
@@ -2259,6 +2473,48 @@ font-size: var(--text-sm);
   margin-bottom: 28px;
 }
 
+.action-plan-head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-5);
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.action-plan-head p {
+  max-width: 760px;
+  margin: 6px 0 0;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.action-plan-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.copy-action-plan {
+  min-height: 36px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 800;
+}
+
+.copy-action-plan:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .action-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2353,6 +2609,57 @@ font-size: var(--text-sm);
   font-weight: 700;
   flex-shrink: 0;
   min-width: 32px;
+}
+
+.structured-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.structured-action-section {
+  padding: 18px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-surface);
+}
+
+.structured-section-head {
+  margin-bottom: 12px;
+}
+
+.structured-action-item strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.structured-action-item dl {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 0;
+}
+
+.structured-action-item dl div {
+  display: grid;
+  gap: 3px;
+}
+
+.structured-action-item dt {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.structured-action-item dd {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.55;
 }
 
 /* Action Items */
@@ -2879,7 +3186,14 @@ font-size: var(--text-sm);
   .mid-row {
     grid-template-columns: 1fr;
   }
-  .action-grid {
+  .action-plan-head {
+    flex-direction: column;
+  }
+  .action-plan-tools {
+    justify-content: flex-start;
+  }
+  .action-grid,
+  .structured-action-grid {
     grid-template-columns: 1fr;
   }
   .influencer-grid {
