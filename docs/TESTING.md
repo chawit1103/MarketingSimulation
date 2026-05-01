@@ -65,6 +65,17 @@ Current e2e coverage verifies visible UI states for:
 
 These tests intentionally avoid pixel-perfect assertions. They check user-visible labels and high-value decision surfaces instead.
 
+## CI
+
+GitHub Actions runs the same release-safe checks on pull requests and pushes to main release branches plus `codex/**` branches:
+
+- `Secret Hygiene`: scans committed files for common API-key/private-key patterns.
+- `Backend Tests`: installs `backend` with dev dependencies and runs `python -m pytest tests`.
+- `Frontend Build`: runs `npm ci` and `npm run build`.
+- `E2E Smoke`: installs Chromium and runs the mocked Playwright smoke suite.
+
+CI uses dummy test-mode environment values for LLM, embedding, and Neo4j settings. It must not require real provider keys, Neo4j cloud credentials, paid services, or live model calls.
+
 ## Current Gaps
 
 - No frontend unit/component test runner is configured yet.
