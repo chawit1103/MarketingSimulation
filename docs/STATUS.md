@@ -27,7 +27,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - War Room now defaults to the backend deterministic competitor simulation API at `POST /api/competitor/simulate`.
 - Structured Action Plan output is available for dashboards and demo dashboards, with source mode, sectioned recommendations, reasons, expected impact, and risks.
 - Settings Wizard supports Demo only, Local model, and Cloud API setup readiness checks without exposing secrets.
-- Frontend source badges identify result provenance: Demo Mode, Local Estimate, Live Backend, Backend Verified, or Unknown Source.
+- Frontend source badges identify result provenance: Demo Mode, Local Estimate, Live Backend, Backend Verified, or Unknown Source. Backend Verified is reserved for persisted real simulation KPI/evidence for an owned campaign/run; backend route success alone is not enough.
 - Dashboard influence surfaces now describe demo/local accounts as simulated influence nodes, not real scraped or verified social profiles.
 - Comparator now uses backend demo fixtures for emotional/storytelling, proof-led/trust, and price/promotion directions and keeps browser-side output as explicit Local Estimate fallback only.
 - Revised Brief v2 is available from dashboard Action Plans through `POST /api/brief/revise`; it preserves action-plan provenance and can be reviewed against the original brief.

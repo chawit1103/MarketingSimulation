@@ -58,7 +58,7 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 ## Security And Abuse Protection
 
 - [x] SEC-001 repository secret hygiene is partially remediated: `.env.dev` is removed from Git tracking, safe `.env.dev.example` placeholders are provided, and CI blocks tracked local env/runtime files plus common secret-like token patterns.
-- [ ] SEC-001 manual credential rotation is complete and evidenced outside the repository. Remaining manual action: rotate any provider/API/graph credentials that may have been committed before remediation.
+- [ ] SEC-001 manual credential rotation evidence has been provided outside the repository. Remaining manual action: rotate any provider/API/graph credentials that may have been committed before remediation.
 - [x] Production refuses known fallback auth/session secrets.
 - [x] New passwords use Werkzeug adaptive hashes.
 - [x] Legacy salted SHA256 hashes are rehashed on successful login.
@@ -71,7 +71,7 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] SEC-004 RBAC baseline is remediated for the current route set: centralized role guards protect settings/API-key/destructive/admin operations, analyst/admin mutation flows, persona generation, report/export/simulation actions, and viewer read-only behavior.
 - [x] SEC-006 auth route exposure is remediated by safe disablement: only auth login/register remain public, `/me` is authenticated, API-key generation is admin-only, cross-org switching is denied without existence leakage, and current-org switching returns a safe disabled response without a token.
 - [x] SEC-003 tenant isolation for ID-addressed resources is remediated for the current local JSON architecture: campaign pipeline status, dashboard KPI/report/timeline/segment routes, simulation reads/status/actions, reports, projects, graphs, and graph tasks are scoped to the authenticated organization.
-- [x] SEC-005 dashboard provenance is remediated: fallback/mock KPI output is labeled `local_estimate`, demo fixtures are labeled `demo_mode`, and `backend_verified` is reserved for explicit persisted real simulation KPI metrics.
+- [x] SEC-005 dashboard provenance is remediated: fallback/mock KPI output is labeled `local_estimate`, demo fixtures are labeled `demo_mode`, and `backend_verified` is reserved for explicit persisted real simulation KPI/evidence for an owned campaign/run.
 - [x] SEC-008/010/011/013 production hardening baseline is remediated: debug/body logging are opt-in, query-parameter API keys are rejected, production CORS fails startup without explicit trusted origins, and 5xx API errors return stable client-safe messages.
 - [x] SEC-007 production settings secret persistence is remediated for local files: production resolves LLM/embedding/graph secrets from environment variables, ignores local JSON secret fields, writes blank secret fields to `settings.json`, and keeps restrictive settings-file permissions where supported.
 - [x] Local demo settings can still persist secrets only when explicitly allowed outside production.
@@ -307,6 +307,23 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] Analytics sanitization tests rerun for PR AD after secret-scan fixture hygiene: `cd frontend && npm run test:analytics` passed on 2026-05-02: 2 passed.
 - [x] CI-equivalent secret hygiene scan run for PR AD: passed on 2026-05-02.
 - [x] `git diff --check` run for PR AD: passed on 2026-05-02.
+
+### PR AE Merge Stacked Roadmap Into Release Candidate Run
+
+- [x] Created release-candidate integration branch from `codex/pr-ad-brand-agency-go-no-go`.
+- [x] Confirmed completed PR V through PR AD commits are present in the branch history.
+- [x] Confirmed `.env.dev` is not tracked.
+- [x] Confirmed `.env.dev.example` exists with safe placeholder values.
+- [x] Readiness wording reviewed across README, STATUS, SECURITY_REVIEW, KNOWN_LIMITATIONS, RELEASE_READINESS_CHECKLIST, PILOT_PLAN, ROADMAP, and RELEASE_NOTES.
+- [x] Manual credential rotation remains a required owner action and is not marked complete.
+- [x] HttpOnly cookie / refresh-token auth remains future work and is not claimed as implemented.
+- [x] Backend Verified wording is aligned: persisted real simulation KPI/evidence for an owned campaign/run is required; backend route success alone is not enough.
+- [x] Backend tests run for PR AE: `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-02: 79 passed, 49 warnings.
+- [x] Frontend build run for PR AE: `cd frontend && npm run build` passed on 2026-05-02.
+- [x] E2E smoke tests run for PR AE: `cd frontend && npm run test:e2e -- --project=chromium --workers=1` passed on 2026-05-02: 13 passed.
+- [x] Analytics tests run for PR AE: `cd frontend && npm run test:analytics` passed on 2026-05-02: 2 passed.
+- [x] CI-equivalent secret hygiene scan run for PR AE: passed on 2026-05-02.
+- [x] `git diff --check` run for PR AE: passed on 2026-05-02.
 
 ## Release Decision
 

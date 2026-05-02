@@ -407,7 +407,7 @@ The UI labels simulation and decision outputs with one of the supported result-s
 - **Demo Mode**: deterministic sample data intended for onboarding and product exploration.
 - **Local Estimate**: browser-side deterministic fallback, visibly warned and not presented as live backend output.
 - **Live Backend**: backend-generated deterministic output.
-- **Backend Verified**: backend route completed successfully and supplied the displayed result.
+- **Backend Verified**: persisted real simulation KPI/evidence was loaded for an owned campaign/run. Backend route success by itself is not enough for this label.
 - **Unknown Source**: source metadata was unavailable and should be treated conservatively.
 
 It checks:

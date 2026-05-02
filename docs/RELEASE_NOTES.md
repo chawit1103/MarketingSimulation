@@ -1,6 +1,6 @@
 # Release Notes
 
-Updated: 2026-05-01
+Updated: 2026-05-02
 
 ## PR T: Public Pilot Go/No-Go Verification
 
@@ -20,7 +20,7 @@ This verification pass adds no product features. It records the current release 
 | Release path | Current decision | Reason |
 | --- | --- | --- |
 | Local demo | Go | Demo mode works without real provider keys when synthetic data is used. |
-| Controlled private pilot | Conditional go | Acceptable only for trusted users after manual credential rotation is confirmed, deployment secrets come from environment variables, and pilot data is non-confidential or explicitly approved. |
+| Controlled private pilot | Conditional go | Acceptable only for trusted users after manual credential-rotation evidence is provided, deployment secrets come from environment variables, and pilot data is non-confidential or explicitly approved. |
 | Public pilot / public internet exposure | No-go | Manual credential rotation is not evidenced, production rate limiting still requires edge/shared enforcement, and browser auth storage is mitigated but not fully hardened. |
 | Production customer deployment | No-go | Requires manual credential rotation, shared/edge rate limiting, hardened browser auth, formal data-retention/deletion policy, production storage decisions, and deployment operations controls. |
 
@@ -225,6 +225,30 @@ This pass closes the Brand & Agency Value Roadmap with documentation, demo frami
 - Updated `docs/PILOT_PLAN.md` with Brand vs Agency participant questions, success criteria, feedback analytics usage, and PR AD go/no-go language.
 - Updated `docs/SCREENSHOT_GUIDE.md` with PR AD screenshot inventory.
 - Kept all curated screenshots and replaced none because PR AD changed docs/demo framing only.
+
+### Validation
+
+- Final validation is recorded in `docs/RELEASE_READINESS_CHECKLIST.md`.
+
+## PR AE: Merge Stacked Roadmap Into Release Candidate
+
+This pass creates a clean release-candidate integration branch from the latest stacked roadmap branch. It does not add product features.
+
+### Integration Decisions
+
+- Use `codex/pr-ad-brand-agency-go-no-go` as the source of truth for the completed PR V through PR AD stack.
+- Keep `.env.dev` untracked.
+- Keep `.env.dev.example` and `.env.example` as safe placeholder examples.
+- Align readiness language across README, status, security, limitations, checklist, pilot plan, roadmap, and release notes.
+- Keep local demo as ready with synthetic data and no real secrets.
+- Keep controlled private pilot conditional on trusted users, credential-rotation evidence, environment-provided secrets, visible source labels, and deployment controls.
+- Keep public pilot, public internet exposure, and production customer deployment blocked.
+
+### Wording Fixes
+
+- Backend Verified means persisted real simulation KPI/evidence for an owned campaign/run; backend route success alone is not enough.
+- Manual credential rotation is still a required owner action and is not marked complete.
+- HttpOnly cookie / refresh-token auth remains future work and is not claimed as implemented.
 
 ### Validation
 
