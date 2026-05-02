@@ -131,3 +131,22 @@ This pass turns structured Action Plans into a reviewable revised campaign brief
 - Frontend build passed: `cd frontend && npm run build`.
 - E2E smoke tests passed: `cd frontend && npm run test:e2e -- --project=chromium --workers=1`.
 - Secret hygiene scan and `git diff --check` passed.
+
+## PR Z: Deep Industry Presets
+
+This pass adds richer planner-ready industry presets without adding live social listening, calibration, or regulated advice claims.
+
+### What Changed
+
+- Added deep built-in presets for FMCG/CPG, Insurance/InsurTech, Retail/Ecommerce, Real Estate, EV/Automotive, and Healthcare/Wellness.
+- Each preset includes segment archetypes, objections, crisis triggers, typical KPIs, channel behavior, competitor archetypes, regulatory sensitivities, proof-point requirements, sample brief, risk checklist, action-plan hints, assumptions, and limitations.
+- Campaign preset API now exposes deep preset metadata plus prefill fields for duration, budget, KPI, competitor context, brand constraints, and risk/legal notes.
+- Industry template detail UI now shows assumptions, limitations, common objections, and proof requirements before applying a preset.
+
+### Validation
+
+- Focused backend deep-preset tests passed: `backend/.venv/bin/python -m pytest backend/tests/test_industry_deep_presets.py -q`.
+- Full backend tests passed: `backend/.venv/bin/python -m pytest backend/tests -q`.
+- Frontend build passed: `cd frontend && npm run build`.
+- E2E smoke tests passed: `cd frontend && npm run test:e2e -- --project=chromium --workers=1`.
+- CI-equivalent secret hygiene scan and `git diff --check` passed.

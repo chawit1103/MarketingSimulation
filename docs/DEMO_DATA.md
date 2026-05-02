@@ -1,6 +1,6 @@
 # Demo Data
 
-Updated: 2026-05-01
+Updated: 2026-05-02
 
 Use these fictional sample briefs for demos, QA, and pilot walkthroughs. They do not contain real customer data and should be treated as scenario-planning inputs, not evidence of real market outcomes.
 
@@ -12,6 +12,27 @@ Use these fictional sample briefs for demos, QA, and pilot walkthroughs. They do
 - **Backend Verified**: backend route completed and supplied the displayed result.
 
 Do not describe any demo output as a guaranteed prediction.
+
+## Deep Industry Presets
+
+Campaign creation now includes richer built-in industry presets for fast planner setup. Each preset is a fictional, assumption-based starting point and includes segment archetypes, common objections, crisis triggers, typical KPIs, channel behavior, competitor archetypes, regulatory sensitivities, proof-point requirements, a sample brief, risk checklist, action-plan hints, assumptions, and limitations.
+
+Available deep presets:
+
+- **FMCG / CPG**: price-pack value, creator proof, retail availability, claim substantiation.
+- **Insurance / InsurTech**: trust, claims concerns, policy exclusions, advisor handoff, OIC/PDPA review.
+- **Retail / Ecommerce**: promo clarity, delivery risk, loyalty, marketplace and live-commerce behavior.
+- **Real Estate**: affordability, location proof, community concerns, lead quality, financing caveats.
+- **EV / Automotive**: test-drive intent, charging/range anxiety, warranty clarity, competitor price war response.
+- **Healthcare / Wellness**: conservative education, privacy, professional review, appointment consideration. This preset must not be used as medical advice or as a substitute for compliance review.
+
+Recommended first-time flow:
+
+1. Open Campaigns.
+2. Select one of the deep presets.
+3. Review the displayed assumptions, limitations, common objections, and proof requirements.
+4. Replace sample budget, duration, KPI, competitor context, risk/legal notes, and channels with the user's actual campaign plan.
+5. Run Brief Quality Score before simulation.
 
 ## Brief 1: Premium Water Launch
 

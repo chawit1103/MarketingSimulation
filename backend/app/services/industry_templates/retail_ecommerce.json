@@ -1,0 +1,126 @@
+{
+  "id": "retail_ecommerce",
+  "name_th": "Retail / Ecommerce",
+  "name_en": "Retail / Ecommerce",
+  "description_th": "Deep preset for retail campaigns, marketplace promos, loyalty, delivery experience, and competitor price attacks.",
+  "description_en": "Deep preset for retail campaigns, marketplace promos, loyalty, delivery experience, and competitor price attacks.",
+  "icon": "R",
+  "color": "#7a4cc2",
+  "industry_depth": "deep_preset",
+  "objectives": ["message_testing", "competitor_response", "brand_perception", "crisis_simulation"],
+  "default_objective": "competitor_response",
+  "default_platform": "both",
+  "default_max_rounds": 18,
+  "default_language": "th",
+  "campaign_duration": "4-6 weeks promo, loyalty, or marketplace activation",
+  "budget_range": "THB 500K-6M test budget; replace with real media, marketplace, and CRM budget",
+  "primary_kpi": "Purchase intent, basket lift estimate, promo confusion rate, complaint risk",
+  "competitor_context": "Marketplace sellers, discount chains, brand stores, quick-commerce apps, and live-commerce competitors.",
+  "brand_constraints": "Avoid unclear promo terms, fake scarcity, unsupported price comparisons, and misleading delivery promises.",
+  "risk_legal_notes": "Review promotion terms, consumer protection rules, refund policy, marketplace policy, and influencer disclosures.",
+  "target_audience": {
+    "age_range": [18, 55],
+    "gender": "all",
+    "regions": ["bangkok", "central", "northeast", "north", "south"],
+    "channels": ["tiktok", "facebook", "instagram", "line", "youtube"],
+    "persona_count": 120
+  },
+  "persona_segments": [
+    {
+      "id": "deal_hunters",
+      "name_th": "Deal hunters",
+      "name_en": "Deal hunters",
+      "count": 60,
+      "interests": ["coupons", "flash sales", "free shipping", "reviews"],
+      "archetypes": [
+        {
+          "id": "marketplace_stack_buyer",
+          "name_th": "Marketplace stack buyer",
+          "name_en": "Marketplace stack buyer",
+          "age_range": [18, 35],
+          "income": "lower_middle",
+          "regions": ["bangkok", "central"],
+          "occupation_th": "Student / employee",
+          "channels": ["tiktok", "facebook", "line"],
+          "narrative_th": "Waits for double-day campaigns, stacks coupons, and complains if promo terms are unclear.",
+          "purchase_style": "price_sensitive"
+        },
+        {
+          "id": "live_commerce_buyer",
+          "name_th": "Live commerce buyer",
+          "name_en": "Live commerce buyer",
+          "age_range": [22, 45],
+          "income": "middle",
+          "regions": ["central", "northeast", "south"],
+          "occupation_th": "Shopper / small trader",
+          "channels": ["tiktok", "facebook", "line"],
+          "narrative_th": "Buys when host energy, price proof, and comment momentum feel convincing.",
+          "purchase_style": "impulsive"
+        }
+      ]
+    },
+    {
+      "id": "experience_driven",
+      "name_th": "Experience-driven shoppers",
+      "name_en": "Experience-driven shoppers",
+      "count": 40,
+      "interests": ["delivery speed", "return policy", "brand service", "loyalty points"],
+      "archetypes": [
+        {
+          "id": "loyalty_member",
+          "name_th": "Loyalty member",
+          "name_en": "Loyalty member",
+          "age_range": [28, 52],
+          "income": "middle",
+          "regions": ["bangkok", "central"],
+          "occupation_th": "Family shopper",
+          "channels": ["line", "facebook", "email"],
+          "narrative_th": "Values points, service recovery, and convenient returns more than the lowest price.",
+          "purchase_style": "brand_loyal"
+        },
+        {
+          "id": "delivery_sensitive_buyer",
+          "name_th": "Delivery-sensitive buyer",
+          "name_en": "Delivery-sensitive buyer",
+          "age_range": [24, 44],
+          "income": "middle",
+          "regions": ["bangkok", "east"],
+          "occupation_th": "Urban worker",
+          "channels": ["instagram", "facebook", "tiktok"],
+          "narrative_th": "Checks delivery time, return policy, and stock accuracy before buying.",
+          "purchase_style": "researcher"
+        }
+      ]
+    }
+  ],
+  "crisis_scenarios": [
+    {"id": "promo_terms_confusion", "name_th": "Promo terms confusion", "name_en": "Promo terms confusion", "trigger": "Customers accuse the campaign of hiding restrictions after coupon redemption fails.", "event_tag": "promo-confusion", "impact": "negative", "intensity": 8},
+    {"id": "delivery_delay_spike", "name_th": "Delivery delay spike", "name_en": "Delivery delay spike", "trigger": "A promotion creates delayed orders and public complaint threads about late delivery.", "event_tag": "delivery-delay", "impact": "negative", "intensity": 7},
+    {"id": "loyalty_bonus_launch", "name_th": "Loyalty bonus launch", "name_en": "Loyalty bonus launch", "trigger": "A loyalty bonus creates positive engagement but some shoppers question eligibility.", "event_tag": "loyalty-bonus", "impact": "mixed", "intensity": 5}
+  ],
+  "document_seeds": [
+    {
+      "id": "retail_promo_brief",
+      "name_th": "Retail promo brief",
+      "name_en": "Retail promo brief",
+      "description_th": "Starter brief for a promotion, marketplace, or loyalty campaign.",
+      "description_en": "Starter brief for a promotion, marketplace, or loyalty campaign.",
+      "content": "# Retail Campaign Brief\n\nOffer: [offer]\nObjective: drive purchase intent without creating promo confusion.\nAudience: deal hunters and experience-driven shoppers.\nProof: final price, coupon rules, stock and delivery promise, return policy.\nRisks: promo confusion, delivery delays, refund complaints, competitor price undercut.\nValidation: test offer clarity, service capacity, and complaint response scripts."
+    }
+  ],
+  "deep_preset": {
+    "target_segment_archetypes": ["Marketplace stack buyer", "Live commerce buyer", "Loyalty member", "Delivery-sensitive buyer"],
+    "common_objections": ["Promo terms are confusing", "Delivery may be late", "Competitor is cheaper", "Return policy is unclear"],
+    "crisis_triggers": ["Coupon redemption failure", "Stock-out after promo", "Delivery delay spike", "Refund complaint thread"],
+    "typical_kpis": ["Purchase intent", "Promo comprehension", "Basket lift estimate", "Complaint risk", "Loyalty action rate"],
+    "channel_behavior": ["TikTok accelerates live commerce and complaint clips", "Facebook carries promo complaints", "LINE is useful for loyalty and service recovery", "Instagram supports product inspiration"],
+    "competitor_archetypes": ["Marketplace price undercutter", "Discount chain", "Premium service retailer", "Live-commerce seller"],
+    "legal_regulatory_sensitivities": ["Promotion terms", "Refund and return promises", "Price comparison wording", "Influencer disclosure"],
+    "proof_point_requirements": ["Clear final price", "Coupon eligibility", "Delivery capacity evidence", "Return and refund policy"],
+    "sample_brief": "Run a double-day promotion with clear savings proof, service-capacity guardrails, and loyalty follow-up.",
+    "sample_risk_checklist": ["Can shoppers understand eligibility in 10 seconds?", "Is inventory capacity realistic?", "Is refund policy visible?", "Is competitor price comparison fair?"],
+    "sample_action_plan_hints": ["Simplify promo mechanics", "Pre-write service recovery posts", "Segment loyalty and deal hunters separately", "Monitor stock-out complaints"],
+    "assumptions": ["This preset estimates message and service-risk reactions, not actual marketplace conversion.", "Operational capacity must be validated by the retailer."],
+    "limitations": ["No live marketplace inventory or order data is used.", "Does not replace legal review of promotion terms."]
+  }
+}

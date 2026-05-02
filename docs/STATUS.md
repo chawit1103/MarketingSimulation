@@ -31,6 +31,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - Dashboard influence surfaces now describe demo/local accounts as simulated influence nodes, not real scraped or verified social profiles.
 - Comparator now uses backend demo fixtures for emotional/storytelling, proof-led/trust, and price/promotion directions and keeps browser-side output as explicit Local Estimate fallback only.
 - Revised Brief v2 is available from dashboard Action Plans through `POST /api/brief/revise`; it preserves action-plan provenance and can be reviewed against the original brief.
+- Deep industry presets are available for FMCG/CPG, Insurance/InsurTech, Retail/Ecommerce, Real Estate, EV/Automotive, and Healthcare/Wellness. Each preset includes assumptions, limitations, common objections, crisis triggers, proof requirements, risk checklist, and action-plan hints.
 - Critical frontend route contracts are covered by backend smoke tests for demo, impact, decision, comparator, competitor, export, settings readiness, and report status endpoints.
 - API response safety removes raw traceback keys and redacts common secret-like strings before JSON responses reach clients.
 
@@ -77,6 +78,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - Strategy packs are structured JSON payloads for meeting preparation; PPTX/template rendering for white-label agency decks still needs a dedicated design pass.
 - Settings Wizard readiness checks validate configuration completeness; LLM live tests still depend on authenticated runtime access and real provider availability.
 - Comparator backend demo fixtures are deterministic planning examples; they are not real-world A/B test evidence or calibrated campaign lift.
+- Deep industry presets are deterministic starter assumptions. They must be reviewed, localized, and adjusted with real brand, legal, compliance, and market context before pilot or client use.
 - Demo dashboards should be expanded for every demo campaign instead of relying on one premium-water sample shape.
 - Production deployment still needs environment-specific secret rotation, TLS, backup, observability, and CI gates.
 - KPI and Decision Engine scoring should be calibrated against real campaign outcomes.

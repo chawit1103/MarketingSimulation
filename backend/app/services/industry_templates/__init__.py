@@ -35,6 +35,21 @@ REQUIRED_SEGMENT_KEYS = {"id", "name_th", "name_en", "archetypes"}
 REQUIRED_ARCHETYPE_KEYS = {"id", "name_th", "name_en", "age_range", "income", "regions", "occupation_th", "channels", "narrative_th", "purchase_style"}
 REQUIRED_CRISIS_KEYS = {"id", "name_th", "name_en", "trigger", "impact"}
 REQUIRED_SEED_KEYS = {"id", "name_th", "description_th", "content"}
+REQUIRED_DEEP_PRESET_KEYS = {
+    "target_segment_archetypes",
+    "common_objections",
+    "crisis_triggers",
+    "typical_kpis",
+    "channel_behavior",
+    "competitor_archetypes",
+    "legal_regulatory_sensitivities",
+    "proof_point_requirements",
+    "sample_brief",
+    "sample_risk_checklist",
+    "sample_action_plan_hints",
+    "assumptions",
+    "limitations",
+}
 VALID_IMPACTS = {"negative", "positive", "mixed"}
 VALID_PURCHASE_STYLES = {"impulsive", "price_sensitive", "researcher", "early_adopter", "social_proof", "brand_loyal", "traditional"}
 VALID_INCOMES = {"low", "lower_middle", "middle", "upper_middle", "high"}
@@ -62,10 +77,14 @@ class IndustryTemplateLoader:
                 "name_th": tmpl.get("name_th", tid),
                 "name_en": tmpl.get("name_en", tid),
                 "description_th": tmpl.get("description_th", ""),
+                "description_en": tmpl.get("description_en", ""),
                 "icon": tmpl.get("icon", "📋"),
                 "color": tmpl.get("color", "#000"),
                 "source": tmpl.get("_source", "builtin"),
                 "objectives": tmpl.get("objectives", []),
+                "industry_depth": tmpl.get("industry_depth", "standard"),
+                "assumptions": tmpl.get("deep_preset", {}).get("assumptions", []),
+                "limitations": tmpl.get("deep_preset", {}).get("limitations", []),
                 "persona_segment_count": len(tmpl.get("persona_segments", [])),
                 "crisis_scenario_count": len(tmpl.get("crisis_scenarios", [])),
                 "document_seed_count": len(tmpl.get("document_seeds", [])),
@@ -102,6 +121,8 @@ class IndustryTemplateLoader:
             "template_id": template_id,
             "name_th": tmpl.get("name_th"),
             "name_en": tmpl.get("name_en"),
+            "description_th": tmpl.get("description_th"),
+            "description_en": tmpl.get("description_en"),
             "icon": tmpl.get("icon"),
             "color": tmpl.get("color"),
             "target": tmpl.get("target_audience", {}),
@@ -111,11 +132,25 @@ class IndustryTemplateLoader:
                 "language": tmpl.get("default_language", "th"),
             },
             "default_objective": tmpl.get("default_objective", "crisis_simulation"),
+            "campaign_duration": tmpl.get("campaign_duration", ""),
+            "budget_range": tmpl.get("budget_range", ""),
+            "primary_kpi": tmpl.get("primary_kpi", ""),
+            "competitor_context": tmpl.get("competitor_context", ""),
+            "brand_constraints": tmpl.get("brand_constraints", ""),
+            "risk_legal_notes": tmpl.get("risk_legal_notes", ""),
+            "industry_depth": tmpl.get("industry_depth", "standard"),
+            "deep_preset": tmpl.get("deep_preset", {}),
             "available_objectives": tmpl.get("objectives", []),
             "persona_segments": tmpl.get("persona_segments", []),
             "crisis_scenarios": tmpl.get("crisis_scenarios", []),
             "document_seeds": [
-                {"id": ds["id"], "name_th": ds.get("name_th", ds["id"]), "description_th": ds.get("description_th", "")}
+                {
+                    "id": ds["id"],
+                    "name_th": ds.get("name_th", ds["id"]),
+                    "name_en": ds.get("name_en", ds.get("name_th", ds["id"])),
+                    "description_th": ds.get("description_th", ""),
+                    "description_en": ds.get("description_en", ds.get("description_th", "")),
+                }
                 for ds in tmpl.get("document_seeds", [])
             ],
         }
@@ -245,6 +280,20 @@ class IndustryTemplateLoader:
             for key in REQUIRED_SEED_KEYS:
                 if key not in seed:
                     raise TemplateValidationError(f"Seed {i}: missing key '{key}'")
+
+        deep_preset = data.get("deep_preset")
+        if deep_preset is not None:
+            if not isinstance(deep_preset, dict):
+                raise TemplateValidationError("deep_preset must be an object when provided")
+            for key in REQUIRED_DEEP_PRESET_KEYS:
+                if key not in deep_preset:
+                    raise TemplateValidationError(f"deep_preset missing key '{key}'")
+            for key in REQUIRED_DEEP_PRESET_KEYS - {"sample_brief"}:
+                value = deep_preset.get(key)
+                if not isinstance(value, list) or not value:
+                    raise TemplateValidationError(f"deep_preset.{key} must be a non-empty array")
+            if not isinstance(deep_preset.get("sample_brief"), str) or not deep_preset["sample_brief"].strip():
+                raise TemplateValidationError("deep_preset.sample_brief must be a non-empty string")
 
         # Check ID uniqueness across segments
         all_ids = set()

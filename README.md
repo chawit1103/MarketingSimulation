@@ -184,15 +184,20 @@ Users can open a sample campaign and see a full executive dashboard without regi
 
 Start from industry-specific persona segments, crisis seeds, document seeds, and campaign defaults.
 
-Current and importable template areas include:
+Deep built-in presets now include richer planner scaffolding: target segment archetypes, common objections, crisis triggers, typical KPIs, channel behavior, competitor archetypes, regulatory sensitivities, proof-point requirements, sample brief, risk checklist, action-plan hints, assumptions, and limitations.
+
+Current built-in and importable template areas include:
 
 - energy
 - finance
+- FMCG / CPG
 - insurance / InsurTech
 - retail / ecommerce
 - real estate
-- healthcare
-- FMCG
+- EV / automotive
+- healthcare / wellness
+
+Templates are assumptions for scenario planning, not market-truth or regulated advice. Replace sample budget, duration, KPI, competitor context, risk/legal notes, and channel mix with the user's actual campaign plan before running a simulation.
 
 ### Audience Channels
 

@@ -7,73 +7,74 @@ Controller source: `CODEX_SEQUENTIAL_ORCHESTRATOR_PROMPT.md`
 
 ## Current Stage
 
-Selected roadmap item: **PR Y: Revised Brief v2 From Action Plan**
+Selected roadmap item: **PR Z: Deep Industry Presets**
 
-## Why PR Y Was Selected
+## Why PR Z Was Selected
 
-PR X was completed on the current stacked roadmap branch. The next incomplete roadmap item in order is PR Y: Revised Brief v2 From Action Plan.
+PR Y was completed on the current stacked roadmap branch. The next incomplete roadmap item in order is PR Z: Deep Industry Presets.
 
 Current repository inspection found:
 
 - GitHub default branch: `multilang-v0.3`.
-- Current branch: `codex/pr-y-revised-brief-v2`.
-- Release-candidate integration docs from PR V are present.
-- PR W strategy-pack export exists.
-- PR X comparator backend-first work exists.
-- Dashboard already had structured Action Plans, but no workflow to turn an Action Plan into a revised campaign brief.
+- Current branch: `codex/pr-z-deep-industry-presets`.
+- Release-candidate, strategy-pack, comparator, and revised-brief roadmap work is present.
+- Industry templates existed for energy and finance, but priority brand/agency presets were still shallow or missing.
+- The Campaigns template selector and campaign creation flow already supported applying template presets, so this PR could focus on richer backend templates plus a small detail-panel improvement.
 
-Therefore PR Y is the next correct focused PR.
+## Completed In PR Z
 
-## Completed In PR Y
-
-- Added deterministic backend Revised Brief v2 generation.
-- Added `POST /api/brief/revise`.
-- Revised Brief v2 output includes:
-  - objective.
-  - target segments.
-  - key message.
-  - tone and voice.
-  - proof points.
-  - channel recommendations.
-  - risk guardrails.
-  - validation plan.
-  - creative team notes.
-- Added provenance metadata:
-  - source action plan ID.
-  - campaign ID.
-  - source mode.
-  - data basis.
+- Added deep built-in industry presets for:
+  - FMCG / CPG.
+  - Insurance / InsurTech.
+  - Retail / Ecommerce.
+  - Real Estate.
+  - EV / Automotive.
+  - Healthcare / Wellness.
+- Each deep preset includes:
+  - target segment archetypes.
+  - common objections.
+  - crisis triggers.
+  - typical KPIs.
+  - channel behavior.
+  - competitor archetypes.
+  - legal/regulatory sensitivities.
+  - proof-point requirements.
+  - sample brief.
+  - sample risk checklist.
+  - sample action-plan hints.
   - assumptions.
   - limitations.
-  - recommended validation step.
-- Added Dashboard UI entry point: Create Revised Brief.
-- Added original brief vs revised brief review panel.
-- Added backend tests, route contract coverage, and e2e smoke coverage.
-- Updated README, demo script, user journey, status, checklist, and release notes.
+- Extended the industry preset API response so campaign setup can receive:
+  - campaign duration.
+  - budget range.
+  - primary KPI.
+  - competitor context.
+  - brand constraints.
+  - risk/legal notes.
+  - deep preset metadata.
+- Added optional validation for `deep_preset` schema when a template includes it.
+- Updated the template detail UI to show common objections, proof requirements, assumptions, and limitations before applying a preset.
+- Added backend tests for deep preset listing, validation, API prefill shape, incomplete deep schema rejection, and conservative healthcare/wellness language.
+- Updated README, demo data, demo script, status, and release notes.
 
-## Not Completed In PR Y
+## Not Completed In PR Z
 
-- No live simulation calibration was added.
-- No image prompt or Midjourney prompt generation was added.
-- No LLM calls are required for revised brief tests.
-- No guarantee of improved real-world outcomes was claimed.
-- No save-as-new-campaign persistence was added; this PR provides reviewable v1 vs v2 output first.
-- No social listening, CRM integration, or paid provider integration was added.
-- No database migration was added.
+- No calibration loop was added.
+- No live social listening, CRM import, marketplace import, or paid provider integration was added.
 - No exact ROI, sales forecast, or guaranteed prediction language was added.
+- Healthcare / Wellness remains conservative communication planning only and is not medical advice.
+- Deep presets remain assumption-based starter scaffolds and must be reviewed with real brand, legal, compliance, and market context before pilot or client use.
 - Manual credential rotation was not marked complete because it requires repository-owner action outside Codex.
 
 ## Tests And Checks
 
-- `backend/.venv/bin/python -m pytest backend/tests/test_revised_brief.py backend/tests/test_api_contract.py -q`: passed, 5 passed.
-- `backend/.venv/bin/python -m pytest backend/tests -q`: passed, 65 passed and 40 warnings.
-- `python3 -m json.tool src/locales/en.json` and `src/locales/th.json`: passed.
+- `backend/.venv/bin/python -m pytest backend/tests/test_industry_deep_presets.py -q`: passed, 5 passed.
+- `backend/.venv/bin/python -m pytest backend/tests -q`: passed, 70 passed and 38 warnings.
+- JSON validation for six new built-in template files: passed.
 - `cd frontend && npm run build`: passed.
 - `cd frontend && npm run test:e2e -- --project=chromium --workers=1`: passed, 11 passed.
 - CI-equivalent secret hygiene scan: passed.
 - `git diff --check`: passed.
-
-GitNexus note: `impact` and `context` calls failed with a local GitNexus WAL corruption error during this work, so final scope validation will use `detect_changes` instead.
 
 ## Remaining Blockers / Accepted Risks
 
@@ -82,10 +83,11 @@ GitNexus note: `impact` and `context` calls failed with a local GitNexus WAL cor
 - Browser auth storage is mitigated but still needs HttpOnly cookie, refresh-token, or equivalent production hardening before public/customer deployment.
 - External pilot data-retention and deletion procedures still need approval.
 - Legacy local JSON records without `org_id` need review, backfill, or re-creation before production use.
+- Deep industry presets must be treated as assumptions until calibrated with real campaign data and client-approved market inputs.
 
 ## Next Recommended Roadmap Item
 
-After PR Y is reviewed and merged, proceed to **PR Z: Deep Industry Presets**.
+After PR Z is reviewed and merged, proceed to **PR AA: Budget Scenario Planner, not ROI Predictor**.
 
 Short prompt for the next run:
 

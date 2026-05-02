@@ -226,6 +226,21 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] CI-equivalent secret hygiene scan run for PR Y: passed on 2026-05-02.
 - [x] `git diff --check` run for PR Y: passed on 2026-05-02.
 
+### PR Z Deep Industry Presets Run
+
+- [x] Roadmap progress selected PR Z after PR Y.
+- [x] Added deep industry presets for FMCG/CPG, Insurance/InsurTech, Retail/Ecommerce, Real Estate, EV/Automotive, and Healthcare/Wellness.
+- [x] Deep presets include assumptions, limitations, segment archetypes, objections, crisis triggers, typical KPIs, channel behavior, competitor archetypes, legal/regulatory sensitivities, proof requirements, sample brief, risk checklist, and action-plan hints.
+- [x] Campaign preset API exposes deep preset metadata and campaign prefill fields for duration, budget, KPI, competitor context, brand constraints, and risk/legal notes.
+- [x] Industry template detail UI shows common objections, proof requirements, assumptions, and limitations before a preset is applied.
+- [x] Focused backend tests run for PR Z: `backend/.venv/bin/python -m pytest backend/tests/test_industry_deep_presets.py -q` passed on 2026-05-02: 5 passed.
+- [x] Full backend tests run for PR Z: `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-02: 70 passed, 38 warnings.
+- [x] JSON validation run for PR Z built-in templates: passed on 2026-05-02.
+- [x] Frontend build run for PR Z: `cd frontend && npm run build` passed on 2026-05-02.
+- [x] E2E smoke tests run for PR Z: `cd frontend && npm run test:e2e -- --project=chromium --workers=1` passed on 2026-05-02: 11 passed.
+- [x] CI-equivalent secret hygiene scan run for PR Z: passed on 2026-05-02.
+- [x] `git diff --check` run for PR Z: passed on 2026-05-02.
+
 ## Release Decision
 
 This repository is suitable for local demo use with synthetic data and no real secrets.

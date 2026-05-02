@@ -1,6 +1,6 @@
 # 5-Minute Demo Script
 
-Updated: 2026-05-01
+Updated: 2026-05-02
 
 Use this script for a concise product walkthrough. Keep the message grounded: the demo is deterministic scenario planning, not guaranteed prediction. Say the source mode out loud whenever a result appears: Demo Mode, Local Estimate, Live Backend, or Backend Verified.
 
@@ -39,20 +39,25 @@ Do not say the numbers are real market predictions. Say they are safe synthetic 
 
 Screenshot: `docs/screenshots/demo-dashboard-overview.png`
 
-## 1:30-2:10 — Brief Quality Score
+## 1:30-2:10 — Deep Industry Preset And Brief Quality Score
 
-Open Campaigns, create a new campaign, skip template if needed, and scroll to Brief Quality Score.
+Open Campaigns, create a new campaign, and choose a deep industry preset such as FMCG / CPG, Insurance / InsurTech, Retail / Ecommerce, Real Estate, EV / Automotive, or Healthcare / Wellness.
 
 Key message:
 
-> The system checks whether the brief is complete enough before simulation time or model spend is used.
+> The template gets a planner from blank page to a realistic campaign shape in minutes, but its assumptions and limitations are visible and must be reviewed.
 
 Show:
 
+- Preset assumptions and limitations.
+- Common objections and proof requirements.
+- Prefilled duration, budget, KPI, competitor context, brand constraints, risk/legal notes, and channel mix.
 - Score percentage.
 - Confidence impact.
 - Missing fields or strong-brief signal.
 - Deterministic, non-LLM scoring.
+
+For Healthcare / Wellness, say explicitly that the preset is conservative communication planning and not medical advice.
 
 Screenshot: `docs/screenshots/brief-quality-score.png`
 
