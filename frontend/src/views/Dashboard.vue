@@ -411,6 +411,9 @@
             <button class="copy-action-plan" type="button" @click="copyActionPlan">
               {{ actionPlanCopied ? $t('dashboard.actionPlanCopied') : $t('dashboard.copyActionPlan') }}
             </button>
+            <button class="copy-action-plan" type="button" :disabled="revisedBriefLoading" @click="createRevisedBrief">
+              {{ revisedBriefLoading ? $t('common.loading') : $t('dashboard.createRevisedBrief') }}
+            </button>
           </div>
         </div>
 
@@ -478,6 +481,82 @@
           </div>
         </div>
 
+        <div v-if="revisedBrief" class="revised-brief-panel">
+          <div class="revised-brief-head">
+            <div>
+              <span class="brief-kicker">{{ $t('dashboard.revisedBriefKicker') }}</span>
+              <h3>{{ revisedBrief.title }}</h3>
+              <p>{{ revisedBrief.disclaimer }}</p>
+            </div>
+            <ResultSourceBadge
+              :source="revisedBrief.provenance.source_mode"
+              :warning="revisedBrief.provenance.recommended_next_validation_step"
+            />
+          </div>
+
+          <div class="brief-compare-grid">
+            <section class="brief-version-card">
+              <h4>{{ $t('dashboard.originalBrief') }}</h4>
+              <dl>
+                <div>
+                  <dt>{{ $t('dashboard.revisedObjective') }}</dt>
+                  <dd>{{ revisedBrief.original_brief.objective || campaignBrief.objective }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedTargetSegments') }}</dt>
+                  <dd>{{ listText(revisedBrief.original_brief.target_segments) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedKeyMessage') }}</dt>
+                  <dd>{{ revisedBrief.original_brief.description || campaignBrief.description }}</dd>
+                </div>
+              </dl>
+            </section>
+
+            <section class="brief-version-card revised">
+              <h4>{{ $t('dashboard.revisedBrief') }}</h4>
+              <dl>
+                <div>
+                  <dt>{{ $t('dashboard.revisedObjective') }}</dt>
+                  <dd>{{ revisedBrief.revised_brief.objective }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedTargetSegments') }}</dt>
+                  <dd>{{ listText(revisedBrief.revised_brief.target_segments) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedKeyMessage') }}</dt>
+                  <dd>{{ revisedBrief.revised_brief.key_message }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedTone') }}</dt>
+                  <dd>{{ revisedBrief.revised_brief.tone_and_voice }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedProofPoints') }}</dt>
+                  <dd>{{ listText(revisedBrief.revised_brief.proof_points) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedChannels') }}</dt>
+                  <dd>{{ listText(revisedBrief.revised_brief.channel_recommendations) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedRiskGuardrails') }}</dt>
+                  <dd>{{ listText(revisedBrief.revised_brief.risk_guardrails) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedValidationPlan') }}</dt>
+                  <dd>{{ listText(revisedBrief.revised_brief.validation_plan) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedCreativeNotes') }}</dt>
+                  <dd>{{ listText(revisedBrief.revised_brief.creative_team_notes) }}</dd>
+                </div>
+              </dl>
+            </section>
+          </div>
+        </div>
+
         <!-- Action Items -->
         <div class="action-items">
           <h3 class="action-items-title">{{ $t('dashboard.priorityActionItems') }}</h3>
@@ -525,6 +604,7 @@ import { getKPIs, getTimeline, getSegments, getInfluencers } from '@/api/dashboa
 import { getCampaign, hasCampaignAuth } from '@/api/campaign'
 import { getDemoDashboard } from '@/api/demo'
 import { analyzeDecision, runWhatIf } from '@/api/decision'
+import { reviseBriefFromActionPlan } from '@/api/brief'
 import ExportButton from '@/components/ExportButton.vue'
 import ResultSourceBadge from '@/components/ResultSourceBadge.vue'
 import { sourceModeFromValue, trackEvent } from '@/services/analytics'
@@ -660,6 +740,8 @@ const riskAreas = ref([])
 const actionItems = ref([])
 const structuredActionPlan = ref(null)
 const actionPlanCopied = ref(false)
+const revisedBrief = ref(null)
+const revisedBriefLoading = ref(false)
 const executiveSummaryTH = ref('')
 const confidenceScore = ref(78)
 const assumptions = ref([])
@@ -1341,6 +1423,63 @@ function actionPlanToLines(plan) {
     })
   }
   return lines
+}
+
+function revisedBriefPayload() {
+  const campaign = campaignDetails.value || {
+    id: campaignId.value,
+    name: campaignName.value,
+    description: campaignBrief.value.description,
+    objective: campaignBrief.value.objective,
+  }
+  return {
+    campaign,
+    original_brief: {
+      ...campaign,
+      description: campaignBrief.value.description,
+      objective: campaignBrief.value.objective,
+      target: {
+        segment_name: campaignBrief.value.audience,
+        channels: campaignBrief.value.channels
+          ? campaignBrief.value.channels.split(',').map(item => item.trim()).filter(Boolean)
+          : [],
+      },
+    },
+    action_plan: displayActionPlan.value,
+    evidence: {
+      assumptions: assumptions.value,
+      risk_drivers: riskDrivers.value,
+      quotes: simulatedQuotes.value,
+      segments: segments.value,
+      recommended_next_validation_step: trustPanel.value.nextValidationStep,
+    },
+    source: {
+      ...resultSource.value,
+      campaign_id: campaign.campaign_id || campaign.id || campaignId.value,
+    },
+  }
+}
+
+async function createRevisedBrief() {
+  if (revisedBriefLoading.value) return
+  revisedBriefLoading.value = true
+  try {
+    const res = await reviseBriefFromActionPlan(revisedBriefPayload())
+    revisedBrief.value = res.data || res
+    trackEvent('revised_brief_created', {
+      source_mode: sourceModeFromValue(revisedBrief.value?.provenance?.source_mode),
+      has_campaign_id: Boolean(revisedBrief.value?.campaign_id),
+    })
+  } catch (e) {
+    console.warn('Revised brief generation failed:', e.message)
+  } finally {
+    revisedBriefLoading.value = false
+  }
+}
+
+function listText(value) {
+  if (Array.isArray(value)) return value.filter(Boolean).join(' / ') || '—'
+  return value || '—'
 }
 
 function localDecisionFallback() {
@@ -2587,6 +2726,11 @@ font-size: var(--text-sm);
   color: var(--accent);
 }
 
+.copy-action-plan:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
 .action-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2729,6 +2873,81 @@ font-size: var(--text-sm);
 
 .structured-action-item dd {
   margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.revised-brief-panel {
+  margin-bottom: 24px;
+  padding: 22px;
+  border: 1px solid var(--border-accent);
+  border-radius: 8px;
+  background: var(--bg-surface);
+}
+
+.revised-brief-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin-bottom: 18px;
+}
+
+.revised-brief-head h3 {
+  margin: 4px 0 6px;
+  color: var(--text-primary);
+  font-size: var(--text-xl);
+}
+
+.revised-brief-head p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.brief-compare-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 16px;
+}
+
+.brief-version-card {
+  padding: 18px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-panel);
+}
+
+.brief-version-card.revised {
+  border-color: var(--border-accent);
+  background: var(--accent-subtle);
+}
+
+.brief-version-card h4 {
+  margin: 0 0 14px;
+  color: var(--text-primary);
+  font-size: var(--text-base);
+}
+
+.brief-version-card dl {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.brief-version-card dt {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.brief-version-card dd {
+  margin: 3px 0 0;
   color: var(--text-secondary);
   font-size: var(--text-sm);
   line-height: 1.55;

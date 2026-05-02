@@ -99,6 +99,7 @@ Goal:
 Recommended action:
 
 - Copy/export the Action Plan for team review.
+- Create a Revised Brief v2 from the Action Plan, compare it against the original brief, and review the proof points/risk guardrails before the next simulation.
 - Use the strategy pack export when the next meeting needs a Brand Executive Summary or Agency Client Pitch Summary with source/provenance labels attached to every section.
 - Validate high-risk recommendations with a small live-market or audience test before full spend.
 

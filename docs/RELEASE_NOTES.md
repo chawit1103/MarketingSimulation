@@ -111,3 +111,23 @@ This pass makes the Comparator backend-first for demo and authenticated campaign
 - Frontend build passed: `cd frontend && npm run build`.
 - E2E smoke tests passed: `cd frontend && npm run test:e2e -- --project=chromium --workers=1`.
 - Secret hygiene scan and `git diff --check` passed.
+
+## PR Y: Revised Brief v2 From Action Plan
+
+This pass turns structured Action Plans into a reviewable revised campaign brief. It does not generate image prompts, require live LLM calls, or claim the revised brief will guarantee better market outcomes.
+
+### What Changed
+
+- Added deterministic Revised Brief v2 generation at `POST /api/brief/revise`.
+- Revised brief output includes objective, target segments, key message, tone and voice, proof points, channel recommendations, risk guardrails, validation plan, and creative team notes.
+- Added provenance fields for source action plan ID, campaign ID, source mode, data basis, assumptions, limitations, and recommended validation step.
+- Added Dashboard UI to create a Revised Brief from the Action Plan and review original brief vs revised brief.
+- Added backend contract tests and e2e smoke coverage for the revised brief workflow.
+
+### Validation
+
+- Focused backend revised-brief/API contract tests passed: `backend/.venv/bin/python -m pytest backend/tests/test_revised_brief.py backend/tests/test_api_contract.py -q`.
+- Full backend tests passed: `backend/.venv/bin/python -m pytest backend/tests -q`.
+- Frontend build passed: `cd frontend && npm run build`.
+- E2E smoke tests passed: `cd frontend && npm run test:e2e -- --project=chromium --workers=1`.
+- Secret hygiene scan and `git diff --check` passed.

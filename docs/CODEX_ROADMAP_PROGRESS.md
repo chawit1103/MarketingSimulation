@@ -7,51 +7,57 @@ Controller source: `CODEX_SEQUENTIAL_ORCHESTRATOR_PROMPT.md`
 
 ## Current Stage
 
-Selected roadmap item: **PR X: Campaign A/B/C Comparator Backend-First**
+Selected roadmap item: **PR Y: Revised Brief v2 From Action Plan**
 
-## Why PR X Was Selected
+## Why PR Y Was Selected
 
-PR W was completed on the current stacked roadmap branch. The next incomplete roadmap item in order is PR X: Campaign A/B/C Comparator Backend-First.
+PR X was completed on the current stacked roadmap branch. The next incomplete roadmap item in order is PR Y: Revised Brief v2 From Action Plan.
 
 Current repository inspection found:
 
 - GitHub default branch: `multilang-v0.3`.
-- Current branch: `codex/pr-x-comparator-backend-first`.
+- Current branch: `codex/pr-y-revised-brief-v2`.
 - Release-candidate integration docs from PR V are present.
 - PR W strategy-pack export exists.
-- Comparator frontend previously called backend first but silently generated browser-side fallback results after failure.
-- Comparator demo options were browser-local rather than backend fixtures.
-- Frontend comparison results hardcoded `backend_verified` after any successful comparator API response instead of inheriting backend provenance.
+- PR X comparator backend-first work exists.
+- Dashboard already had structured Action Plans, but no workflow to turn an Action Plan into a revised campaign brief.
 
-Therefore PR X is the next correct focused PR.
+Therefore PR Y is the next correct focused PR.
 
-## Completed In PR X
+## Completed In PR Y
 
-- Added backend comparator demo fixtures for three variants:
-  - Emotional / storytelling direction.
-  - Proof-led / trust direction.
-  - Price / promotion direction.
-- Added public no-key demo comparator routes:
-  - `GET /api/comparator/demo/campaigns`.
-  - `POST /api/comparator/demo/compare`.
-- Expanded comparator output with:
-  - overall winner and ranked recommendation.
-  - segment-level strengths and weaknesses.
-  - conversion and engagement estimates.
-  - crisis/risk comparison.
-  - trade-offs.
-  - recommended use case per variant.
-  - source/provenance metadata per variant and for the comparison result.
-- Updated authenticated comparator results so `backend_verified` is used only when all compared variants are persisted real simulation KPI records.
-- Labeled deterministic fallback KPI comparisons as `local_estimate`.
-- Updated Comparator UI to use backend demo fixtures first and to require an explicit Local Estimate action after backend failure.
-- Added backend comparator tests, route contract coverage, and e2e smoke coverage for backend demo comparator labels.
+- Added deterministic backend Revised Brief v2 generation.
+- Added `POST /api/brief/revise`.
+- Revised Brief v2 output includes:
+  - objective.
+  - target segments.
+  - key message.
+  - tone and voice.
+  - proof points.
+  - channel recommendations.
+  - risk guardrails.
+  - validation plan.
+  - creative team notes.
+- Added provenance metadata:
+  - source action plan ID.
+  - campaign ID.
+  - source mode.
+  - data basis.
+  - assumptions.
+  - limitations.
+  - recommended validation step.
+- Added Dashboard UI entry point: Create Revised Brief.
+- Added original brief vs revised brief review panel.
+- Added backend tests, route contract coverage, and e2e smoke coverage.
 - Updated README, demo script, user journey, status, checklist, and release notes.
 
-## Not Completed In PR X
+## Not Completed In PR Y
 
 - No live simulation calibration was added.
-- No real-world A/B accuracy, sales lift, ROAS, or ROI guarantee was claimed.
+- No image prompt or Midjourney prompt generation was added.
+- No LLM calls are required for revised brief tests.
+- No guarantee of improved real-world outcomes was claimed.
+- No save-as-new-campaign persistence was added; this PR provides reviewable v1 vs v2 output first.
 - No social listening, CRM integration, or paid provider integration was added.
 - No database migration was added.
 - No exact ROI, sales forecast, or guaranteed prediction language was added.
@@ -59,11 +65,11 @@ Therefore PR X is the next correct focused PR.
 
 ## Tests And Checks
 
-- `backend/.venv/bin/python -m pytest backend/tests/test_comparator_api.py backend/tests/test_api_contract.py -q`: passed, 7 passed and 4 warnings.
-- `backend/.venv/bin/python -m pytest backend/tests -q`: passed, 63 passed and 38 warnings.
+- `backend/.venv/bin/python -m pytest backend/tests/test_revised_brief.py backend/tests/test_api_contract.py -q`: passed, 5 passed.
+- `backend/.venv/bin/python -m pytest backend/tests -q`: passed, 65 passed and 40 warnings.
 - `python3 -m json.tool src/locales/en.json` and `src/locales/th.json`: passed.
 - `cd frontend && npm run build`: passed.
-- `cd frontend && npm run test:e2e -- --project=chromium --workers=1`: passed, 10 passed.
+- `cd frontend && npm run test:e2e -- --project=chromium --workers=1`: passed, 11 passed.
 - CI-equivalent secret hygiene scan: passed.
 - `git diff --check`: passed.
 
@@ -79,7 +85,7 @@ GitNexus note: `impact` and `context` calls failed with a local GitNexus WAL cor
 
 ## Next Recommended Roadmap Item
 
-After PR X is reviewed and merged, proceed to **PR Y: Revised Brief v2 From Action Plan**.
+After PR Y is reviewed and merged, proceed to **PR Z: Deep Industry Presets**.
 
 Short prompt for the next run:
 

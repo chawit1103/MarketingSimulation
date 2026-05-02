@@ -18,6 +18,7 @@ Use this checklist before tagging or deploying a release candidate.
 - [x] `/api/demo/campaigns`
 - [x] `/api/demo/campaigns/<demo_id>/dashboard`
 - [x] `/api/brief/quality`
+- [x] `/api/brief/revise`
 - [x] `/api/decision/analyze`
 - [x] `/api/decision/what-if`
 - [x] `/api/comparator/compare`
@@ -47,6 +48,7 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] Comparator demo routes return backend fixture output labeled `demo_mode`; browser fallback is explicit `local_estimate`.
 - [x] War Room calls the backend by default and exposes Local Estimate only after an explicit fallback action.
 - [x] Action plans inherit source metadata.
+- [x] Revised Brief v2 inherits source/action-plan provenance metadata.
 - [x] Strategy pack exports include section-level source/provenance metadata.
 - [x] Unknown source is displayed conservatively when source metadata is missing.
 
@@ -208,6 +210,21 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] E2E smoke tests run for PR X: `cd frontend && npm run test:e2e -- --project=chromium --workers=1` passed on 2026-05-02: 10 passed.
 - [x] CI-equivalent secret hygiene scan run for PR X: passed on 2026-05-02.
 - [x] `git diff --check` run for PR X: passed on 2026-05-02.
+
+### PR Y Revised Brief v2 Run
+
+- [x] Roadmap progress selected PR Y after PR X.
+- [x] Added `POST /api/brief/revise`.
+- [x] Revised Brief v2 includes objective, target segments, key message, tone and voice, proof points, channel recommendations, risk guardrails, validation plan, and creative team notes.
+- [x] Revised Brief v2 includes provenance for source action plan ID, campaign ID, source mode, data basis, assumptions, limitations, and recommended validation step.
+- [x] Dashboard UI can create a Revised Brief from the Action Plan and compare original vs revised brief.
+- [x] Focused backend tests run for PR Y: `backend/.venv/bin/python -m pytest backend/tests/test_revised_brief.py backend/tests/test_api_contract.py -q` passed on 2026-05-02: 5 passed.
+- [x] Full backend tests run for PR Y: `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-02: 65 passed, 40 warnings.
+- [x] Locale JSON validation run for PR Y: `python3 -m json.tool src/locales/en.json` and `src/locales/th.json` passed on 2026-05-02.
+- [x] Frontend build run for PR Y: `cd frontend && npm run build` passed on 2026-05-02.
+- [x] E2E smoke tests run for PR Y: `cd frontend && npm run test:e2e -- --project=chromium --workers=1` passed on 2026-05-02: 11 passed.
+- [x] CI-equivalent secret hygiene scan run for PR Y: passed on 2026-05-02.
+- [x] `git diff --check` run for PR Y: passed on 2026-05-02.
 
 ## Release Decision
 

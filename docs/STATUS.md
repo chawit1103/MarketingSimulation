@@ -30,6 +30,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - Frontend source badges identify result provenance: Demo Mode, Local Estimate, Live Backend, Backend Verified, or Unknown Source.
 - Dashboard influence surfaces now describe demo/local accounts as simulated influence nodes, not real scraped or verified social profiles.
 - Comparator now uses backend demo fixtures for emotional/storytelling, proof-led/trust, and price/promotion directions and keeps browser-side output as explicit Local Estimate fallback only.
+- Revised Brief v2 is available from dashboard Action Plans through `POST /api/brief/revise`; it preserves action-plan provenance and can be reviewed against the original brief.
 - Critical frontend route contracts are covered by backend smoke tests for demo, impact, decision, comparator, competitor, export, settings readiness, and report status endpoints.
 - API response safety removes raw traceback keys and redacts common secret-like strings before JSON responses reach clients.
 
@@ -72,6 +73,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - Brief Quality Score is deterministic completeness scoring only; it does not validate factual accuracy or calibrate confidence against real-world outcomes.
 - War Room should still be connected to full OASIS simulation records and real campaign calibration before being treated as measured market prediction.
 - Action Plan recommendations remain deterministic planning guidance and still need calibration against real campaign outcomes.
+- Revised Brief v2 is a deterministic draft-generation workflow from the Action Plan; it does not guarantee improved campaign performance and should be reviewed before saving or re-simulation.
 - Strategy packs are structured JSON payloads for meeting preparation; PPTX/template rendering for white-label agency decks still needs a dedicated design pass.
 - Settings Wizard readiness checks validate configuration completeness; LLM live tests still depend on authenticated runtime access and real provider availability.
 - Comparator backend demo fixtures are deterministic planning examples; they are not real-world A/B test evidence or calibrated campaign lift.

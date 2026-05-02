@@ -240,6 +240,38 @@ const demoComparatorResult = {
   },
 }
 
+const revisedBriefResult = {
+  version: 'revised_brief_v2',
+  campaign_id: 'demo-premium-water',
+  title: 'Premium Water Launch TH — Revised Brief v2',
+  original_brief: {
+    objective: 'product_launch',
+    description: 'Synthetic demo campaign for premium water launch.',
+    target_segments: ['Thai Urban Health Buyers'],
+  },
+  revised_brief: {
+    objective: 'product_launch',
+    target_segments: ['Thai Urban Health Buyers'],
+    key_message: 'Lead with hydration proof and premium taste.',
+    tone_and_voice: 'Clear, proof-led, calm, and specific.',
+    proof_points: ['Add proof cards before launch.'],
+    channel_recommendations: ['Facebook', 'TikTok', 'Instagram'],
+    risk_guardrails: ['Prepare claim substantiation and price FAQ.'],
+    validation_plan: ['Run a small audience test before national spend.'],
+    creative_team_notes: ['Reason: Message resonance is strongest among health buyers.'],
+  },
+  provenance: {
+    source_mode: 'demo_mode',
+    type: 'demo_mode',
+    data_basis: 'demo_fixture',
+    campaign_id: 'demo-premium-water',
+    assumptions: ['Synthetic demo evidence.'],
+    limitations: ['Not a live market test.'],
+    recommended_next_validation_step: 'Review the revised brief before running another simulation.',
+  },
+  disclaimer: 'This revised brief is deterministic planning guidance from the action plan, not a guaranteed performance improvement.',
+}
+
 async function installApiMocks(page, options = {}) {
   await page.addInitScript(() => {
     localStorage.removeItem('3c-auth-token')
@@ -272,6 +304,9 @@ async function installApiMocks(page, options = {}) {
           known_limitations: [],
         },
       })
+    }
+    if (path === '/api/brief/revise') {
+      return json(route, { success: true, data: revisedBriefResult })
     }
     if (path === '/api/campaign') {
       return json(route, { success: true, data: [demoCampaign] })
@@ -400,6 +435,17 @@ test('action plan section inherits source labeling', async ({ page }) => {
   await expect(page.getByText('Demo Mode').first()).toBeVisible()
   await expect(page.getByText('Creative Adjustment')).toBeVisible()
   await expect(page.getByText('Validation Plan')).toBeVisible()
+})
+
+test('dashboard can create a revised brief from the action plan', async ({ page }) => {
+  await page.goto('/dashboard/demo-premium-water')
+  await page.getByText('Action Plan', { exact: false }).first().scrollIntoViewIfNeeded()
+  await page.getByRole('button', { name: 'Create Revised Brief' }).click()
+
+  await expect(page.getByText('Brief v2').first()).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Revised Brief', exact: true })).toBeVisible()
+  await expect(page.getByText('Lead with hydration proof and premium taste.')).toBeVisible()
+  await expect(page.getByText('Review the revised brief before running another simulation.')).toBeVisible()
 })
 
 test('brief quality score can be checked without live providers', async ({ page }) => {

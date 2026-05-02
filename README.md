@@ -293,6 +293,12 @@ For decision meetings, the backend can package existing dashboard/simulation pay
 
 Each pack includes executive decision summary, launch recommendation, KPI summary, segment reactions, risk drivers, crisis watchouts, recommended action plan, and next validation steps. Every section inherits source/provenance metadata such as `source_mode`, `data_basis`, confidence level, assumptions, limitations, and recommended validation step.
 
+### Revised Brief v2
+
+Dashboard Action Plans can be turned into a reviewable revised brief before the next simulation or creative review. The revised brief includes objective, target segments, key message, tone and voice, proof points, channel recommendations, risk guardrails, validation plan, and creative team notes.
+
+The brief keeps provenance from the source action plan and is deterministic planning guidance, not a guarantee of improved market outcomes.
+
 ### Backend-First Comparator
 
 The A/B/C Comparator compares 2-5 campaign directions through the backend first. It includes backend demo fixtures for:
@@ -461,6 +467,7 @@ All product APIs are registered under `/api/*`.
 | GET | `/api/demo/campaigns/{id}/dashboard` | No-key demo dashboard |
 | GET | `/api/industry/templates` | Public industry template list |
 | POST | `/api/brief/quality` | Deterministic brief completeness scoring |
+| POST | `/api/brief/revise` | Deterministic Revised Brief v2 from an Action Plan |
 | GET | `/api/settings/providers` | Safe provider catalog |
 | POST | `/api/settings/readiness` | Secret-safe setup readiness check |
 

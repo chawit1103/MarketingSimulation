@@ -73,11 +73,19 @@ Show:
   - Creative Adjustment
   - Channel Allocation
   - Crisis Prevention
-  - Validation Plan
+- Validation Plan
 
 Point out that the Action Plan inherits the same source label as the dashboard result.
 
 Mention that the same evidence can be packaged as either a Brand Executive Summary or Agency Client Pitch Summary strategy pack, and that every exported section keeps the same source/provenance label.
+
+Click **Create Revised Brief**.
+
+Show:
+
+- Original brief vs Revised Brief v2.
+- Key message, proof points, channel recommendations, risk guardrails, and validation plan.
+- Provenance label and next validation step.
 
 Screenshots:
 
