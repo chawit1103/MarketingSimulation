@@ -1,8 +1,17 @@
 # 3C Simulator Status
 
-Updated: 2026-05-01
+Updated: 2026-05-02
 
-## Production-Ready
+## Current Release Readiness
+
+- Local demo: allowed with synthetic data and no real secrets.
+- Controlled private pilot: conditional on trusted users, credential rotation evidence, environment-provided secrets, visible source labels, and deployment controls.
+- Public internet exposure: blocked.
+- Production customer deployment: blocked.
+
+This document lists implemented controls and remaining gaps. It does not claim the full product is production-ready.
+
+## Implemented / Hardened Controls
 
 - Flask blueprints are consistently mounted under `/api/*`.
 - Public no-key demo entrypoints are available for onboarding:
@@ -19,6 +28,7 @@ Updated: 2026-05-01
 - Structured Action Plan output is available for dashboards and demo dashboards, with source mode, sectioned recommendations, reasons, expected impact, and risks.
 - Settings Wizard supports Demo only, Local model, and Cloud API setup readiness checks without exposing secrets.
 - Frontend source badges identify result provenance: Demo Mode, Local Estimate, Live Backend, Backend Verified, or Unknown Source.
+- Dashboard influence surfaces now describe demo/local accounts as simulated influence nodes, not real scraped or verified social profiles.
 - Critical frontend route contracts are covered by backend smoke tests for demo, impact, decision, comparator, competitor, export, settings readiness, and report status endpoints.
 - API response safety removes raw traceback keys and redacts common secret-like strings before JSON responses reach clients.
 

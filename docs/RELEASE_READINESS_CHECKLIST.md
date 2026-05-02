@@ -147,6 +147,20 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] CI-equivalent secret hygiene scan passed on 2026-05-01.
 - [x] `git diff --check` passed on 2026-05-01.
 
+### PR V Release Candidate Integration Run
+
+- [x] Roadmap controller and brand/agency roadmap were read on 2026-05-02.
+- [x] GitHub default branch confirmed as `multilang-v0.3`.
+- [x] Open PR stack confirmed still exists; PR V selected before PR W.
+- [x] `.env.dev` is not tracked in the current release-candidate branch.
+- [x] `.env.dev.example` exists with safe placeholders.
+- [x] Backend tests run for PR V: `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-02: 56 passed, 39 warnings.
+- [x] Focused security tests run for PR V: `backend/.venv/bin/python -m pytest backend/tests/test_rbac.py backend/tests/test_tenant_isolation.py backend/tests/test_settings_readiness.py backend/tests/test_dashboard_provenance.py backend/tests/test_production_hardening.py backend/tests/test_security_controls.py -q` passed on 2026-05-02: 39 passed, 21 warnings.
+- [x] Frontend build run for PR V: `cd frontend && npm run build` passed on 2026-05-02.
+- [x] E2E smoke tests run for PR V: `cd frontend && npm run test:e2e -- --project=chromium --workers=1` passed on 2026-05-02: 9 passed after aligning the authenticated smoke fixture with session-storage auth.
+- [x] CI-equivalent secret hygiene scan run for PR V: passed on 2026-05-02.
+- [x] `git diff --check` run for PR V: passed on 2026-05-02.
+
 ## Manual Demo Flow Checks
 
 - [ ] Open `/dashboard/demo-premium-water` and confirm KPIs, confidence/evidence, source badge, and action plan render.

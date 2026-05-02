@@ -181,6 +181,8 @@ async function installApiMocks(page, options = {}) {
   await page.addInitScript(() => {
     localStorage.removeItem('3c-auth-token')
     localStorage.removeItem('3c-api-key')
+    sessionStorage.removeItem('3c-auth-token')
+    sessionStorage.removeItem('3c-api-key')
     localStorage.setItem('3c-lang', 'en')
     localStorage.setItem('3c-theme', 'dark')
   })
@@ -309,7 +311,7 @@ test('demo dashboard labels synthetic demo evidence', async ({ page }) => {
 })
 
 test('backend dashboard route shows backend verified source', async ({ page }) => {
-  await page.addInitScript(() => localStorage.setItem('3c-auth-token', 'smoke-test-token'))
+  await page.addInitScript(() => sessionStorage.setItem('3c-auth-token', 'smoke-test-token'))
   await page.goto('/dashboard/cmp-live')
 
   await expect(page.getByRole('heading', { name: /Backend Verified Campaign/i }).first()).toBeVisible()

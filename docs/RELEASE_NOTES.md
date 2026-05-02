@@ -52,3 +52,24 @@ This pass reviewed the existing curated screenshots and demo package after PR S/
 - Controlled private pilot: conditional go only after credential rotation evidence, environment-provided secrets, trusted users, and deployment controls.
 - Public pilot / public internet exposure: no-go.
 - Production customer deployment: no-go.
+
+## Post-PR U Product-Trust Fix: Synthetic Influence Nodes
+
+The dashboard influence section now uses simulated influence-node wording and explicitly states that demo/local estimate modes use synthetic nodes, not scraped or verified real social profiles.
+
+This improves product trust without adding live social listening, real account discovery, or production-readiness claims.
+
+## PR V: Release Candidate Integration
+
+This integration pass selects PR V as the next roadmap item because the latest work remains open as a stacked PR chain rather than being merged into the default branch.
+
+### Integration Decisions
+
+- Use the latest completed branch stack as the release-candidate source of truth.
+- Keep public pilot and production customer deployment as no-go.
+- Keep controlled private pilot as conditional.
+- Do not start PR W in this PR.
+
+### Validation
+
+Validation results are recorded in `docs/RELEASE_READINESS_CHECKLIST.md` and `docs/CODEX_ROADMAP_PROGRESS.md`.
