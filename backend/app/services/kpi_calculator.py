@@ -39,8 +39,8 @@ _MOCK_SEGMENTS = [
 ]
 
 _MOCK_INFLUENCER_NAMES = [
-    "คุณนภา", "อาจารย์สมชาย", "แพรวา รีวิว", "หมอต้น",
-    "เชฟนุช", "ลุงสมบัติ", "เจ๊ตุ๊ก", "ป้าอร",
+    "Synthetic KOL A", "Synthetic Analyst B", "Synthetic Review Page C", "Synthetic Health Expert D",
+    "Synthetic Food Creator E", "Synthetic Community Voice F", "Synthetic Merchant Page G", "Synthetic Elder Panel H",
 ]
 
 _MOCK_INFLUENCER_TYPES = [
@@ -249,7 +249,7 @@ class KPICalculator:
         # Segment breakdown
         report.sentiment_by_segment = self._mock_segments(overall, rng)
 
-        # Top influencers
+        # Modeled influence nodes
         report.top_influencers = self._mock_influencers(overall, rng)
 
         # Timeline (20 rounds, ~1 simulated hour each)

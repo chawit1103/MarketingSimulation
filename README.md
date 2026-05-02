@@ -235,7 +235,7 @@ It includes:
 - opinion polarization
 - sentiment timeline
 - segment breakdown
-- top influencers
+- simulated influence nodes
 - action plan
 - Thai executive summary
 

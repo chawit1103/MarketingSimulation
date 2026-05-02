@@ -365,9 +365,10 @@
         </div>
       </section>
 
-      <!-- Top Influencers -->
+      <!-- Simulated influence nodes -->
       <section class="panel">
         <h2 class="panel-title">{{ $t('dashboard.topInfluencers') }}</h2>
+        <p class="panel-note">{{ $t('dashboard.syntheticInfluencerNote') }}</p>
         <div class="influencer-grid">
           <div v-for="(inf, idx) in influencers" :key="idx" class="influencer-card">
             <div class="inf-rank">#{{ idx + 1 }}</div>
@@ -378,11 +379,11 @@
             </div>
             <div class="inf-metrics">
               <div class="inf-metric">
-                <span class="inf-metric-label">Impact</span>
+                <span class="inf-metric-label">{{ $t('dashboard.influencerImpact') }}</span>
                 <span class="inf-metric-val">{{ inf.impact_score }}/100</span>
               </div>
               <div class="inf-metric">
-                <span class="inf-metric-label">Reach</span>
+                <span class="inf-metric-label">{{ $t('dashboard.influencerReach') }}</span>
                 <span class="inf-metric-val">{{ formatNumber(inf.reach) }}</span>
               </div>
             </div>
@@ -1492,10 +1493,10 @@ function seedDemoData() {
 
   if (influencers.value.length === 0) {
     influencers.value = [
-      { name: '@TechReviewTH', platform: 'Twitter', impact_score: 92, sentiment: 68, reach: 245000 },
-      { name: 'SomsakD', platform: 'Reddit', impact_score: 85, sentiment: 45, reach: 180000 },
-      { name: '@DigitalNomadBKK', platform: 'Twitter', impact_score: 78, sentiment: 55, reach: 120000 },
-      { name: 'PraewMedia', platform: 'Facebook', impact_score: 71, sentiment: 30, reach: 310000 },
+      { name: 'Synthetic Tech Reviewer A', platform: 'X', impact_score: 92, sentiment: 68, reach: 245000 },
+      { name: 'Synthetic Forum Voice B', platform: 'Reddit', impact_score: 85, sentiment: 45, reach: 180000 },
+      { name: 'Synthetic Urban Creator C', platform: 'X', impact_score: 78, sentiment: 55, reach: 120000 },
+      { name: 'Synthetic Family Page D', platform: 'Facebook', impact_score: 71, sentiment: 30, reach: 310000 },
     ]
   }
 
@@ -2283,6 +2284,14 @@ font-size: var(--text-sm);
   margin: 0 0 16px 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.panel-note {
+  margin: -8px 0 16px 0;
+  max-width: 760px;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
 }
 
 /* ====================== CHART ====================== */

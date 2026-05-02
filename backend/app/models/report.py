@@ -9,7 +9,7 @@ import uuid
 
 
 # ---------------------------------------------------------------------------
-# Sub-models for segment breakdowns, influencers, timeline, action items
+# Sub-models for segment breakdowns, modeled influence nodes, timeline, action items
 # ---------------------------------------------------------------------------
 
 class SegmentSentiment(BaseModel):
@@ -21,7 +21,7 @@ class SegmentSentiment(BaseModel):
 
 
 class Influencer(BaseModel):
-    """Top influencer: high influence_weight × sentiment impact."""
+    """Modeled influence node: high influence_weight x sentiment impact."""
     agent_name: str
     agent_type: str = "persona"
     influence_score: float = 0.0                               # 0.0-100.0

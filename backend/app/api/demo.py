@@ -104,10 +104,10 @@ DEMO_DASHBOARDS = {
             {"name": "Creator-led Gen Z", "sentiment": 58, "conversion_estimate": 79, "size": "7%"},
         ],
         "influencers": [
-            {"name": "@HealthBKK", "platform": "TikTok", "impact_score": 91, "sentiment": 64, "reach": 310000},
-            {"name": "แม่บ้านรีวิว", "platform": "Facebook", "impact_score": 84, "sentiment": 42, "reach": 225000},
-            {"name": "@PriceWatchTH", "platform": "X", "impact_score": 79, "sentiment": -28, "reach": 188000},
-            {"name": "GreenLiving Club", "platform": "Line", "impact_score": 72, "sentiment": 51, "reach": 96000},
+            {"name": "Synthetic Health Creator A", "platform": "TikTok", "impact_score": 91, "sentiment": 64, "reach": 310000},
+            {"name": "Synthetic Family Reviewer B", "platform": "Facebook", "impact_score": 84, "sentiment": 42, "reach": 225000},
+            {"name": "Synthetic Price Watch C", "platform": "X", "impact_score": 79, "sentiment": -28, "reach": 188000},
+            {"name": "Synthetic Green Living Club D", "platform": "LINE", "impact_score": 72, "sentiment": 51, "reach": 96000},
         ],
         "evidence": {
             "confidence_score": 82,
