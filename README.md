@@ -27,7 +27,7 @@ It works like a **flight simulator for market decisions**:
 2. Generate culturally grounded synthetic personas.
 3. Run multi-agent social simulation through OASIS-style behavior models.
 4. Review KPIs, segment reactions, risk drivers, assumptions, and simulated quotes.
-5. Export the evidence into a boardroom-ready slide deck.
+5. Export the evidence into a boardroom-ready slide deck or client-ready strategy pack.
 
 This is not positioned as an AI playground. It is a decision-support system for answering:
 
@@ -284,6 +284,15 @@ Run lightweight what-if analysis from dashboard KPIs:
 
 The what-if engine returns KPI deltas, adjusted business impact, and an updated decision recommendation.
 
+### Client-Ready Strategy Packs
+
+For decision meetings, the backend can package existing dashboard/simulation payloads into two structured report modes:
+
+- **Brand Executive Summary** for internal launch/revise/do-not-launch review.
+- **Agency Client Pitch Summary** for agency-to-client strategy discussion.
+
+Each pack includes executive decision summary, launch recommendation, KPI summary, segment reactions, risk drivers, crisis watchouts, recommended action plan, and next validation steps. Every section inherits source/provenance metadata such as `source_mode`, `data_basis`, confidence level, assumptions, limitations, and recommended validation step.
+
 ### Export To Slide
 
 Export simulation output into client- or leadership-ready files:
@@ -513,6 +522,7 @@ All product APIs are registered under `/api/*`.
 | POST | `/api/competitor/simulate` | Run competitor simulation |
 | POST | `/api/export/pptx` | Export PowerPoint deck |
 | POST | `/api/export/csv` | Export CSV data |
+| POST | `/api/export/strategy-pack` | Build a client-ready Brand or Agency strategy pack payload |
 
 ---
 

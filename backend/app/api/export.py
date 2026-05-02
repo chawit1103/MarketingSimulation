@@ -4,12 +4,33 @@ from flask import Blueprint, request, jsonify, send_file
 import io
 
 from ..services.export_engine import PPTXGenerator
+from ..services.strategy_pack import StrategyPackService
 from ..authz import ANALYST_ROLES, role_required
 from ..utils.logger import get_logger
 
 logger = get_logger("mirofish.api.export")
 
 export_bp = Blueprint("export", __name__)
+
+
+@export_bp.route("/strategy-pack", methods=["POST"])
+@role_required(*ANALYST_ROLES)
+def export_strategy_pack():
+    """POST /api/export/strategy-pack — build a client-ready strategy payload."""
+    data = request.get_json(silent=True) or {}
+
+    try:
+        pack = StrategyPackService().build(data)
+        return jsonify({
+            "success": True,
+            "data": pack,
+        })
+    except Exception:
+        logger.exception("Failed to build strategy pack export")
+        return jsonify({
+            "success": False,
+            "error": "Could not build strategy pack export.",
+        }), 500
 
 
 @export_bp.route("/pptx", methods=["POST"])

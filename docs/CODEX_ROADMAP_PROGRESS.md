@@ -7,52 +7,60 @@ Controller source: `CODEX_SEQUENTIAL_ORCHESTRATOR_PROMPT.md`
 
 ## Current Stage
 
-Selected roadmap item: **PR V: Release Candidate Integration**
+Selected roadmap item: **PR W: Client-Ready Strategy Pack**
 
-## Why PR V Was Selected
+## Why PR W Was Selected
 
-PR V is the first roadmap item and is required when the latest security, demo, screenshot, public pilot, and product-trust work is still spread across open stacked PRs instead of being cleanly integrated into the target/default branch.
+PR V was completed on the current stacked roadmap branch. The next incomplete roadmap item in order is PR W: Client-Ready Strategy Pack.
 
 Current repository inspection found:
 
 - GitHub default branch: `multilang-v0.3`.
-- Latest local branch includes the full stacked work through PR U plus the synthetic influence-node labeling fix.
-- The GitHub PR stack remains open and stacked rather than merged into `multilang-v0.3`.
-- `.env.dev` is not tracked in the current branch.
-- `.env.dev.example` is present.
+- Current branch: `codex/pr-w-client-ready-strategy-pack`.
+- Release-candidate integration docs from PR V are present.
+- Export architecture already supports authenticated PPTX/CSV routes under `/api/export`.
+- No client-ready Brand/Agency strategy pack route existed before this PR.
 
-Therefore PR V is needed before starting PR W.
+Therefore PR W is the next correct focused PR.
 
-## Completed In PR V
+## Completed In PR W
 
-- Created a release-candidate integration branch from the latest completed stack.
-- Re-read repository source-of-truth docs: `README.md`, `AGENTS.md`, `docs/SECURITY_REVIEW.md`, `docs/RELEASE_READINESS_CHECKLIST.md`, `docs/KNOWN_LIMITATIONS.md`, `docs/STATUS.md`, `docs/PILOT_PLAN.md`, and `docs/RELEASE_NOTES.md`.
-- Confirmed release readiness wording remains:
-  - Local demo: allowed with synthetic data and no real secrets.
-  - Controlled private pilot: conditional.
-  - Public internet exposure: blocked.
-  - Production customer deployment: blocked.
-- Confirmed source/provenance language remains explicit for demo, local estimate, live backend, backend verified, and unknown source modes.
-- Confirmed simulated influence-node wording avoids implying real scraped social profiles.
-- Updated the Playwright authenticated dashboard smoke fixture to use `sessionStorage`, matching the PR S browser token behavior.
+- Added a deterministic backend strategy-pack builder.
+- Added `POST /api/export/strategy-pack` protected by analyst/admin export authorization.
+- Added two pack modes:
+  - Brand Executive Summary.
+  - Agency Client Pitch Summary.
+- Added white-label/report metadata placeholders for agency name, client name, prepared by, report date, campaign name, scenario name, and logo presence without echoing logo URLs.
+- Added meeting-ready sections:
+  - Executive decision summary.
+  - Launch / revise / do-not-launch recommendation.
+  - KPI summary.
+  - Segment reactions.
+  - Risk drivers.
+  - Crisis watchouts.
+  - Recommended action plan.
+  - Next validation steps.
+- Added section-level source/provenance metadata including source mode, data basis, run/campaign/simulation IDs when available, confidence level, assumptions, limitations, and next validation step.
+- Added tests for strategy pack payload shape, mode behavior, logo URL safety, source labels, route contract, and viewer denial.
+- Updated README and demo/user journey docs.
 
-## Not Completed In PR V
+## Not Completed In PR W
 
-- PR W Client-Ready Strategy Pack was not started.
-- No product features were added.
+- No frontend export UI was added; this PR adds the backend JSON strategy-pack contract only.
+- No PPTX white-label template rendering was added.
+- No exact ROI, sales forecast, or guaranteed prediction language was added.
 - No database migration, billing, production auth rewrite, live social listening, CRM integration, calibration loop, or social account discovery was added.
 - Manual credential rotation was not marked complete because it requires repository-owner action outside Codex.
 
 ## Tests And Checks
 
-- `backend/.venv/bin/python -m pytest backend/tests -q`: passed, 56 passed and 39 warnings.
-- `backend/.venv/bin/python -m pytest backend/tests/test_rbac.py backend/tests/test_tenant_isolation.py backend/tests/test_settings_readiness.py backend/tests/test_dashboard_provenance.py backend/tests/test_production_hardening.py backend/tests/test_security_controls.py -q`: passed, 39 passed and 21 warnings.
+- `backend/.venv/bin/python -m pytest backend/tests/test_strategy_pack.py backend/tests/test_api_contract.py backend/tests/test_rbac.py -q`: passed, 13 passed and 4 warnings.
+- `backend/.venv/bin/python -m pytest backend/tests -q`: passed, 59 passed and 38 warnings.
 - `cd frontend && npm run build`: passed.
-- `cd frontend && npm run test:e2e -- --project=chromium --workers=1`: passed, 9 passed after updating the smoke auth fixture from localStorage to sessionStorage.
 - CI-equivalent secret hygiene scan: passed.
 - `git diff --check`: passed.
 
-GitNexus note: `impact` and `context` calls for `installApiMocks` failed with a local GitNexus WAL corruption error, so final scope validation used `detect_changes` instead.
+GitNexus note: `impact` and `context` calls failed with a local GitNexus WAL corruption error during this work, so final scope validation will use `detect_changes` instead.
 
 ## Remaining Blockers / Accepted Risks
 
@@ -64,7 +72,7 @@ GitNexus note: `impact` and `context` calls for `installApiMocks` failed with a 
 
 ## Next Recommended Roadmap Item
 
-After PR V is reviewed and merged, proceed to **PR W: Client-Ready Strategy Pack**.
+After PR W is reviewed and merged, proceed to **PR X: Comparator Backend-First**.
 
 Short prompt for the next run:
 

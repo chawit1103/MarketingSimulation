@@ -58,6 +58,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - War Room backend responses include expected sentiment movement, affected segments, amplification channels, key drivers, recommended response, and first 2h/24h/72h playbooks.
 - Dashboard Action Plans now include creative adjustment, channel allocation, crisis prevention, and validation plan sections.
 - Dashboard export payloads, CSV export, quick download, and PPTX action-plan slides can include structured action plan rows.
+- Client-ready strategy pack export is available at `POST /api/export/strategy-pack` with Brand Executive Summary and Agency Client Pitch Summary modes; every section includes source/provenance metadata.
 - Settings Wizard adds mode selection, deterministic readiness checks for LLM/embedding/Neo4j config, safe provider catalog access, sanitized provider errors, sample simulation guidance, and clearly labeled cost estimates.
 - Frontend report status helper now uses the backend `POST /api/report/generate/status` contract.
 - Response sanitization now redacts API-key, token, password, bearer-token, and `sk-*` style values from client-facing JSON.
@@ -70,6 +71,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - Brief Quality Score is deterministic completeness scoring only; it does not validate factual accuracy or calibrate confidence against real-world outcomes.
 - War Room should still be connected to full OASIS simulation records and real campaign calibration before being treated as measured market prediction.
 - Action Plan recommendations remain deterministic planning guidance and still need calibration against real campaign outcomes.
+- Strategy packs are structured JSON payloads for meeting preparation; PPTX/template rendering for white-label agency decks still needs a dedicated design pass.
 - Settings Wizard readiness checks validate configuration completeness; LLM live tests still depend on authenticated runtime access and real provider availability.
 - Comparator fallback should eventually be replaced by backend-provided demo comparator fixtures.
 - Demo dashboards should be expanded for every demo campaign instead of relying on one premium-water sample shape.

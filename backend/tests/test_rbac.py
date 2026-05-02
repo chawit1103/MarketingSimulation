@@ -121,6 +121,15 @@ def test_analyst_can_create_campaign_but_cannot_manage_settings_or_api_keys(rbac
         headers=headers["analyst"],
         json={"provider": "openai", "model": "gpt-4o-mini", "api_key": "not-used"},
     )
+    strategy_pack_response = client.post(
+        "/api/export/strategy-pack",
+        headers=headers["analyst"],
+        json={
+            "mode": "brand",
+            "campaign": {"name": "RBAC Strategy Pack"},
+            "source": {"type": "local_estimate"},
+        },
+    )
     switch_response = client.post(
         "/api/auth/switch-org",
         headers=headers["analyst"],
@@ -131,6 +140,8 @@ def test_analyst_can_create_campaign_but_cannot_manage_settings_or_api_keys(rbac
     assert settings_response.status_code == 403
     assert api_key_response.status_code == 403
     assert provider_test_response.status_code == 403
+    assert strategy_pack_response.status_code == 200
+    assert strategy_pack_response.get_json()["data"]["source"]["source_mode"] == "local_estimate"
     assert switch_response.status_code == 403
 
 
@@ -224,6 +235,11 @@ def test_viewer_cannot_run_simulation_report_export_or_persona_mutations(rbac_co
         headers=headers["viewer"],
         json={"title": "Viewer export attempt"},
     )
+    strategy_pack_response = client.post(
+        "/api/export/strategy-pack",
+        headers=headers["viewer"],
+        json={"title": "Viewer strategy pack attempt"},
+    )
     persona_response = client.post(
         "/api/persona/generate",
         headers=headers["viewer"],
@@ -235,6 +251,7 @@ def test_viewer_cannot_run_simulation_report_export_or_persona_mutations(rbac_co
     assert close_env_response.status_code == 403
     assert report_response.status_code == 403
     assert export_response.status_code == 403
+    assert strategy_pack_response.status_code == 403
     assert persona_response.status_code == 403
 
 

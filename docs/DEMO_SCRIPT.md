@@ -77,6 +77,8 @@ Show:
 
 Point out that the Action Plan inherits the same source label as the dashboard result.
 
+Mention that the same evidence can be packaged as either a Brand Executive Summary or Agency Client Pitch Summary strategy pack, and that every exported section keeps the same source/provenance label.
+
 Screenshots:
 
 - `docs/screenshots/simulation-dashboard-kpis.png`

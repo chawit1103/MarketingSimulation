@@ -27,6 +27,7 @@ Use this checklist before tagging or deploying a release candidate.
 - [x] `/api/competitor/simulate`
 - [x] `/api/export/pptx`
 - [x] `/api/export/csv`
+- [x] `/api/export/strategy-pack`
 - [x] `/api/settings/providers`
 - [x] `/api/settings/readiness`
 - [x] `/api/report/generate/status`
@@ -43,6 +44,7 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] Comparator demo/local fallback output is visibly labeled.
 - [x] War Room calls the backend by default and exposes Local Estimate only after an explicit fallback action.
 - [x] Action plans inherit source metadata.
+- [x] Strategy pack exports include section-level source/provenance metadata.
 - [x] Unknown source is displayed conservatively when source metadata is missing.
 
 ## Security And Abuse Protection
@@ -176,6 +178,18 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [ ] Any changed critical frontend flow has a build check and either a manual check note or automated coverage.
 - [ ] Any new result surface labels Demo Mode, Local Estimate, Live Backend, Backend Verified, or Unknown Source.
 - [ ] Docs are updated if API routes, demo paths, source labels, provider readiness, or release claims changed.
+
+### PR W Client-Ready Strategy Pack Run
+
+- [x] Roadmap progress selected PR W after PR V.
+- [x] Added `POST /api/export/strategy-pack` as an analyst/admin export route.
+- [x] Strategy pack payloads include Brand Executive Summary and Agency Client Pitch Summary modes.
+- [x] Section-level provenance includes source mode, data basis, confidence level, assumptions, limitations, and next validation step.
+- [x] Focused backend tests run for PR W: `backend/.venv/bin/python -m pytest backend/tests/test_strategy_pack.py backend/tests/test_api_contract.py backend/tests/test_rbac.py -q` passed on 2026-05-02: 13 passed, 4 warnings.
+- [x] Full backend tests run for PR W: `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-02: 59 passed, 38 warnings.
+- [x] Frontend build run for PR W: `cd frontend && npm run build` passed on 2026-05-02.
+- [x] CI-equivalent secret hygiene scan run for PR W: passed on 2026-05-02.
+- [x] `git diff --check` run for PR W: passed on 2026-05-02.
 
 ## Release Decision
 

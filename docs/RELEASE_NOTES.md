@@ -73,3 +73,21 @@ This integration pass selects PR V as the next roadmap item because the latest w
 ### Validation
 
 Validation results are recorded in `docs/RELEASE_READINESS_CHECKLIST.md` and `docs/CODEX_ROADMAP_PROGRESS.md`.
+
+## PR W: Client-Ready Strategy Pack
+
+This pass adds a backend strategy-pack export payload for meeting preparation. It does not add new prediction claims, ROI guarantees, social integrations, or production-readiness claims.
+
+### What Changed
+
+- Added Brand Executive Summary and Agency Client Pitch Summary pack modes.
+- Added sectioned outputs for executive decision summary, launch/revise/do-not-launch recommendation, KPI summary, segment reactions, risk drivers, crisis watchouts, recommended action plan, and next validation steps.
+- Added section-level provenance so Demo Mode, Local Estimate, Live Backend, Backend Verified, and Unknown Source-style outputs remain traceable in exports.
+- Added white-label metadata placeholders for agency/client/prepared-by/report-date/campaign/scenario fields without echoing logo URLs.
+
+### Validation
+
+- Focused backend tests passed: `backend/.venv/bin/python -m pytest backend/tests/test_strategy_pack.py backend/tests/test_api_contract.py backend/tests/test_rbac.py -q`.
+- Full backend tests passed: `backend/.venv/bin/python -m pytest backend/tests -q`.
+- Frontend build passed: `cd frontend && npm run build`.
+- Secret hygiene scan and `git diff --check` passed.
