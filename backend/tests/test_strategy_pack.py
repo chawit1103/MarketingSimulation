@@ -6,6 +6,7 @@ BACKEND_DIR = Path(__file__).resolve().parents[1]
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
+from app.services.export_engine import PPTXGenerator  # noqa: E402
 from app.services.strategy_pack import StrategyPackService  # noqa: E402
 
 
@@ -63,7 +64,10 @@ def _payload(source_mode="demo_mode"):
         "source": {
             "type": source_mode,
             "source_mode": source_mode,
-            "data_basis": "demo_fixture" if source_mode == "demo_mode" else "real_simulation",
+            "data_basis": {
+                "demo_mode": "demo_fixture",
+                "local_estimate": "local_estimate",
+            }.get(source_mode, "real_simulation"),
             "run_id": "run_demo",
         },
     }
@@ -114,3 +118,59 @@ def test_strategy_pack_does_not_echo_logo_url_or_upgrade_source_labels():
     assert "example.test/logo" not in str(pack)
     assert pack["source"]["source_mode"] == "local_estimate"
     assert "backend_verified" not in str(pack["source"])
+
+
+def _slide_text(slide):
+    parts = []
+    for shape in slide.shapes:
+        if getattr(shape, "has_text_frame", False):
+            parts.append(shape.text)
+    return "\n".join(parts)
+
+
+def test_strategy_pack_pptx_renderer_preserves_source_metadata_on_every_slide():
+    from pptx import Presentation
+
+    pack = StrategyPackService().build(_payload("demo_mode"))
+    buffer = PPTXGenerator().generate({
+        "slide_type": "strategy_pack",
+        "strategy_pack": pack,
+    })
+
+    prs = Presentation(buffer)
+    slide_texts = [_slide_text(slide) for slide in prs.slides]
+    deck_text = "\n".join(slide_texts)
+
+    assert len(prs.slides) == 7
+    assert "Agency Client Pitch Summary" in deck_text
+    assert "Demo Agency" in deck_text
+    assert "Sample Client" in deck_text
+    assert "Limitations & Recommended Validation" in deck_text
+    assert "Recommended validation:" in deck_text
+    assert "Decision-support scenario planning" in deck_text
+    assert "guaranteed prediction" in deck_text
+    assert "example.test/logo" not in deck_text
+
+    for text in slide_texts:
+        assert "Source: demo_mode" in text
+        assert "Basis: demo_fixture" in text
+        assert "Run ID: run_demo" in text
+
+
+def test_strategy_pack_pptx_renderer_supports_brand_and_agency_modes():
+    from pptx import Presentation
+
+    for mode, expected_label in [
+        ("brand", "Brand Executive Summary"),
+        ("agency", "Agency Client Pitch Summary"),
+    ]:
+        pack = StrategyPackService().build({**_payload("local_estimate"), "mode": mode})
+        buffer = PPTXGenerator().generate({
+            "slide_type": "strategy_pack",
+            "strategy_pack": pack,
+        })
+        text = "\n".join(_slide_text(slide) for slide in Presentation(buffer).slides)
+
+        assert expected_label in text
+        assert "Source: local_estimate" in text
+        assert "Basis: local_estimate" in text

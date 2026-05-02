@@ -34,6 +34,7 @@ Use this checklist before tagging or deploying a release candidate.
 - [x] `/api/export/pptx`
 - [x] `/api/export/csv`
 - [x] `/api/export/strategy-pack`
+- [x] `/api/export/strategy-pack/pptx`
 - [x] `/api/settings/providers`
 - [x] `/api/settings/readiness`
 - [x] `/api/report/generate/status`
@@ -55,6 +56,7 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] Action plans inherit source metadata.
 - [x] Revised Brief v2 inherits source/action-plan provenance metadata.
 - [x] Strategy pack exports include section-level source/provenance metadata.
+- [x] Strategy pack PPTX decks include source/provenance metadata on every slide.
 - [x] Unknown source is displayed conservatively when source metadata is missing.
 
 ## Security And Abuse Protection

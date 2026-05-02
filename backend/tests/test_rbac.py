@@ -130,6 +130,15 @@ def test_analyst_can_create_campaign_but_cannot_manage_settings_or_api_keys(rbac
             "source": {"type": "local_estimate"},
         },
     )
+    strategy_pack_pptx_response = client.post(
+        "/api/export/strategy-pack/pptx",
+        headers=headers["analyst"],
+        json={
+            "mode": "brand",
+            "campaign": {"name": "RBAC Strategy Pack"},
+            "source": {"type": "local_estimate"},
+        },
+    )
     switch_response = client.post(
         "/api/auth/switch-org",
         headers=headers["analyst"],
@@ -142,6 +151,11 @@ def test_analyst_can_create_campaign_but_cannot_manage_settings_or_api_keys(rbac
     assert provider_test_response.status_code == 403
     assert strategy_pack_response.status_code == 200
     assert strategy_pack_response.get_json()["data"]["source"]["source_mode"] == "local_estimate"
+    assert strategy_pack_pptx_response.status_code == 200
+    assert (
+        strategy_pack_pptx_response.mimetype
+        == "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    )
     assert switch_response.status_code == 403
 
 
@@ -240,6 +254,11 @@ def test_viewer_cannot_run_simulation_report_export_or_persona_mutations(rbac_co
         headers=headers["viewer"],
         json={"title": "Viewer strategy pack attempt"},
     )
+    strategy_pack_pptx_response = client.post(
+        "/api/export/strategy-pack/pptx",
+        headers=headers["viewer"],
+        json={"title": "Viewer strategy pack PPTX attempt"},
+    )
     persona_response = client.post(
         "/api/persona/generate",
         headers=headers["viewer"],
@@ -252,6 +271,7 @@ def test_viewer_cannot_run_simulation_report_export_or_persona_mutations(rbac_co
     assert report_response.status_code == 403
     assert export_response.status_code == 403
     assert strategy_pack_response.status_code == 403
+    assert strategy_pack_pptx_response.status_code == 403
     assert persona_response.status_code == 403
 
 

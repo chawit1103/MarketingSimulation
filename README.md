@@ -364,6 +364,8 @@ For decision meetings, the backend can package existing dashboard/simulation pay
 
 Each pack includes executive decision summary, launch recommendation, KPI summary, segment reactions, risk drivers, crisis watchouts, recommended action plan, and next validation steps. Every section inherits source/provenance metadata such as `source_mode`, `data_basis`, confidence level, assumptions, limitations, and recommended validation step.
 
+Strategy packs can also be rendered as native PowerPoint decks through `POST /api/export/strategy-pack/pptx`. Optional white-label fields include agency name, client name, prepared by, report date, campaign name, scenario name, and a safe logo placeholder. The export does not fetch or embed remote logo URLs. Every slide includes provenance footer metadata, and the deck ends with limitations and recommended validation. It is scenario-planning material, not guaranteed ROI or production-readiness evidence.
+
 ### Revised Brief v2
 
 Dashboard Action Plans can be turned into a reviewable revised brief before the next simulation or creative review. The revised brief includes objective, target segments, key message, tone and voice, proof points, channel recommendations, risk guardrails, validation plan, and creative team notes.
@@ -395,6 +397,16 @@ Recommended deck structure:
 3. Segment Insight
 4. Risk & Crisis Drivers
 5. Recommended Action Plan
+
+Strategy pack PPTX structure:
+
+1. Cover / white-label context
+2. Executive Decision Summary
+3. Decision Gate & KPI Summary
+4. Segment Reactions
+5. Risk Drivers & Crisis Watchouts
+6. Recommended Action Plan
+7. Limitations & Recommended Validation
 
 ### System Health
 
@@ -621,6 +633,7 @@ All product APIs are registered under `/api/*`.
 | POST | `/api/export/pptx` | Export PowerPoint deck |
 | POST | `/api/export/csv` | Export CSV data |
 | POST | `/api/export/strategy-pack` | Build a client-ready Brand or Agency strategy pack payload |
+| POST | `/api/export/strategy-pack/pptx` | Render a client-ready strategy pack PPTX |
 
 ---
 

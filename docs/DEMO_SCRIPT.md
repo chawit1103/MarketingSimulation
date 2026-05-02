@@ -261,7 +261,14 @@ Show:
 - Action Plan.
 - Revised Brief v2.
 - Strategy pack positioning: Agency Client Pitch Summary.
-- Source/provenance label carried into exports.
+- Strategy Pack PPTX export path for Brand Executive Summary or Agency Client Pitch Summary.
+- Source/provenance label carried into every slide.
+- Limitations and recommended validation slide.
+
+Say clearly:
+
+- The PPTX is a meeting pack, not a guaranteed ROI forecast.
+- Logo support is a safe placeholder; do not embed secret, private, or unapproved assets.
 
 Screenshot kept: `docs/screenshots/action-plan.png`
 

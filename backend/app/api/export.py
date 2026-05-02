@@ -2,6 +2,7 @@
 
 from flask import Blueprint, request, jsonify, send_file
 import io
+import re
 
 from ..services.export_engine import PPTXGenerator
 from ..services.strategy_pack import StrategyPackService
@@ -11,6 +12,12 @@ from ..utils.logger import get_logger
 logger = get_logger("mirofish.api.export")
 
 export_bp = Blueprint("export", __name__)
+
+
+def _safe_pptx_filename(value: str | None, fallback: str) -> str:
+    base = re.sub(r"[^A-Za-z0-9._-]+", "_", str(value or fallback)).strip("._-")
+    base = base or fallback
+    return base if base.lower().endswith(".pptx") else f"{base}.pptx"
 
 
 @export_bp.route("/strategy-pack", methods=["POST"])
@@ -30,6 +37,40 @@ def export_strategy_pack():
         return jsonify({
             "success": False,
             "error": "Could not build strategy pack export.",
+        }), 500
+
+
+@export_bp.route("/strategy-pack/pptx", methods=["POST"])
+@role_required(*ANALYST_ROLES)
+def export_strategy_pack_pptx():
+    """POST /api/export/strategy-pack/pptx — render strategy pack payload as PPTX."""
+    data = request.get_json(silent=True) or {}
+
+    try:
+        pack = data.get("strategy_pack")
+        if not isinstance(pack, dict) or pack.get("version") != "strategy_pack_v1":
+            pack = StrategyPackService().build(data)
+
+        buffer = PPTXGenerator().generate({
+            "slide_type": "strategy_pack",
+            "strategy_pack": pack,
+        })
+        white_label = pack.get("white_label") or {}
+        filename = _safe_pptx_filename(
+            data.get("filename") or white_label.get("campaign_name"),
+            "strategy_pack",
+        )
+        return send_file(
+            buffer,
+            mimetype="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            as_attachment=True,
+            download_name=filename,
+        )
+    except Exception:
+        logger.exception("Failed to render strategy pack PPTX")
+        return jsonify({
+            "success": False,
+            "error": "Could not render strategy pack PPTX.",
         }), 500
 
 

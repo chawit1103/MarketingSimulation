@@ -23,6 +23,22 @@ This pass completes the currently visible no-key demo dashboard set and removes 
 - Analytics tests passed.
 - Secret hygiene scan and `git diff --check` passed.
 
+## PR AG: Strategy Pack PPTX Renderer
+
+This pass converts the existing strategy pack payload into a native PowerPoint export path without adding new prediction, ROI, or production-readiness claims.
+
+### What Changed
+
+- Added `POST /api/export/strategy-pack/pptx`.
+- Rendered Brand Executive Summary and Agency Client Pitch Summary decks from the existing strategy pack payload.
+- Added optional white-label context for agency name, client name, prepared by, report date, campaign name, scenario name, and a safe logo placeholder.
+- Added source/provenance footer metadata to every strategy pack slide.
+- Added a limitations and recommended validation slide.
+
+### Validation
+
+- Strategy pack renderer tests cover deck structure, report modes, safe logo handling, and source metadata on every slide.
+
 ## PR T: Public Pilot Go/No-Go Verification
 
 This verification pass adds no product features. It records the current release posture after PR P, PR Q, PR R, and PR S.

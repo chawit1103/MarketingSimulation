@@ -75,6 +75,7 @@ def test_critical_frontend_routes_exist_in_backend_url_map(monkeypatch):
         ("POST", "/api/export/pptx"),
         ("POST", "/api/export/csv"),
         ("POST", "/api/export/strategy-pack"),
+        ("POST", "/api/export/strategy-pack/pptx"),
         ("GET", "/api/settings/providers"),
         ("POST", "/api/settings/readiness"),
         ("POST", "/api/report/generate/status"),

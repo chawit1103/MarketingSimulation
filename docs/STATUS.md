@@ -69,7 +69,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - War Room backend responses include expected sentiment movement, affected segments, amplification channels, key drivers, recommended response, and first 2h/24h/72h playbooks.
 - Dashboard Action Plans now include creative adjustment, channel allocation, crisis prevention, and validation plan sections.
 - Dashboard export payloads, CSV export, quick download, and PPTX action-plan slides can include structured action plan rows.
-- Client-ready strategy pack export is available at `POST /api/export/strategy-pack` with Brand Executive Summary and Agency Client Pitch Summary modes; every section includes source/provenance metadata.
+- Client-ready strategy pack export is available at `POST /api/export/strategy-pack` with Brand Executive Summary and Agency Client Pitch Summary modes; every section includes source/provenance metadata. `POST /api/export/strategy-pack/pptx` renders the same payload as a PPTX deck with provenance metadata on every slide and a limitations / recommended validation slide.
 - Settings Wizard adds mode selection, deterministic readiness checks for LLM/embedding/Neo4j config, safe provider catalog access, sanitized provider errors, sample simulation guidance, and clearly labeled cost estimates.
 - Frontend report status helper now uses the backend `POST /api/report/generate/status` contract.
 - Response sanitization now redacts API-key, token, password, bearer-token, and `sk-*` style values from client-facing JSON.
