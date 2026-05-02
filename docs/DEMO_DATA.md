@@ -9,7 +9,7 @@ Use these fictional sample briefs for demos, QA, and pilot walkthroughs. They do
 - **Demo Mode**: synthetic sample data for onboarding.
 - **Local Estimate**: browser-side deterministic fallback; use only when explicitly selected.
 - **Live Backend**: backend deterministic simulation output.
-- **Backend Verified**: backend route completed and supplied the displayed result.
+- **Backend Verified**: persisted real simulation KPI/evidence for an owned campaign/run. Backend route success alone is not enough.
 
 Do not describe any demo output as a guaranteed prediction.
 
@@ -80,7 +80,7 @@ Recommended first-time flow:
 
 **Risk/legal notes:** Product terms, claim exclusions, and privacy language must be reviewed.
 
-**Demo angle:** Good for Brief Quality Score and risk-driver discussion.
+**Demo angle:** Good for the InsurTech Trust Recovery demo dashboard, Brief Quality Score, and risk-driver discussion.
 
 ## Brief 3: EV Test Drive Weekend
 
@@ -153,3 +153,27 @@ Recommended first-time flow:
 **Risk/legal notes:** Franchise return claims and promotion terms require approval.
 
 **Demo angle:** Good for channel allocation and creative adjustment sections.
+
+## Brief 6: Community Energy Brief
+
+**Campaign name:** Community Energy Brief
+
+**Objective:** Improve community trust and reduce objections before a clean-energy project announcement.
+
+**Audience:** Local households near the project site, community leaders, policy watchers, media commentators, and business stakeholders.
+
+**Duration:** 8 weeks.
+
+**Budget range:** THB 2M-4M.
+
+**Primary KPI:** Trust sentiment, community objection rate, earned-media tone, and meeting attendance quality.
+
+**Channel mix:** Facebook, LINE, YouTube, Reddit, community events, and local media.
+
+**Competitor context:** Rival energy narratives may frame the project as disruptive, expensive, or externally imposed.
+
+**Brand constraints:** Lead with local benefit, transparency, safety, and long-term community participation. Avoid dismissive language toward critics.
+
+**Risk/legal notes:** Environmental, land-use, regulatory, and community-consultation claims require review before public use.
+
+**Demo angle:** Good for the Community Energy demo dashboard, risk-driver walkthrough, segment reactions, and validation-step discussion.

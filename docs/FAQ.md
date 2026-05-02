@@ -15,7 +15,7 @@ No. It supports scenario planning and decision review. Outputs should be treated
 - **Demo Mode**: safe synthetic sample data for onboarding.
 - **Local Estimate**: browser-side deterministic fallback, not a backend simulation.
 - **Live Backend**: backend-generated deterministic output.
-- **Backend Verified**: backend route completed successfully and supplied the displayed result.
+- **Backend Verified**: persisted real simulation KPI/evidence for an owned campaign/run. Backend route success alone is not enough.
 - **Unknown Source**: source metadata was unavailable; treat the output cautiously.
 
 ## Can I demo it without API keys?

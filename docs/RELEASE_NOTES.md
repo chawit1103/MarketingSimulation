@@ -2,6 +2,27 @@
 
 Updated: 2026-05-02
 
+## PR AF: Complete Demo Dashboard Fixtures
+
+This pass completes the currently visible no-key demo dashboard set and removes the misleading fallback that could show the premium-water dashboard for unrelated demo IDs.
+
+### What Changed
+
+- Added industry-specific dashboard fixtures for InsurTech trust recovery and community energy.
+- Kept the premium-water dashboard as the FMCG demo fixture.
+- Filtered the public demo campaign list to campaigns with matching dashboard fixtures.
+- Unknown demo dashboard IDs now return a safe 404 instead of unrelated sample output.
+- Demo fixtures are labeled `demo_mode` and include assumptions, limitations, segment breakdowns, risk drivers, simulated quotes, action plans, and recommended validation steps.
+
+### Validation
+
+- Focused demo route tests passed.
+- Full backend tests passed.
+- Frontend production build passed.
+- Mocked Playwright e2e smoke tests passed.
+- Analytics tests passed.
+- Secret hygiene scan and `git diff --check` passed.
+
 ## PR T: Public Pilot Go/No-Go Verification
 
 This verification pass adds no product features. It records the current release posture after PR P, PR Q, PR R, and PR S.

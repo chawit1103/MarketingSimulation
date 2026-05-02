@@ -86,18 +86,28 @@ New users should be able to see value before configuring an LLM provider.
 The product includes a public no-key demo flow:
 
 - Demo campaign list: `GET /api/demo/campaigns`
-- Demo dashboard: `GET /api/demo/campaigns/demo-premium-water/dashboard`
+- Demo dashboard: `GET /api/demo/campaigns/{id}/dashboard`
 - Frontend sample route: `/dashboard/demo-premium-water`
 
-The sample dashboard includes:
+Current public demo dashboards:
+
+- `demo-premium-water`: FMCG / premium water launch.
+- `demo-insurtech-trust`: InsurTech trust recovery after claim delays.
+- `demo-energy-community`: community energy and clean-power narrative.
+
+Each demo dashboard includes:
 
 - campaign brief
 - 7 executive KPIs
 - confidence score
 - assumptions
+- limitations
 - why-this-score explanations
 - risk drivers
 - simulated persona quotes
+- segment breakdown
+- structured action plan
+- recommended validation step
 - priority recommended actions
 
 For local development:

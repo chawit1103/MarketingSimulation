@@ -15,7 +15,7 @@ This plan focuses on turning the current release candidate into a reliable pilot
 2. Capture where users hesitate: brief entry, source labels, confidence/evidence, War Room, export, and Settings Wizard.
 3. Turn the best demo paths into first-run templates with sample campaigns and expected outputs.
 4. Replace browser-side comparator fallback with backend demo fixtures.
-5. Expand demo dashboards beyond `demo-premium-water`.
+5. Add future public demo dashboards only when each visible campaign has a matching industry-specific fixture, source labels, assumptions, limitations, and tests.
 6. Calibrate KPI, Decision Engine, War Room, and Action Plan rules against real or historical campaign outcomes.
 7. Maintain product claims discipline: describe outputs as scenario planning until calibration evidence exists.
 
@@ -84,5 +84,5 @@ See [PILOT_PLAN.md](PILOT_PLAN.md) for the recommended pilot structure, particip
 1. Add CI workflow for backend tests, frontend build, and locale validation.
 2. Add frontend component tests for source labels and explicit fallback warnings.
 3. Add backend demo comparator fixture route to remove browser-side comparator fallback.
-4. Add broader demo dashboards and industry sample briefs.
+4. Add broader demo dashboards and industry sample briefs only when each new public campaign has a complete dashboard fixture and safe 404 behavior for unknown IDs.
 5. Add production deployment runbook with environment validation and rollback steps.

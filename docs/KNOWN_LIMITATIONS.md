@@ -18,7 +18,7 @@ This document separates what the system currently does from what should not yet 
 - Browser-side fallback output exists to preserve local demo continuity.
 - Local fallback output must be treated as Local Estimate and should not be used as evidence of backend simulation success.
 - Comparator still has browser-side demo fallback. A backend demo comparator fixture should replace it later.
-- Demo dashboards are strongest for `demo-premium-water`; broader demo campaign coverage remains pending.
+- Public demo dashboards currently cover premium water, InsurTech trust recovery, and community energy scenarios. Additional demo campaigns should stay hidden until a matching industry-specific dashboard fixture is ready.
 - Any new dashboard, export, or recommendation surface must inherit and show source-mode metadata before being considered release-ready.
 - Calibration import accepts manual JSON and one-row aggregate CSV/JSON uploads only. It does not connect to live CRM, ad-platform, or social-listening systems.
 

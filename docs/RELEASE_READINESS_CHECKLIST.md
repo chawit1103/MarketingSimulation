@@ -46,6 +46,8 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 ## Result Source And Fallback Safety
 
 - [x] Demo dashboards are labeled Demo Mode.
+- [x] Every campaign returned by `/api/demo/campaigns` has a matching industry-specific dashboard fixture.
+- [x] Unknown demo dashboard IDs return a safe 404 instead of falling back to unrelated demo data.
 - [x] Dashboard local fallbacks are labeled Local Estimate.
 - [x] Comparator demo/local fallback output is visibly labeled.
 - [x] Comparator demo routes return backend fixture output labeled `demo_mode`; browser fallback is explicit `local_estimate`.

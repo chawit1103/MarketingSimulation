@@ -36,6 +36,50 @@ def test_demo_dashboard_route_is_public_and_labeled(client):
     assert "traceback" not in payload
 
 
+def test_every_visible_demo_campaign_has_matching_dashboard_fixture(client):
+    list_response = client.get("/api/demo/campaigns")
+    assert list_response.status_code == 200
+    campaigns = list_response.get_json()["data"]
+    assert campaigns
+
+    for campaign in campaigns:
+        response = client.get(f"/api/demo/campaigns/{campaign['id']}/dashboard")
+        assert response.status_code == 200
+        payload = response.get_json()
+        data = payload["data"]
+
+        assert data["campaign"]["id"] == campaign["id"]
+        assert data["source"]["type"] == "demo_mode"
+        assert data["source"]["source_mode"] == "demo_mode"
+        assert data["source"]["data_basis"] == "demo_fixture"
+        assert data["source"]["type"] != "backend_verified"
+        assert data["source"]["source_mode"] != "backend_verified"
+        assert "backend_verified" not in str(data).lower()
+        assert data["kpis"]
+        assert data["segments"]
+        assert data["action_plan"]
+        assert data["evidence"]["assumptions"]
+        assert data["evidence"]["limitations"]
+        assert data["evidence"]["risk_drivers"]
+        assert data["evidence"]["quotes"]
+        assert data["evidence"]["recommended_actions"]
+        assert data["evidence"]["recommended_validation_step"]
+
+
+def test_demo_dashboard_unknown_id_returns_safe_404(client):
+    response = client.get("/api/demo/campaigns/demo-missing/dashboard")
+    payload = response.get_json()
+
+    assert response.status_code == 404
+    assert payload == {
+        "success": False,
+        "error": "Demo dashboard not found",
+        "code": "demo_dashboard_not_found",
+    }
+    assert "premium-water" not in str(payload)
+    assert "traceback" not in str(payload).lower()
+
+
 def test_impact_quick_scenario_route_is_public_and_labeled(client):
     response = client.get(
         "/api/impact/scenarios/42?price=120&market=100000&share=10&conversion=5&cost=500000&months=6"

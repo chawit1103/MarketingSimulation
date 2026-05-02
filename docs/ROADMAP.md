@@ -38,7 +38,7 @@ This roadmap reflects the current implementation after the production-hardening,
 - Calibrate deterministic KPI, Decision Engine, Action Plan, and War Room rules against real campaign outcomes.
 - Store simulation run metadata and provenance so every dashboard can show run ID, source, persona count, provider/model, and limitations consistently.
 - Replace browser-side comparator fallback with backend-provided demo comparator fixtures.
-- Add demo dashboards for more sample campaigns beyond premium water.
+- Add future public demo campaigns only when a matching industry-specific dashboard fixture and contract test are ready.
 - Add a brief-quality gate before expensive simulation runs in production flows.
 - Add pilot feedback review loops for brief quality, confidence/evidence, and action-plan usefulness.
 - Improve PPTX templates into agency/client-ready executive packs with stronger narrative structure.

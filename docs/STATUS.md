@@ -41,7 +41,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 
 ## Demo / Prototype
 
-- Demo campaign dashboards use deterministic sample data and are labeled as Demo Mode.
+- Demo campaign dashboards use deterministic sample data and are labeled as Demo Mode. Public demo dashboards are available for premium water, InsurTech trust recovery, and community energy scenarios.
 - War Room backend output is deterministic scenario planning, not a calibrated live OASIS or social-listening run.
 - War Room browser-side output remains available only as an explicit Local Estimate fallback after backend failure.
 - Comparator can use browser-side output only after the user explicitly runs Local Estimate; backend demo fixtures are preferred for no-key demo comparison.
@@ -54,6 +54,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 
 - `/api/impact/scenarios/<sentiment_value>` is now reachable without auth for the frontend quick scenario flow.
 - `/api/demo/campaigns/<demo_id>/dashboard` has smoke coverage and returns result-source metadata.
+- Public demo list now includes only demo campaigns with matching industry-specific dashboard fixtures; unknown demo IDs return safe 404 instead of falling back to another demo.
 - Public route contract tests cover demo dashboard and impact scenario endpoints.
 - Raw `traceback` fields are stripped from JSON API responses before reaching clients.
 - Production secret handling rejects default fallback secrets.
@@ -87,7 +88,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - Comparator backend demo fixtures are deterministic planning examples; they are not real-world A/B test evidence or calibrated campaign lift.
 - Deep industry presets are deterministic starter assumptions. They must be reviewed, localized, and adjusted with real brand, legal, compliance, and market context before pilot or client use.
 - Budget Scenario Planner does not use live ad-platform costs, exact ROI/ROAS modeling, CAC prediction, or sales forecasting. It needs calibration with real media benchmarks and pilot outcomes.
-- Demo dashboards should be expanded for every demo campaign instead of relying on one premium-water sample shape.
+- Additional demo dashboards beyond the current premium water, InsurTech trust recovery, and community energy fixtures can be added when they have industry-specific evidence and source labels.
 - Production deployment still needs environment-specific secret rotation, TLS, backup, observability, and CI gates.
 - KPI and Decision Engine scoring should be calibrated against real campaign outcomes.
 - Manual Calibration v1 needs real approved aggregate campaign outcomes from multiple comparable campaigns before any calibration status should influence high-stakes spend decisions.
