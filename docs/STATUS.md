@@ -29,6 +29,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - Settings Wizard supports Demo only, Local model, and Cloud API setup readiness checks without exposing secrets.
 - Frontend source badges identify result provenance: Demo Mode, Local Estimate, Live Backend, Backend Verified, or Unknown Source.
 - Dashboard influence surfaces now describe demo/local accounts as simulated influence nodes, not real scraped or verified social profiles.
+- Comparator now uses backend demo fixtures for emotional/storytelling, proof-led/trust, and price/promotion directions and keeps browser-side output as explicit Local Estimate fallback only.
 - Critical frontend route contracts are covered by backend smoke tests for demo, impact, decision, comparator, competitor, export, settings readiness, and report status endpoints.
 - API response safety removes raw traceback keys and redacts common secret-like strings before JSON responses reach clients.
 
@@ -37,7 +38,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - Demo campaign dashboards use deterministic sample data and are labeled as Demo Mode.
 - War Room backend output is deterministic scenario planning, not a calibrated live OASIS or social-listening run.
 - War Room browser-side output remains available only as an explicit Local Estimate fallback after backend failure.
-- Comparator can fall back to browser-side sample output for demo continuity; fallback output is visibly labeled as Local Estimate.
+- Comparator can use browser-side output only after the user explicitly runs Local Estimate; backend demo fixtures are preferred for no-key demo comparison.
 - Quick impact scenarios are deterministic business estimates based on sentiment and supplied business inputs.
 
 ## Recently Fixed / Hardened
@@ -73,7 +74,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - Action Plan recommendations remain deterministic planning guidance and still need calibration against real campaign outcomes.
 - Strategy packs are structured JSON payloads for meeting preparation; PPTX/template rendering for white-label agency decks still needs a dedicated design pass.
 - Settings Wizard readiness checks validate configuration completeness; LLM live tests still depend on authenticated runtime access and real provider availability.
-- Comparator fallback should eventually be replaced by backend-provided demo comparator fixtures.
+- Comparator backend demo fixtures are deterministic planning examples; they are not real-world A/B test evidence or calibrated campaign lift.
 - Demo dashboards should be expanded for every demo campaign instead of relying on one premium-water sample shape.
 - Production deployment still needs environment-specific secret rotation, TLS, backup, observability, and CI gates.
 - KPI and Decision Engine scoring should be calibrated against real campaign outcomes.

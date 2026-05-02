@@ -7,56 +7,63 @@ Controller source: `CODEX_SEQUENTIAL_ORCHESTRATOR_PROMPT.md`
 
 ## Current Stage
 
-Selected roadmap item: **PR W: Client-Ready Strategy Pack**
+Selected roadmap item: **PR X: Campaign A/B/C Comparator Backend-First**
 
-## Why PR W Was Selected
+## Why PR X Was Selected
 
-PR V was completed on the current stacked roadmap branch. The next incomplete roadmap item in order is PR W: Client-Ready Strategy Pack.
+PR W was completed on the current stacked roadmap branch. The next incomplete roadmap item in order is PR X: Campaign A/B/C Comparator Backend-First.
 
 Current repository inspection found:
 
 - GitHub default branch: `multilang-v0.3`.
-- Current branch: `codex/pr-w-client-ready-strategy-pack`.
+- Current branch: `codex/pr-x-comparator-backend-first`.
 - Release-candidate integration docs from PR V are present.
-- Export architecture already supports authenticated PPTX/CSV routes under `/api/export`.
-- No client-ready Brand/Agency strategy pack route existed before this PR.
+- PR W strategy-pack export exists.
+- Comparator frontend previously called backend first but silently generated browser-side fallback results after failure.
+- Comparator demo options were browser-local rather than backend fixtures.
+- Frontend comparison results hardcoded `backend_verified` after any successful comparator API response instead of inheriting backend provenance.
 
-Therefore PR W is the next correct focused PR.
+Therefore PR X is the next correct focused PR.
 
-## Completed In PR W
+## Completed In PR X
 
-- Added a deterministic backend strategy-pack builder.
-- Added `POST /api/export/strategy-pack` protected by analyst/admin export authorization.
-- Added two pack modes:
-  - Brand Executive Summary.
-  - Agency Client Pitch Summary.
-- Added white-label/report metadata placeholders for agency name, client name, prepared by, report date, campaign name, scenario name, and logo presence without echoing logo URLs.
-- Added meeting-ready sections:
-  - Executive decision summary.
-  - Launch / revise / do-not-launch recommendation.
-  - KPI summary.
-  - Segment reactions.
-  - Risk drivers.
-  - Crisis watchouts.
-  - Recommended action plan.
-  - Next validation steps.
-- Added section-level source/provenance metadata including source mode, data basis, run/campaign/simulation IDs when available, confidence level, assumptions, limitations, and next validation step.
-- Added tests for strategy pack payload shape, mode behavior, logo URL safety, source labels, route contract, and viewer denial.
-- Updated README and demo/user journey docs.
+- Added backend comparator demo fixtures for three variants:
+  - Emotional / storytelling direction.
+  - Proof-led / trust direction.
+  - Price / promotion direction.
+- Added public no-key demo comparator routes:
+  - `GET /api/comparator/demo/campaigns`.
+  - `POST /api/comparator/demo/compare`.
+- Expanded comparator output with:
+  - overall winner and ranked recommendation.
+  - segment-level strengths and weaknesses.
+  - conversion and engagement estimates.
+  - crisis/risk comparison.
+  - trade-offs.
+  - recommended use case per variant.
+  - source/provenance metadata per variant and for the comparison result.
+- Updated authenticated comparator results so `backend_verified` is used only when all compared variants are persisted real simulation KPI records.
+- Labeled deterministic fallback KPI comparisons as `local_estimate`.
+- Updated Comparator UI to use backend demo fixtures first and to require an explicit Local Estimate action after backend failure.
+- Added backend comparator tests, route contract coverage, and e2e smoke coverage for backend demo comparator labels.
+- Updated README, demo script, user journey, status, checklist, and release notes.
 
-## Not Completed In PR W
+## Not Completed In PR X
 
-- No frontend export UI was added; this PR adds the backend JSON strategy-pack contract only.
-- No PPTX white-label template rendering was added.
+- No live simulation calibration was added.
+- No real-world A/B accuracy, sales lift, ROAS, or ROI guarantee was claimed.
+- No social listening, CRM integration, or paid provider integration was added.
+- No database migration was added.
 - No exact ROI, sales forecast, or guaranteed prediction language was added.
-- No database migration, billing, production auth rewrite, live social listening, CRM integration, calibration loop, or social account discovery was added.
 - Manual credential rotation was not marked complete because it requires repository-owner action outside Codex.
 
 ## Tests And Checks
 
-- `backend/.venv/bin/python -m pytest backend/tests/test_strategy_pack.py backend/tests/test_api_contract.py backend/tests/test_rbac.py -q`: passed, 13 passed and 4 warnings.
-- `backend/.venv/bin/python -m pytest backend/tests -q`: passed, 59 passed and 38 warnings.
+- `backend/.venv/bin/python -m pytest backend/tests/test_comparator_api.py backend/tests/test_api_contract.py -q`: passed, 7 passed and 4 warnings.
+- `backend/.venv/bin/python -m pytest backend/tests -q`: passed, 63 passed and 38 warnings.
+- `python3 -m json.tool src/locales/en.json` and `src/locales/th.json`: passed.
 - `cd frontend && npm run build`: passed.
+- `cd frontend && npm run test:e2e -- --project=chromium --workers=1`: passed, 10 passed.
 - CI-equivalent secret hygiene scan: passed.
 - `git diff --check`: passed.
 
@@ -72,7 +79,7 @@ GitNexus note: `impact` and `context` calls failed with a local GitNexus WAL cor
 
 ## Next Recommended Roadmap Item
 
-After PR W is reviewed and merged, proceed to **PR X: Comparator Backend-First**.
+After PR X is reviewed and merged, proceed to **PR Y: Revised Brief v2 From Action Plan**.
 
 Short prompt for the next run:
 

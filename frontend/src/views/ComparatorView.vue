@@ -44,6 +44,14 @@
         <span v-if="!loading">{{ $t('comparator.compareBtn') }} ({{ selectedIds.length }})</span>
         <span v-else>{{ $t('comparator.comparing') }}</span>
       </button>
+
+      <div v-if="backendFailureWarning" class="fallback-panel">
+        <strong>{{ $t('comparator.backendUnavailableTitle') }}</strong>
+        <p>{{ backendFailureWarning }}</p>
+        <button class="btn-fallback" @click="runLocalEstimate">
+          {{ $t('comparator.runLocalEstimate') }}
+        </button>
+      </div>
     </div>
 
     <!-- Loading -->
@@ -80,6 +88,26 @@
           <span class="label-name">{{ summary.campaign_name || summary.campaign_id.slice(0, 12) }}</span>
           <span class="label-wins">{{ $t('comparator.metricWins', { count: summary.metric_wins }) }}</span>
         </div>
+      </div>
+
+      <div v-if="comparisonResult.ranked_recommendation?.length" class="insight-grid">
+        <section class="insight-panel">
+          <h3>{{ $t('comparator.rankedRecommendation') }}</h3>
+          <ol>
+            <li v-for="item in comparisonResult.ranked_recommendation" :key="item.campaign_id">
+              <strong>{{ item.campaign_name }}</strong>
+              <span>{{ item.reason }}</span>
+            </li>
+          </ol>
+        </section>
+        <section class="insight-panel">
+          <h3>{{ $t('comparator.tradeOffs') }}</h3>
+          <div v-for="row in comparisonResult.campaign_summaries" :key="`trade-${row.campaign_id}`" class="trade-row">
+            <strong>{{ row.campaign_name }}</strong>
+            <p>{{ row.recommended_use_case }}</p>
+            <small>{{ (row.trade_offs || []).join(' ') }}</small>
+          </div>
+        </section>
       </div>
 
       <!-- Metric-by-Metric Comparison -->
@@ -130,7 +158,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { listCampaigns } from '@/api/campaign'
 import { hasBrowserAuth } from '@/api/authStorage'
-import { compareCampaigns } from '@/api/comparator'
+import { compareCampaigns, compareDemoCampaigns, listDemoComparatorCampaigns } from '@/api/comparator'
 import ExportButton from '@/components/ExportButton.vue'
 import ResultSourceBadge from '@/components/ResultSourceBadge.vue'
 
@@ -143,19 +171,22 @@ const loading = ref(false)
 const error = ref('')
 const campaignListSource = ref({ source: 'unknown', warning: '' })
 const resultSource = ref({ source: 'unknown', warning: '' })
+const backendFailureWarning = ref('')
 
 const exportData = computed(() => ({
   slide_type: 'comparison',
   title: t('comparator.exportTitle'),
   subtitle: t('comparator.exportSubtitle', { count: comparisonResult.value?.campaign_count || 0 }),
   comparison: comparisonResult.value,
+  source: comparisonResult.value?.source,
   filename: `msaas_comparison_${new Date().toISOString().slice(0, 10)}`,
 }))
 
 onMounted(async () => {
   try {
     if (shouldUseDemoCampaigns()) {
-      availableCampaigns.value = demoCampaigns()
+      const demoRes = await listDemoComparatorCampaigns()
+      availableCampaigns.value = demoRes.data || []
       campaignListSource.value = {
         source: 'demo_mode',
         warning: t('comparator.demoCampaignWarning'),
@@ -168,11 +199,11 @@ onMounted(async () => {
     availableCampaigns.value = Array.isArray(campaigns) ? campaigns : campaigns.campaigns || []
     campaignListSource.value = { source: 'live_backend', warning: '' }
   } catch (e) {
-    console.warn('Failed to load campaigns for comparator, using demo:', e.message)
-    availableCampaigns.value = demoCampaigns()
+    console.warn('Failed to load campaigns for comparator:', e.message)
+    availableCampaigns.value = localComparatorCampaigns()
     campaignListSource.value = {
-      source: 'demo_mode',
-      warning: t('comparator.demoCampaignWarning'),
+      source: 'local_estimate',
+      warning: t('comparator.localCampaignListWarning'),
     }
   }
 })
@@ -182,11 +213,11 @@ function shouldUseDemoCampaigns() {
   return !hasBrowserAuth()
 }
 
-function demoCampaigns() {
+function localComparatorCampaigns() {
   return [
-    { id: 'cmp_demo_a', campaign_id: 'cmp_demo_a', name: 'Message A: Product Launch Q2' },
-    { id: 'cmp_demo_b', campaign_id: 'cmp_demo_b', name: 'Message B: Value Proposition' },
-    { id: 'cmp_demo_c', campaign_id: 'cmp_demo_c', name: 'Message C: Fear of Missing Out' },
+    { id: 'cmp_local_emotional', campaign_id: 'cmp_local_emotional', name: 'Local Estimate A: Emotional Storytelling' },
+    { id: 'cmp_local_proof', campaign_id: 'cmp_local_proof', name: 'Local Estimate B: Proof-Led Trust' },
+    { id: 'cmp_local_price', campaign_id: 'cmp_local_price', name: 'Local Estimate C: Price / Promotion' },
   ]
 }
 
@@ -203,25 +234,49 @@ async function runComparison() {
   if (selectedIds.value.length < 2 || loading.value) return
   loading.value = true
   error.value = ''
+  backendFailureWarning.value = ''
 
   try {
-    const res = await compareCampaigns(selectedIds.value)
+    const useDemoBackend = campaignListSource.value.source === 'demo_mode'
+    const res = useDemoBackend
+      ? await compareDemoCampaigns(selectedIds.value)
+      : await compareCampaigns(selectedIds.value)
     const data = res.data || res
     comparisonResult.value = data
-    resultSource.value = {
-      source: 'backend_verified',
-      warning: t('comparator.backendVerifiedWarning'),
-    }
+    resultSource.value = normalizeResultSource(data.source || data)
   } catch (e) {
     console.error('Comparison failed:', e)
-    comparisonResult.value = generateDemoComparison()
-    resultSource.value = {
-      source: 'local_estimate',
-      warning: t('comparator.localEstimateWarning'),
-    }
+    comparisonResult.value = null
+    backendFailureWarning.value = t('comparator.backendUnavailableBody')
   } finally {
     loading.value = false
   }
+}
+
+function normalizeResultSource(source) {
+  const raw = source?.source_mode || source?.type || source?.source || 'unknown'
+  const allowed = ['demo_mode', 'local_estimate', 'live_backend', 'backend_verified', 'unknown']
+  const mode = allowed.includes(raw) ? raw : 'unknown'
+  const fallbackWarnings = {
+    demo_mode: t('comparator.demoResultWarning'),
+    local_estimate: t('comparator.localEstimateWarning'),
+    live_backend: t('comparator.liveBackendWarning'),
+    backend_verified: t('comparator.backendVerifiedWarning'),
+    unknown: t('comparator.unknownSourceWarning'),
+  }
+  return {
+    source: mode,
+    warning: source?.warning || fallbackWarnings[mode],
+  }
+}
+
+function runLocalEstimate() {
+  comparisonResult.value = generateLocalEstimateComparison()
+  resultSource.value = {
+    source: 'local_estimate',
+    warning: t('comparator.localEstimateWarning'),
+  }
+  backendFailureWarning.value = ''
 }
 
 function barWidth(metric, value) {
@@ -237,19 +292,24 @@ function resetComparison() {
   selectedIds.value = []
 }
 
-// Demo fallback data
-function generateDemoComparison() {
+// Explicit browser-side fallback data
+function generateLocalEstimateComparison() {
   const ids = selectedIds.value
   if (ids.length < 2) return null
 
-  const names = ids.map((id, i) => `Message ${String.fromCharCode(65 + i)}: ${id.slice(0, 8)}`)
+  const names = ids.map((id, i) => `Local Estimate ${String.fromCharCode(65 + i)}: ${id.slice(0, 8)}`)
+  const source = {
+    type: 'local_estimate',
+    source_mode: 'local_estimate',
+    data_basis: 'local_estimate',
+    warning: t('comparator.localEstimateWarning'),
+  }
 
-  return {
+  const result = {
     campaign_count: ids.length,
-    source: {
-      type: 'local_estimate',
-      warning: t('comparator.localEstimateWarning'),
-    },
+    source,
+    source_mode: 'local_estimate',
+    data_basis: 'local_estimate',
     metrics_comparison: [
       { key: 'overall_sentiment', label: t('comparator.metricOverallSentiment'), unit: '', higher_is_better: true,
         values: ids.map((id, i) => ({ campaign_id: id, value: [42, 28, 55][i] || 35 })),
@@ -278,14 +338,54 @@ function generateDemoComparison() {
       kpi: {},
       metric_wins: i === 2 ? 7 : i === 0 ? 0 : 0,
       is_overall_winner: i === 2,
+      conversion_estimate: [67, 52, 73][i] || 60,
+      engagement_estimate: [75, 56, 81][i] || 65,
+      risk_level: ['low', 'medium', 'low'][i] || 'medium',
+      segment_strengths: [['Lifestyle buyers'], ['Trust seekers'], ['Value hunters']][i] || ['General audience'],
+      segment_weaknesses: [['Proof seekers'], ['Impulse buyers'], ['Premium buyers']][i] || ['Unknown segment'],
+      trade_offs: [
+        ['Memorable story, weaker proof.'],
+        ['Trustworthy, less exciting.'],
+        ['Strong conversion, possible brand dilution.'],
+      ][i] || ['Directional local estimate only.'],
+      recommended_use_case: [
+        'Use for awareness testing.',
+        'Use for trust-led launch review.',
+        'Use for tactical promotion testing.',
+      ][i] || 'Use only for local planning.',
+      source,
     })),
+    ranked_recommendation: ids.map((id, i) => ({
+      rank: i + 1,
+      campaign_id: id,
+      campaign_name: names[i],
+      recommendation: i === 2 ? 'Lead with this only after validation.' : 'Keep as secondary route.',
+      reason: 'Local estimate generated in browser after backend comparison failed.',
+      source,
+    })),
+    risk_comparison: ids.map((id, i) => ({
+      campaign_id: id,
+      campaign_name: names[i],
+      crisis_risk: [15, 35, 8][i] || 20,
+      risk_level: ['low', 'medium', 'low'][i] || 'medium',
+      source,
+    })),
+    trade_offs: [],
     overall_winner: {
       campaign_id: ids[2] || ids[0],
       campaign_name: names[2] || names[0],
       metric_wins: 7,
       total_metrics: 7,
+      recommendation: 'Use this local estimate only for planning continuity; rerun backend before approval.',
+      source,
     },
   }
+  result.trade_offs = result.campaign_summaries.map(row => ({
+    campaign_id: row.campaign_id,
+    campaign_name: row.campaign_name,
+    trade_offs: row.trade_offs,
+  }))
+  return result
 }
 </script>
 
@@ -341,7 +441,9 @@ function generateDemoComparison() {
 .selection-section,
 .winner-banner,
 .metric-row,
-.campaign-label {
+.campaign-label,
+.fallback-panel,
+.insight-panel {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   background: var(--bg-surface);
@@ -437,6 +539,35 @@ function generateDemoComparison() {
   opacity: 0.35;
 }
 
+.fallback-panel {
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  border-color: var(--yellow);
+}
+
+.fallback-panel strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.fallback-panel p {
+  margin: 0 0 var(--space-3);
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+}
+
+.btn-fallback {
+  min-height: 38px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--yellow);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--yellow);
+  font-weight: 900;
+  cursor: pointer;
+}
+
 .loading-state {
   padding: var(--space-20);
   color: var(--text-tertiary);
@@ -497,6 +628,52 @@ function generateDemoComparison() {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: var(--space-4);
   margin-bottom: var(--space-8);
+}
+
+.insight-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.insight-panel {
+  padding: var(--space-5);
+}
+
+.insight-panel h3 {
+  margin: 0 0 var(--space-4);
+  color: var(--text-primary);
+  font-size: var(--text-lg);
+}
+
+.insight-panel ol {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.insight-panel li,
+.trade-row {
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.insight-panel li strong,
+.trade-row strong {
+  display: block;
+  color: var(--text-primary);
+}
+
+.trade-row + .trade-row {
+  margin-top: var(--space-4);
+}
+
+.trade-row p,
+.trade-row small {
+  margin: var(--space-1) 0 0;
 }
 
 .campaign-label {

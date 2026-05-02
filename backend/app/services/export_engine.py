@@ -336,6 +336,7 @@ class PPTXGenerator:
         comparison = data.get("comparison", {})
         winner = comparison.get("overall_winner", {})
         metrics = comparison.get("metrics_comparison", [])
+        source = comparison.get("source") or data.get("source") or {}
 
         # Winner banner
         win_box = slide.shapes.add_textbox(Inches(1), Inches(2), Inches(11), Inches(1))
@@ -346,6 +347,14 @@ class PPTXGenerator:
         p.font.color.rgb = RGBColor(0xFF, 0x45, 0x00)
         p.font.bold = True
         p.alignment = PP_ALIGN.CENTER
+
+        if source:
+            source_box = slide.shapes.add_textbox(Inches(1), Inches(2.95), Inches(11), Inches(0.35))
+            source_p = source_box.text_frame.paragraphs[0]
+            source_p.text = f"Source: {source.get('source_mode') or source.get('type', 'unknown')} | Basis: {source.get('data_basis', 'unknown')}"
+            source_p.font.size = Pt(9)
+            source_p.font.color.rgb = RGBColor(0x88, 0x88, 0x88)
+            source_p.alignment = PP_ALIGN.CENTER
 
         # Metrics table
         if metrics:

@@ -293,6 +293,16 @@ For decision meetings, the backend can package existing dashboard/simulation pay
 
 Each pack includes executive decision summary, launch recommendation, KPI summary, segment reactions, risk drivers, crisis watchouts, recommended action plan, and next validation steps. Every section inherits source/provenance metadata such as `source_mode`, `data_basis`, confidence level, assumptions, limitations, and recommended validation step.
 
+### Backend-First Comparator
+
+The A/B/C Comparator compares 2-5 campaign directions through the backend first. It includes backend demo fixtures for:
+
+- Emotional / storytelling direction.
+- Proof-led / trust direction.
+- Price / promotion direction.
+
+Comparator output includes ranked recommendation, metric wins, segment strengths and weaknesses, conversion and engagement estimates, crisis/risk comparison, trade-offs, recommended use case, and source/provenance metadata per variant and for the overall comparison. Browser-side output is available only as an explicit Local Estimate fallback.
+
 ### Export To Slide
 
 Export simulation output into client- or leadership-ready files:
@@ -516,6 +526,8 @@ All product APIs are registered under `/api/*`.
 | POST | `/api/decision/what-if` | Run deterministic what-if strategy simulation |
 | POST | `/api/comparator/compare` | Compare 2-5 campaigns |
 | GET | `/api/comparator/metrics` | Comparator metric definitions |
+| GET | `/api/comparator/demo/campaigns` | Public backend demo comparator variants |
+| POST | `/api/comparator/demo/compare` | Compare backend demo comparator variants |
 | POST | `/api/impact/calculate` | Business impact calculation |
 | GET | `/api/impact/scenarios/{sentiment}` | Quick impact scenario |
 | GET | `/api/competitor/scenarios` | War room scenario list |

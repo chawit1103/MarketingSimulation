@@ -869,8 +869,17 @@
     "metricBrandPerceptionShift": "Brand Perception Shift",
     "metricOpinionPolarization": "Opinion Polarization",
     "demoCampaignWarning": "Demo campaign options are being shown because no backend campaign session is available.",
+    "demoResultWarning": "This comparison uses deterministic backend demo fixtures, not live market evidence.",
+    "localCampaignListWarning": "Comparator demo options could not be loaded from the backend. Local estimate options are shown for continuity.",
     "localEstimateWarning": "These comparison results are generated in the browser for demo continuity. They are not backend-verified simulation results.",
-    "backendVerifiedWarning": "These results came from the comparator API using campaign KPI records."
+    "liveBackendWarning": "These results came from the backend comparator API; check each variant source before decision use.",
+    "backendVerifiedWarning": "These results came from the comparator API using persisted real simulation KPI records.",
+    "unknownSourceWarning": "Source metadata was not available. Treat this comparison cautiously.",
+    "backendUnavailableTitle": "Backend comparison unavailable",
+    "backendUnavailableBody": "The comparator API did not return a usable result. You can run an explicit Local Estimate, but it is not backend-verified evidence.",
+    "runLocalEstimate": "Run Local Estimate",
+    "rankedRecommendation": "Ranked Recommendation",
+    "tradeOffs": "Trade-offs & Use Cases"
   },
   "steps": {
     "graphBuild": "Graph Build",

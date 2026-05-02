@@ -91,3 +91,23 @@ This pass adds a backend strategy-pack export payload for meeting preparation. I
 - Full backend tests passed: `backend/.venv/bin/python -m pytest backend/tests -q`.
 - Frontend build passed: `cd frontend && npm run build`.
 - Secret hygiene scan and `git diff --check` passed.
+
+## PR X: Campaign A/B/C Comparator Backend-First
+
+This pass makes the Comparator backend-first for demo and authenticated campaign comparisons. It does not claim real-world A/B test accuracy or calibrated campaign lift.
+
+### What Changed
+
+- Added backend demo comparator variants for emotional/storytelling, proof-led/trust, and price/promotion campaign directions.
+- Added public demo comparator routes for no-key onboarding.
+- Comparator results now include ranked recommendation, segment strengths/weaknesses, conversion and engagement estimates, risk comparison, trade-offs, recommended use cases, and source/provenance metadata.
+- Frontend Comparator uses backend demo fixtures first and no longer silently falls back to browser-generated results.
+- Browser-side comparator output is available only through an explicit Local Estimate action after backend comparison fails.
+
+### Validation
+
+- Focused backend comparator/API contract tests passed: `backend/.venv/bin/python -m pytest backend/tests/test_comparator_api.py backend/tests/test_api_contract.py -q`.
+- Full backend tests passed: `backend/.venv/bin/python -m pytest backend/tests -q`.
+- Frontend build passed: `cd frontend && npm run build`.
+- E2E smoke tests passed: `cd frontend && npm run test:e2e -- --project=chromium --workers=1`.
+- Secret hygiene scan and `git diff --check` passed.

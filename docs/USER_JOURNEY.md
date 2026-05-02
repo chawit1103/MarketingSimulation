@@ -121,6 +121,21 @@ Recommended action:
 - Start with Price War, Influencer Backlash, Product Recall, Regulatory Issue, ESG Controversy, Fake News/Rumor, or Competitor Launch.
 - If backend simulation fails, use Local Estimate only as an explicit fallback.
 
+## 6A. Compare Campaign Directions
+
+Open Comparator.
+
+Goal:
+
+- Compare 2-5 campaign directions before pitching or launching.
+- Understand why one direction wins, where each variant is weak, and which source mode supports the result.
+
+Recommended action:
+
+- Start with backend demo variants for emotional/storytelling, proof-led/trust, and price/promotion directions.
+- Use Local Estimate only when explicitly needed for demo continuity after backend comparison is unavailable.
+- Treat Demo Mode and Local Estimate comparisons as planning examples, not real-world A/B test results.
+
 Screenshot:
 
 - `docs/screenshots/war-room.png`

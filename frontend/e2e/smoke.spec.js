@@ -177,6 +177,69 @@ const liveWarRoomResult = {
   ],
 }
 
+const demoComparatorCampaigns = [
+  { id: 'cmp_demo_emotional_story', campaign_id: 'cmp_demo_emotional_story', name: 'Variant A: Emotional Storytelling', direction: 'emotional_storytelling' },
+  { id: 'cmp_demo_proof_trust', campaign_id: 'cmp_demo_proof_trust', name: 'Variant B: Proof-Led Trust', direction: 'proof_led_trust' },
+  { id: 'cmp_demo_price_promo', campaign_id: 'cmp_demo_price_promo', name: 'Variant C: Price / Promotion', direction: 'price_promotion' },
+]
+
+const demoComparatorResult = {
+  source: {
+    type: 'demo_mode',
+    source_mode: 'demo_mode',
+    data_basis: 'demo_fixture',
+    warning: 'Comparison uses deterministic demo fixtures only.',
+  },
+  source_mode: 'demo_mode',
+  data_basis: 'demo_fixture',
+  campaign_count: 3,
+  metrics_comparison: [
+    {
+      key: 'conversion_probability',
+      label: 'Conversion Probability',
+      unit: '%',
+      higher_is_better: true,
+      values: [
+        { campaign_id: 'cmp_demo_emotional_story', value: 57 },
+        { campaign_id: 'cmp_demo_proof_trust', value: 69 },
+        { campaign_id: 'cmp_demo_price_promo', value: 74 },
+      ],
+      winner_campaign_id: 'cmp_demo_price_promo',
+      winner_value: 74,
+      max_diff: 17,
+    },
+  ],
+  campaign_summaries: demoComparatorCampaigns.map((campaign, index) => ({
+    campaign_id: campaign.campaign_id,
+    campaign_name: campaign.name,
+    metric_wins: index === 2 ? 1 : 0,
+    is_overall_winner: index === 2,
+    recommended_use_case: index === 1 ? 'Use for trust-led launch review.' : 'Use for directional planning.',
+    trade_offs: ['Demo fixture trade-off.'],
+    source: { type: 'demo_mode', source_mode: 'demo_mode', data_basis: 'demo_fixture' },
+  })),
+  ranked_recommendation: [
+    {
+      rank: 1,
+      campaign_id: 'cmp_demo_price_promo',
+      campaign_name: 'Variant C: Price / Promotion',
+      recommendation: 'Use for tactical promotion testing.',
+      reason: '1 metric wins, conversion estimate 74%, risk medium.',
+      source: { type: 'demo_mode', source_mode: 'demo_mode', data_basis: 'demo_fixture' },
+    },
+  ],
+  risk_comparison: [],
+  trade_offs: [],
+  overall_winner: {
+    campaign_id: 'cmp_demo_price_promo',
+    campaign_name: 'Variant C: Price / Promotion',
+    metric_wins: 1,
+    total_metrics: 1,
+    recommendation: 'Use this direction as the lead route, then validate assumptions.',
+    source: { type: 'demo_mode', source_mode: 'demo_mode', data_basis: 'demo_fixture' },
+  },
+}
+
 async function installApiMocks(page, options = {}) {
   await page.addInitScript(() => {
     localStorage.removeItem('3c-auth-token')
@@ -230,6 +293,16 @@ async function installApiMocks(page, options = {}) {
     }
     if (path === '/api/decision/what-if') {
       return json(route, { success: true, data: { kpi_deltas: {}, verdict: 'Controlled pilot' } })
+    }
+    if (path === '/api/comparator/demo/campaigns') {
+      return json(route, {
+        success: true,
+        data: demoComparatorCampaigns,
+        source: demoComparatorResult.source,
+      })
+    }
+    if (path === '/api/comparator/demo/compare') {
+      return json(route, { success: true, data: demoComparatorResult })
     }
     if (path === '/api/competitor/simulate') {
       if (options.failCompetitorSimulation) {
@@ -349,6 +422,21 @@ test('brief quality score can be checked without live providers', async ({ page 
   await expect(page.getByText('Brief Quality Score')).toBeVisible()
   await expect(page.getByText('100%')).toBeVisible()
   await expect(page.getByText('Strong brief')).toBeVisible()
+})
+
+test('comparator uses backend demo fixtures and source labels', async ({ page }) => {
+  await page.goto('/comparator')
+
+  await expect(page.getByRole('heading', { name: /A\/B Message Comparator/i })).toBeVisible()
+  await expect(page.getByText('Demo Mode').first()).toBeVisible()
+  await page.getByText('Variant A: Emotional Storytelling').click()
+  await page.getByText('Variant B: Proof-Led Trust').click()
+  await page.getByText('Variant C: Price / Promotion').click()
+  await page.getByRole('button', { name: /Compare Campaigns/i }).click()
+
+  await expect(page.getByText('Variant C: Price / Promotion').first()).toBeVisible()
+  await expect(page.getByText('Ranked Recommendation')).toBeVisible()
+  await expect(page.getByText('Comparison uses deterministic demo fixtures only.')).toBeVisible()
 })
 
 test('war room displays live backend source for backend simulation', async ({ page }) => {

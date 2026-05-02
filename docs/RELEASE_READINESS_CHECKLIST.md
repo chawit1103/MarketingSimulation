@@ -22,6 +22,8 @@ Use this checklist before tagging or deploying a release candidate.
 - [x] `/api/decision/what-if`
 - [x] `/api/comparator/compare`
 - [x] `/api/comparator/metrics`
+- [x] `/api/comparator/demo/campaigns`
+- [x] `/api/comparator/demo/compare`
 - [x] `/api/impact/scenarios/<sentiment_value>`
 - [x] `/api/competitor/scenarios`
 - [x] `/api/competitor/simulate`
@@ -42,6 +44,7 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] Demo dashboards are labeled Demo Mode.
 - [x] Dashboard local fallbacks are labeled Local Estimate.
 - [x] Comparator demo/local fallback output is visibly labeled.
+- [x] Comparator demo routes return backend fixture output labeled `demo_mode`; browser fallback is explicit `local_estimate`.
 - [x] War Room calls the backend by default and exposes Local Estimate only after an explicit fallback action.
 - [x] Action plans inherit source metadata.
 - [x] Strategy pack exports include section-level source/provenance metadata.
@@ -190,6 +193,21 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] Frontend build run for PR W: `cd frontend && npm run build` passed on 2026-05-02.
 - [x] CI-equivalent secret hygiene scan run for PR W: passed on 2026-05-02.
 - [x] `git diff --check` run for PR W: passed on 2026-05-02.
+
+### PR X Comparator Backend-First Run
+
+- [x] Roadmap progress selected PR X after PR W.
+- [x] Added backend comparator demo fixtures for emotional/storytelling, proof-led/trust, and price/promotion variants.
+- [x] Added `GET /api/comparator/demo/campaigns` and `POST /api/comparator/demo/compare`.
+- [x] Comparator output includes ranked recommendation, segment strengths/weaknesses, conversion and engagement estimates, risk comparison, trade-offs, recommended use case, and source/provenance metadata.
+- [x] Frontend Comparator uses backend demo fixtures first and requires explicit Local Estimate fallback after backend failure.
+- [x] Focused backend comparator tests run for PR X: `backend/.venv/bin/python -m pytest backend/tests/test_comparator_api.py backend/tests/test_api_contract.py -q` passed on 2026-05-02: 7 passed, 4 warnings.
+- [x] Full backend tests run for PR X: `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-02: 63 passed, 38 warnings.
+- [x] Locale JSON validation run for PR X: `python3 -m json.tool src/locales/en.json` and `src/locales/th.json` passed on 2026-05-02.
+- [x] Frontend build run for PR X: `cd frontend && npm run build` passed on 2026-05-02.
+- [x] E2E smoke tests run for PR X: `cd frontend && npm run test:e2e -- --project=chromium --workers=1` passed on 2026-05-02: 10 passed.
+- [x] CI-equivalent secret hygiene scan run for PR X: passed on 2026-05-02.
+- [x] `git diff --check` run for PR X: passed on 2026-05-02.
 
 ## Release Decision
 

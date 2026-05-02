@@ -43,6 +43,7 @@ class TenantMiddleware:
         "/api/decision",
         "/api/brief",
         "/api/competitor",
+        "/api/comparator/demo",
         "/api/settings/providers",
         "/api/settings/readiness",
         "/api/impact/scenarios",

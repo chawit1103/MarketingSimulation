@@ -84,7 +84,23 @@ Screenshots:
 - `docs/screenshots/simulation-dashboard-kpis.png`
 - `docs/screenshots/action-plan.png`
 
-## 3:00-4:10 — War Room
+## 3:00-3:35 — A/B/C Comparator
+
+Open `/comparator`.
+
+Key message:
+
+> Agencies and brand teams can compare multiple campaign directions before pitching or launching. Demo comparison uses backend fixtures and is labeled Demo Mode; browser fallback must be explicitly run as Local Estimate.
+
+Show:
+
+- Emotional/storytelling, proof-led/trust, and price/promotion variants.
+- Ranked recommendation.
+- Segment strengths and weaknesses.
+- Trade-offs and recommended use case.
+- Source label on the comparison result.
+
+## 3:35-4:25 — War Room
 
 Open `/war-room`.
 
@@ -103,7 +119,7 @@ Show:
 
 Screenshot: `docs/screenshots/war-room.png`
 
-## 4:10-5:00 — Settings Wizard And Close
+## 4:25-5:00 — Settings Wizard And Close
 
 Open `/settings`.
 

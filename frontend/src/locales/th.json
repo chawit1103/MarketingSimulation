@@ -854,8 +854,17 @@
     "metricBrandPerceptionShift": "การเปลี่ยนภาพลักษณ์แบรนด์",
     "metricOpinionPolarization": "ความแตกแยกของความคิดเห็น",
     "demoCampaignWarning": "กำลังแสดง campaign ตัวอย่าง เพราะยังไม่มี backend campaign session ที่ใช้ได้",
+    "demoResultWarning": "ผลเปรียบเทียบนี้ใช้ fixture demo จาก backend ยังไม่ใช่หลักฐานตลาดจริง",
+    "localCampaignListWarning": "โหลดตัวเลือก comparator demo จาก backend ไม่สำเร็จ จึงแสดงตัวเลือก Local Estimate เพื่อให้ทดลองต่อได้",
     "localEstimateWarning": "ผลเปรียบเทียบนี้คำนวณใน browser เพื่อให้ demo ใช้งานต่อได้ ยังไม่ใช่ผล simulation ที่ backend verified",
-    "backendVerifiedWarning": "ผลลัพธ์นี้มาจาก Comparator API โดยใช้ KPI record ของ campaign"
+    "liveBackendWarning": "ผลลัพธ์นี้มาจาก Comparator API โปรดดู source ของแต่ละ variant ก่อนใช้ตัดสินใจ",
+    "backendVerifiedWarning": "ผลลัพธ์นี้มาจาก Comparator API โดยใช้ KPI record จาก real simulation ที่บันทึกไว้",
+    "unknownSourceWarning": "ไม่มี metadata แหล่งที่มาชัดเจน ควรใช้ผลนี้อย่างระมัดระวัง",
+    "backendUnavailableTitle": "Backend comparison ใช้งานไม่ได้",
+    "backendUnavailableBody": "Comparator API ไม่ส่งผลลัพธ์ที่ใช้ได้ คุณสามารถกด Local Estimate เองได้ แต่ไม่ใช่หลักฐาน backend-verified",
+    "runLocalEstimate": "Run Local Estimate",
+    "rankedRecommendation": "อันดับคำแนะนำ",
+    "tradeOffs": "Trade-off และกรณีใช้งาน"
   },
   "impact": {
     "kicker": "โมเดลผลกระทบธุรกิจ",
