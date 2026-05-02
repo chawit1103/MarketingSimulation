@@ -108,8 +108,8 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] Backend tests: `backend/.venv/bin/python -m pytest backend/tests`
 - [x] Frontend production build: `cd frontend && npm run build`
 - [x] Locale JSON validation: `python3 -m json.tool frontend/src/locales/en.json` and `th.json`
-- [ ] Frontend unit tests: not configured.
-- [ ] Frontend lint/typecheck: not configured.
+- [x] Frontend unit tests are configured with Vitest and Vue Test Utils.
+- [x] Frontend lint/typecheck scripts are configured and included in `npm run test:frontend`.
 
 ### PR O Verification Run
 
@@ -328,6 +328,19 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] Analytics tests run for PR AE: `cd frontend && npm run test:analytics` passed on 2026-05-02: 2 passed.
 - [x] CI-equivalent secret hygiene scan run for PR AE: passed on 2026-05-02.
 - [x] `git diff --check` run for PR AE: passed on 2026-05-02.
+
+### PR AI Frontend Quality Gate Run
+
+- [x] Added `npm run lint`, `npm run typecheck`, `npm run test:unit`, and combined `npm run test:frontend` scripts.
+- [x] Added Vitest + Vue Test Utils unit coverage for ResultSourceBadge, Settings secret presence display, Comparator source labels and explicit Local Estimate fallback, Budget Planner disclaimer wording, Calibration privacy warnings, and Strategy Pack provenance rendering.
+- [x] Added CI `Frontend Quality` job that runs `npm run test:frontend` without requiring live LLM/API/Neo4j credentials.
+- [x] Frontend quality gate run for PR AI: `cd frontend && npm run test:frontend` passed on 2026-05-02: lint passed, typecheck passed, 15 unit tests passed, 2 analytics tests passed.
+- [x] Frontend build run for PR AI: `cd frontend && npm run build` passed on 2026-05-02.
+- [x] E2E smoke tests run for PR AI: `cd frontend && npm run test:e2e -- --project=chromium --workers=1` passed on 2026-05-02: 13 passed.
+- [x] Backend tests run for PR AI: `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-02: 83 passed, 46 warnings.
+- [x] Frontend dependency audit run for PR AI: `cd frontend && npm audit --omit=optional` passed on 2026-05-02: found 0 vulnerabilities.
+- [x] CI-equivalent secret hygiene scan run for PR AI: passed on 2026-05-02.
+- [x] `git diff --check` run for PR AI: passed on 2026-05-02.
 
 ## Release Decision
 

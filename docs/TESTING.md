@@ -31,6 +31,42 @@ cd frontend
 npm run build
 ```
 
+## Frontend Quality Gate
+
+Run from the repo root:
+
+```bash
+cd frontend
+npm run lint
+npm run typecheck
+npm run test:unit
+npm run test:analytics
+```
+
+Or run the combined quality gate:
+
+```bash
+cd frontend
+npm run test:frontend
+```
+
+The unit tests use Vitest, Vue Test Utils, and mocked API modules. They do not require:
+
+- a running Flask backend,
+- paid API keys,
+- live LLM providers,
+- Neo4j,
+- real customer data.
+
+Current unit coverage verifies:
+
+- `ResultSourceBadge` labels for Demo Mode, Local Estimate, Live Backend, Backend Verified, and Unknown Source.
+- Settings secret presence display using `api_key_present` / `password_present` flags without rendering raw secrets.
+- Comparator demo/backend result labels and explicit Local Estimate fallback.
+- Budget Planner disclaimer wording for assumption-based planning, not exact ROI/ROAS prediction.
+- Calibration privacy warnings for aggregate-only actuals.
+- Strategy Pack source/provenance formatting for slide footer and validation-summary rendering.
+
 ## E2E Smoke Tests
 
 The Playwright smoke tests live in `frontend/e2e/smoke.spec.js`.
@@ -80,13 +116,13 @@ GitHub Actions runs the same release-safe checks on pull requests and pushes to 
 - `Secret Hygiene`: scans committed files for common API-key/private-key patterns.
 - `Backend Tests`: installs `backend` with dev dependencies and runs `python -m pytest tests`.
 - `Frontend Build`: runs `npm ci` and `npm run build`.
+- `Frontend Quality`: runs `npm run test:frontend`, which includes lint, typecheck, Vitest unit tests, and analytics tests.
 - `E2E Smoke`: installs Chromium and runs the mocked Playwright smoke suite.
 
 CI uses dummy test-mode environment values for LLM, embedding, and Neo4j settings. It must not require real provider keys, Neo4j cloud credentials, paid services, or live model calls.
 
 ## Current Gaps
 
-- No frontend unit/component test runner is configured yet.
-- No lint/typecheck script is configured yet.
+- Frontend lint is intentionally lightweight and currently functions as a parse/configuration gate rather than a style-enforcement pass.
 - E2E tests use mocked API fixtures, so they complement but do not replace backend contract tests.
 - Manual screenshot review remains useful before public demos.
