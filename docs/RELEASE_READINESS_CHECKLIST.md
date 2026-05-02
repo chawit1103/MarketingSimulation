@@ -1,6 +1,6 @@
 # Release Readiness Checklist
 
-Updated: 2026-05-01
+Updated: 2026-05-02
 
 Use this checklist before tagging or deploying a release candidate.
 
@@ -21,6 +21,9 @@ Use this checklist before tagging or deploying a release candidate.
 - [x] `/api/brief/revise`
 - [x] `/api/decision/analyze`
 - [x] `/api/decision/what-if`
+- [x] `/api/decision/budget-scenario`
+- [x] `/api/calibration/actual-results`
+- [x] `/api/calibration/status/<campaign_id>`
 - [x] `/api/comparator/compare`
 - [x] `/api/comparator/metrics`
 - [x] `/api/comparator/demo/campaigns`
@@ -287,6 +290,23 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] Backend tests run for PR AC: `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-02: 79 passed, 49 warnings.
 - [x] CI-equivalent secret hygiene scan run for PR AC: passed on 2026-05-02.
 - [x] `git diff --check` run for PR AC: passed on 2026-05-02.
+
+### PR AD Final Brand/Agency Go-No-Go Run
+
+- [x] Roadmap progress selected PR AD after PR AC.
+- [x] Reviewed features added in PR W through PR AC for demo/docs consistency.
+- [x] README now explains value for Marketing Manager / Brand Team and Marketing Agency / Strategy Team.
+- [x] Demo script now has two tracks: Brand Safety / C-Level Decision Demo and Agency Pitch / A/B/C Campaign Comparison Demo.
+- [x] Screenshot inventory reviewed for PR AD.
+- [x] Screenshots kept: home landing, demo dashboard, brief quality score, simulation dashboard KPIs, War Room, Action Plan, Settings Wizard.
+- [x] Screenshots replaced: none, because PR AD changed docs/demo framing only.
+- [x] Readiness wording remains honest: local demo is ready, controlled private pilot is conditional, public pilot/public internet/production customer deployment remain blocked.
+- [x] Backend tests run for PR AD: `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-02: 79 passed, 49 warnings.
+- [x] Frontend build run for PR AD: `cd frontend && npm run build` passed on 2026-05-02.
+- [x] E2E smoke tests run for PR AD: `cd frontend && npm run test:e2e -- --project=chromium --workers=1` passed on 2026-05-02: 13 passed.
+- [x] Analytics sanitization tests rerun for PR AD after secret-scan fixture hygiene: `cd frontend && npm run test:analytics` passed on 2026-05-02: 2 passed.
+- [x] CI-equivalent secret hygiene scan run for PR AD: passed on 2026-05-02.
+- [x] `git diff --check` run for PR AD: passed on 2026-05-02.
 
 ## Release Decision
 

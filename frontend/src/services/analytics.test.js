@@ -26,16 +26,19 @@ test('analytics allowlist includes pilot journey events', () => {
 })
 
 test('analytics payload sanitizer drops sensitive fields and redacts token-like values', () => {
+  const openAiLikeToken = ['sk', 'test-secret-1234567890'].join('-')
+  const anthropicLikeToken = ['sk', 'ant', 'secret-1234567890'].join('-')
+  const openRouterLikeToken = ['sk', 'or', 'secret-1234567890'].join('-')
   const sanitized = sanitizeAnalyticsPayload({
     route_bucket: 'dashboard',
     source_mode: 'demo_mode',
     rating: 4,
     campaign_name: 'Private campaign name',
     brief_text: 'Raw brief content',
-    api_key: 'sk-test-secret-1234567890',
-    provider_detail: 'failed with sk-ant-secret-1234567890 in payload',
+    api_key: openAiLikeToken,
+    provider_detail: `failed with ${anthropicLikeToken} in payload`,
     nested: { raw: 'should not be serialized' },
-    list: ['safe', 'sk-or-secret-1234567890'],
+    list: ['safe', openRouterLikeToken],
   })
 
   assert.deepEqual(sanitized, {

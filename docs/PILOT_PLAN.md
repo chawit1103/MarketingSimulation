@@ -11,6 +11,7 @@ This plan is for controlled testing with 3-5 real users or internal stakeholders
 - Validate that Demo Mode, Local Estimate, Live Backend, and Backend Verified labels are understood.
 - Learn whether Confidence & Evidence and Action Plan sections help users make a next-step decision.
 - Identify which outputs users would take to a manager, client, or leadership meeting.
+- Compare value perception between Brand/C-level decision users and Agency/client-pitch users.
 
 ## Participant Profile
 
@@ -49,7 +50,12 @@ Recommended starting routes:
 
 ### 0-5 minutes: Guided Demo
 
-Show:
+Choose one track from [DEMO_SCRIPT.md](DEMO_SCRIPT.md):
+
+- Brand Safety / C-Level Decision Demo.
+- Agency Pitch / A/B/C Campaign Comparison Demo.
+
+For both tracks, show:
 
 - Landing page positioning.
 - Demo dashboard with Demo Mode label.
@@ -59,6 +65,7 @@ Show:
 - Action Plan.
 - Settings Wizard.
 - Calibration v1 with aggregate actuals only, if using approved sample data.
+- Fixed-choice feedback widget if the participant is comfortable giving pilot feedback.
 
 ### 5-20 minutes: User Task
 
@@ -84,6 +91,18 @@ Ask:
 - What was missing before you would use this for a real decision?
 - Which step was confusing or slow?
 
+Brand/C-level specific questions:
+
+- Would this help you decide launch, revise, hold, or validate further?
+- Which section would you show leadership?
+- What evidence is still missing before real budget approval?
+
+Agency specific questions:
+
+- Would this help you compare creative routes for a client?
+- Which output would belong in a pitch deck?
+- What would a client challenge or ask you to prove?
+
 ## Data To Capture
 
 Use a structured notes sheet with:
@@ -98,6 +117,7 @@ Use a structured notes sheet with:
 - top trust point,
 - requested feature,
 - eventual campaign outcome if later available and approved.
+- pilot analytics event counts if collected locally and sanitized.
 
 Do not capture:
 
@@ -125,6 +145,8 @@ Pilot is successful if:
 - At least 3 participants say the Action Plan or Confidence & Evidence panel would help in a real campaign discussion.
 - No participant mistakes local fallback output for measured live simulation output.
 - If Calibration v1 is tested, participants understand that imported actuals are manual aggregate evidence and do not automatically retrain the simulation engine.
+- If the Agency track is tested, at least 3 participants can identify a winning route, a trade-off, and a client validation step.
+- If the Brand/C-level track is tested, at least 3 participants can explain launch/revise/hold decision logic from the dashboard evidence.
 
 ## Exit Criteria Before Public Demo
 
@@ -138,7 +160,7 @@ Before broader release:
 
 ## Go/No-Go Gate
 
-Current PR T verification decision:
+Current PR AD verification decision:
 
 | Pilot path | Status | Gate |
 | --- | --- | --- |
@@ -160,7 +182,7 @@ PR T did not change visible UI/security labels, so screenshots do not need recap
 
 Confirm every result screenshot shows the correct source label and that settings screenshots do not show API keys, passwords, auth tokens, private URLs, or customer data.
 
-PR U review kept all current curated screenshots and replaced none because no visible UI/security wording changed after PR T. This does not remove the public-demo requirement to re-check screenshots immediately before sharing.
+PR AD review kept all current curated screenshots and replaced none because PR AD changed documentation/demo framing only, not product UI. This does not remove the public-demo requirement to re-check screenshots immediately before sharing.
 
 ## Follow-Up
 

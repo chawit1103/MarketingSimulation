@@ -208,3 +208,24 @@ This pass improves privacy-conscious product analytics for controlled pilots. It
 
 - Analytics sanitization tests passed: `cd frontend && npm run test:analytics`.
 - Full frontend build/e2e, backend, secret scan, and diff validation are recorded in `docs/RELEASE_READINESS_CHECKLIST.md`.
+
+## PR AD: Final Brand/Agency Go-No-Go + Demo Refresh
+
+This pass closes the Brand & Agency Value Roadmap with documentation, demo framing, screenshot inventory, and readiness consistency. It does not add product features or change runtime behavior.
+
+### What Changed
+
+- Updated README positioning for two audiences:
+  - Marketing Manager / Brand Team.
+  - Marketing Agency / Strategy Team.
+- Updated README product walkthrough to reference Brand and Agency demo tracks.
+- Reworked `docs/DEMO_SCRIPT.md` into two 5-minute tracks:
+  - Brand Safety / C-Level Decision Demo.
+  - Agency Pitch / A/B/C Campaign Comparison Demo.
+- Updated `docs/PILOT_PLAN.md` with Brand vs Agency participant questions, success criteria, feedback analytics usage, and PR AD go/no-go language.
+- Updated `docs/SCREENSHOT_GUIDE.md` with PR AD screenshot inventory.
+- Kept all curated screenshots and replaced none because PR AD changed docs/demo framing only.
+
+### Validation
+
+- Final validation is recorded in `docs/RELEASE_READINESS_CHECKLIST.md`.

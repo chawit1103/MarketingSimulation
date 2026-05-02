@@ -37,6 +37,29 @@ This is not positioned as an AI playground. It is a decision-support system for 
 - How should we revise the campaign before spending real media budget?
 - What should we show leadership or a client?
 
+## Who It Is For
+
+### Marketing Manager / Brand Team
+
+Use 3C Simulator to pressure-test a launch, campaign, competitor move, or crisis-sensitive message before real spend. The recommended brand flow is:
+
+1. Start with a safe demo or approved brief.
+2. Check Brief Quality Score before simulation.
+3. Review Dashboard evidence, Confidence & Evidence, and source labels.
+4. Use Action Plan and Revised Brief v2 to decide what to change.
+5. Use Budget Planner and Calibration v1 as directional planning inputs, not guaranteed forecasts.
+6. Export a Brand Executive Summary for leadership review.
+
+### Marketing Agency / Strategy Team
+
+Use 3C Simulator to compare creative directions and turn scenario evidence into a client-ready recommendation. The recommended agency flow is:
+
+1. Open the Demo Dashboard to establish source-labeling and evidence rules.
+2. Compare 2-5 campaign directions in A/B/C Comparator.
+3. Stress-test competitor or crisis reactions in War Room.
+4. Package the recommendation as an Agency Client Pitch Summary.
+5. Use pilot feedback analytics to learn where clients trust, doubt, or need more proof.
+
 For the current production/demo readiness matrix, see [docs/STATUS.md](docs/STATUS.md).
 For demo, release validation, known limitations, and recommended next actions, see:
 
@@ -95,7 +118,12 @@ http://127.0.0.1:5174/dashboard/demo-premium-water
 
 ## Product Walkthrough
 
-Screenshots below were reviewed after the PR T security-readiness pass and use the local demo flow with no auth token, API key, or real customer data. They show product workflow only; they do not claim public-pilot or production readiness.
+Screenshots below were reviewed after the PR AD roadmap pass and use the local demo flow with no auth token, API key, or real customer data. They show product workflow only; they do not claim public-pilot or production readiness.
+
+For a 5-minute presenter script, use one of the two tracks in [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md):
+
+- Brand Safety / C-Level Decision Demo.
+- Agency Pitch / A/B/C Campaign Comparison Demo.
 
 ### 1. Start From The Landing Page
 
@@ -142,6 +170,10 @@ The Settings Wizard checks readiness for demo-only, local model, and cloud API s
 ### 8. Import Aggregate Actuals For Calibration
 
 Calibration v1 lets analyst/admin users enter approved aggregate actual campaign results and compare them against prior estimates. It rejects raw customer data, CRM records, raw social posts, and PII-like notes.
+
+### 9. Capture Pilot Feedback Privately
+
+Pilot analytics emits sanitized browser `3c:analytics` events and fixed-choice feedback only. No third-party analytics SDK is installed, no network destination is configured by default, and no raw campaign brief, PII, token, API key, or customer record should be collected.
 
 For a presenter-friendly run-through, see [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md). For safe sample briefs, see [docs/DEMO_DATA.md](docs/DEMO_DATA.md). For expected buyer and pilot-user questions, see [docs/FAQ.md](docs/FAQ.md). For a first-time user path, see [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md).
 

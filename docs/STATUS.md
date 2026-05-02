@@ -35,6 +35,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - Budget Scenario Planner is available at `POST /api/decision/budget-scenario` and `/budget-planner`; it provides assumption-based channel/segment allocation ranges, trade-offs, confidence, assumptions, limitations, and validation steps without claiming exact ROI or ROAS prediction.
 - Manual Calibration v1 is available at `POST /api/calibration/actual-results`, `GET /api/calibration/status/<campaign_id>`, and `/calibration`; it compares aggregate actual campaign results against prior estimates without live CRM/social ingestion or model self-learning claims.
 - Provider-neutral pilot analytics emits sanitized browser `3c:analytics` events for key journeys and feedback without installing a third-party SDK or sending network requests by default.
+- Brand/Agency roadmap documentation now provides separate Brand Safety / C-Level and Agency Pitch / A/B/C demo tracks, with screenshot inventory and readiness language kept aligned to this checklist.
 - Critical frontend route contracts are covered by backend smoke tests for demo, impact, decision, comparator, competitor, export, settings readiness, and report status endpoints.
 - API response safety removes raw traceback keys and redacts common secret-like strings before JSON responses reach clients.
 

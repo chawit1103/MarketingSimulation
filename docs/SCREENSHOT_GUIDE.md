@@ -1,6 +1,6 @@
 # Screenshot Guide
 
-Updated: 2026-05-01
+Updated: 2026-05-02
 
 Curated screenshots already live in `docs/screenshots/`, but capture is not fully automated. Use this guide when refreshing README/demo images.
 
@@ -82,3 +82,12 @@ Kept:
 Replaced:
 
 - None.
+
+## PR AD Review Status
+
+Reviewed during the Brand/Agency Go-No-Go documentation pass:
+
+- Kept: all existing curated screenshots.
+- Replaced: none.
+- Reason: PR AD changed documentation, demo tracks, and readiness wording only. No product UI changed in PR AD, and the current curated screenshots remain synthetic/demo-only.
+- Readiness wording: screenshots support local demo and controlled private pilot discussion only. They must not be used to claim public-pilot or production readiness.

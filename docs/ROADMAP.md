@@ -1,8 +1,19 @@
 # 3C Simulator Roadmap
 
-Updated: 2026-05-01
+Updated: 2026-05-02
 
 This roadmap reflects the current implementation after the production-hardening, security, brief-quality, War Room, Action Plan, Settings Wizard, and release-readiness passes.
+
+## Completed Brand & Agency Value Roadmap
+
+- Client-ready strategy pack payloads for Brand Executive Summary and Agency Client Pitch Summary.
+- Backend-first A/B/C Comparator demo fixtures with explicit Local Estimate fallback.
+- Revised Brief v2 from Action Plan.
+- Deep industry presets for high-value pilot categories.
+- Budget Scenario Planner with assumption-based channel/segment allocation ranges.
+- Manual Calibration v1 for aggregate actual-results comparison.
+- Privacy-conscious pilot feedback analytics.
+- Final Brand/Agency demo tracks and screenshot inventory review.
 
 ## Short-Term Priorities: Release Candidate And Pilot Readiness
 
@@ -16,6 +27,8 @@ This roadmap reflects the current implementation after the production-hardening,
   - `/comparator`
   - `/war-room`
   - `/impact`
+  - `/budget-planner`
+  - `/calibration`
   - `/settings`
 - Remove remaining misleading fallback behavior where a local estimate could be mistaken for a measured backend run.
 - Run a controlled pilot with real marketing, PR, or strategy users and capture qualitative feedback.
