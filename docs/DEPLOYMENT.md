@@ -2,7 +2,15 @@
 
 Updated: 2026-05-01
 
-This project is ready for local demo usage and conditionally ready for controlled private pilots. It is not yet ready for public internet exposure or production customer deployment without the remaining release-readiness work in `docs/RELEASE_READINESS_CHECKLIST.md`.
+This project is ready for local demo usage and is a conditional candidate for controlled private pilots. Public pilot, public internet exposure, and production customer deployment remain blocked without the remaining release-readiness work in `docs/RELEASE_READINESS_CHECKLIST.md`.
+
+| Path | Status |
+| --- | --- |
+| Local demo | Ready |
+| Controlled private pilot | Conditional candidate |
+| Public pilot | Blocked |
+| Public internet exposure | Blocked |
+| Production customer deployment | Blocked |
 
 ## Secret Handling
 
@@ -55,7 +63,7 @@ Do not use `*` for production API routes.
 
 The bundled limiter is dependency-free and suitable for local/demo protection. It is still in-memory and per-process, so it is not enough by itself for public internet exposure or multi-worker production deployments.
 
-Production deployments should add edge/API-gateway or shared-store rate limiting. If traffic reaches Flask through a proxy, set `RATE_LIMIT_TRUSTED_PROXIES` only to proxies that overwrite inbound forwarding headers.
+Public internet exposure requires edge/API-gateway or shared-store rate limiting before deployment. If traffic reaches Flask through a proxy, set `RATE_LIMIT_TRUSTED_PROXIES` only to proxies that overwrite inbound forwarding headers.
 
 Examples:
 
@@ -79,7 +87,7 @@ Query-parameter credentials such as `?api_key=...` are not accepted.
 
 The frontend now stores browser auth tokens in `sessionStorage`, not persistent `localStorage`. On load, legacy `3c-auth-token` values are migrated into `sessionStorage` and removed from `localStorage`; legacy `3c-api-key` values are removed from `localStorage` and are not persisted for normal UI sessions.
 
-This reduces persistence risk, but it is not a complete production auth hardening. Session storage is still readable by JavaScript if an XSS vulnerability exists. Before customer production deployment, prefer secure HttpOnly cookies, a short-lived access-token plus refresh-token flow, or an equivalent hardened browser-auth strategy.
+This reduces persistence risk, but it is not a complete production auth hardening. Session storage is still readable by JavaScript if an XSS vulnerability exists. Production customer deployment requires secure HttpOnly cookies, a short-lived access-token plus refresh-token flow, or an equivalent hardened browser-auth strategy before release.
 
 The Flask app emits these browser hardening headers by default:
 
@@ -126,4 +134,4 @@ Before public internet exposure, complete or explicitly risk-accept:
 - deployment logging, backup, retention, and deletion policies,
 - review of legacy local JSON records without `org_id`.
 
-PR T verification keeps public internet exposure as a no-go. Local demo is acceptable with synthetic data. Controlled private pilot is conditional and should not proceed until credential rotation is evidenced and the deployment owner has added the required operational controls.
+Current verification keeps public pilot, public internet exposure, and production customer deployment blocked. Local demo is ready with synthetic data and no real secrets. Controlled private pilot is a conditional candidate and should not proceed until credential rotation is evidenced and the deployment owner has added the required operational controls.

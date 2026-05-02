@@ -2,6 +2,35 @@
 
 Updated: 2026-05-02
 
+## PR AH: Final Branch Consolidation And Readiness Wording Fix
+
+This pass consolidates the latest completed branch stack into a new release-candidate branch intended to become the default source of truth. It adds no product features and does not claim production readiness.
+
+### Readiness Decision
+
+| Path | Status |
+| --- | --- |
+| Local demo | Ready |
+| Controlled private pilot | Conditional candidate |
+| Public pilot | Blocked |
+| Public internet exposure | Blocked |
+| Production customer deployment | Blocked |
+
+### Wording Fixes
+
+- Manual credential rotation remains a required owner action and is not marked complete.
+- SEC-009 now says public internet exposure requires edge/API-gateway or shared-store rate limiting before deployment.
+- SEC-012 now says production customer deployment requires HttpOnly cookies, refresh-token auth, or an equivalent hardened browser-auth strategy before release.
+
+### Validation
+
+- Backend tests passed.
+- Focused security tests passed.
+- Frontend production build passed.
+- Mocked Playwright e2e smoke tests passed.
+- Analytics tests passed.
+- Secret hygiene scan and `git diff --check` passed.
+
 ## PR AF: Complete Demo Dashboard Fixtures
 
 This pass completes the currently visible no-key demo dashboard set and removes the misleading fallback that could show the premium-water dashboard for unrelated demo IDs.
@@ -56,10 +85,11 @@ This verification pass adds no product features. It records the current release 
 
 | Release path | Current decision | Reason |
 | --- | --- | --- |
-| Local demo | Go | Demo mode works without real provider keys when synthetic data is used. |
-| Controlled private pilot | Conditional go | Acceptable only for trusted users after manual credential-rotation evidence is provided, deployment secrets come from environment variables, and pilot data is non-confidential or explicitly approved. |
-| Public pilot / public internet exposure | No-go | Manual credential rotation is not evidenced, production rate limiting still requires edge/shared enforcement, and browser auth storage is mitigated but not fully hardened. |
-| Production customer deployment | No-go | Requires manual credential rotation, shared/edge rate limiting, hardened browser auth, formal data-retention/deletion policy, production storage decisions, and deployment operations controls. |
+| Local demo | Ready | Demo mode works without real provider keys when synthetic data is used. |
+| Controlled private pilot | Conditional candidate | Acceptable only for trusted users after manual credential-rotation evidence is provided, deployment secrets come from environment variables, and pilot data is non-confidential or explicitly approved. |
+| Public pilot | Blocked | Manual credential rotation is not evidenced, production rate limiting still requires edge/shared enforcement, and browser auth storage is mitigated but not fully hardened. |
+| Public internet exposure | Blocked | Manual credential rotation is not evidenced, production rate limiting still requires edge/shared enforcement, and browser auth storage is mitigated but not fully hardened. |
+| Production customer deployment | Blocked | Requires manual credential rotation, shared/edge rate limiting, hardened browser auth, formal data-retention/deletion policy, production storage decisions, and deployment operations controls. |
 
 ### Remaining Blockers
 
@@ -85,10 +115,11 @@ This pass reviewed the existing curated screenshots and demo package after PR S/
 
 ### Demo Readiness Wording
 
-- Local demo: go with synthetic data and no real secrets.
-- Controlled private pilot: conditional go only after credential rotation evidence, environment-provided secrets, trusted users, and deployment controls.
-- Public pilot / public internet exposure: no-go.
-- Production customer deployment: no-go.
+- Local demo: ready with synthetic data and no real secrets.
+- Controlled private pilot: conditional candidate only after credential rotation evidence, environment-provided secrets, trusted users, and deployment controls.
+- Public pilot: blocked.
+- Public internet exposure: blocked.
+- Production customer deployment: blocked.
 
 ## Post-PR U Product-Trust Fix: Synthetic Influence Nodes
 
@@ -103,7 +134,7 @@ This integration pass selects PR V as the next roadmap item because the latest w
 ### Integration Decisions
 
 - Use the latest completed branch stack as the release-candidate source of truth.
-- Keep public pilot and production customer deployment as no-go.
+- Keep public pilot, public internet exposure, and production customer deployment as blocked.
 - Keep controlled private pilot as conditional.
 - Do not start PR W in this PR.
 
@@ -278,7 +309,7 @@ This pass creates a clean release-candidate integration branch from the latest s
 - Keep `.env.dev.example` and `.env.example` as safe placeholder examples.
 - Align readiness language across README, status, security, limitations, checklist, pilot plan, roadmap, and release notes.
 - Keep local demo as ready with synthetic data and no real secrets.
-- Keep controlled private pilot conditional on trusted users, credential-rotation evidence, environment-provided secrets, visible source labels, and deployment controls.
+- Keep controlled private pilot as a conditional candidate with trusted users, credential-rotation evidence, environment-provided secrets, visible source labels, and deployment controls.
 - Keep public pilot, public internet exposure, and production customer deployment blocked.
 
 ### Wording Fixes

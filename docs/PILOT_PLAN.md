@@ -160,13 +160,15 @@ Before broader release:
 
 ## Go/No-Go Gate
 
-Current PR AD verification decision:
+Current release-candidate verification decision:
 
 | Pilot path | Status | Gate |
 | --- | --- | --- |
-| Local demo | Go | Use synthetic demo data and no real provider secrets. |
-| Controlled private pilot | Conditional go | Limit to trusted users. Confirm credential rotation, environment-provided secrets, no confidential briefs unless explicitly approved, and deployment-owned logging/rate-limit controls. |
-| Public pilot | No-go | Blocked until manual credential rotation is evidenced, edge/shared rate limiting is deployed, browser auth storage is hardened or formally risk-accepted, and external data-retention/deletion expectations are approved. |
+| Local demo | Ready | Use synthetic demo data and no real provider secrets. |
+| Controlled private pilot | Conditional candidate | Limit to trusted users. Confirm credential rotation, environment-provided secrets, no confidential briefs unless explicitly approved, and deployment-owned logging/rate-limit controls. |
+| Public pilot | Blocked | Blocked until manual credential rotation is evidenced, edge/shared rate limiting is deployed, browser auth storage is hardened or formally risk-accepted, and external data-retention/deletion expectations are approved. |
+| Public internet exposure | Blocked | Requires edge/shared rate limiting, hardened browser auth, production deployment controls, and approved data-retention/deletion expectations. |
+| Production customer deployment | Blocked | Requires manual credential rotation evidence, production secret operations, safer auth storage, shared rate limiting, data policy, backup/observability, and storage architecture decisions. |
 
 Do not invite untrusted public users or publish a public demo URL until the public-pilot gate is green.
 

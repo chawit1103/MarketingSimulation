@@ -4,8 +4,9 @@ Updated: 2026-05-02
 
 ## Current Release Readiness
 
-- Local demo: allowed with synthetic data and no real secrets.
-- Controlled private pilot: conditional on trusted users, credential rotation evidence, environment-provided secrets, visible source labels, and deployment controls.
+- Local demo: ready with synthetic data and no real secrets.
+- Controlled private pilot: conditional candidate with trusted users, credential rotation evidence, environment-provided secrets, visible source labels, and deployment controls.
+- Public pilot: blocked.
 - Public internet exposure: blocked.
 - Production customer deployment: blocked.
 
@@ -77,7 +78,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 
 ## Remaining Gaps
 
-- Rate limiting is in-memory and per-process; production should still use an edge/API-gateway limiter for multi-worker deployments.
+- Rate limiting is in-memory and per-process; public internet exposure requires edge/API-gateway or shared-store rate limiting before deployment.
 - Legacy SHA256 password support should be removed after a migration window.
 - Brief Quality Score is deterministic completeness scoring only; it does not validate factual accuracy or calibrate confidence against real-world outcomes.
 - War Room should still be connected to full OASIS simulation records and real campaign calibration before being treated as measured market prediction.

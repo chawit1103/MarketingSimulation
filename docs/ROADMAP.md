@@ -4,6 +4,16 @@ Updated: 2026-05-02
 
 This roadmap reflects the current implementation after the production-hardening, security, brief-quality, War Room, Action Plan, Settings Wizard, and release-readiness passes.
 
+## Current Readiness
+
+| Path | Status |
+| --- | --- |
+| Local demo | Ready |
+| Controlled private pilot | Conditional candidate |
+| Public pilot | Blocked |
+| Public internet exposure | Blocked |
+| Production customer deployment | Blocked |
+
 ## Completed Brand & Agency Value Roadmap
 
 - Client-ready strategy pack payloads for Brand Executive Summary and Agency Client Pitch Summary.
@@ -45,7 +55,7 @@ This roadmap reflects the current implementation after the production-hardening,
 
 ## Mid-Term Priorities: Enterprise Readiness
 
-- Replace in-memory rate limiting with edge/API-gateway or shared-store rate limiting for multi-worker deployments.
+- Add edge/API-gateway or shared-store rate limiting before public internet exposure or multi-worker deployments.
 - Complete environment-specific secret rotation and production secret management.
 - Add deployment health checks for backend, frontend, Neo4j, model provider readiness, storage, and export generation.
 - Add CI gates for backend tests, frontend build, locale JSON validation, route-contract checks, and security smoke tests.

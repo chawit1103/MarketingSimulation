@@ -4,6 +4,16 @@ Updated: 2026-05-02
 
 This document separates what the system currently does from what should not yet be claimed.
 
+## Current Readiness
+
+| Path | Status |
+| --- | --- |
+| Local demo | Ready |
+| Controlled private pilot | Conditional candidate |
+| Public pilot | Blocked |
+| Public internet exposure | Blocked |
+| Production customer deployment | Blocked |
+
 ## Simulation And Calibration
 
 - Current demo dashboards are deterministic sample outputs, not measured market results.

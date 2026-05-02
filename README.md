@@ -61,6 +61,17 @@ Use 3C Simulator to compare creative directions and turn scenario evidence into 
 5. Use pilot feedback analytics to learn where clients trust, doubt, or need more proof.
 
 For the current production/demo readiness matrix, see [docs/STATUS.md](docs/STATUS.md).
+
+Current release readiness:
+
+| Path | Status |
+| --- | --- |
+| Local demo | Ready |
+| Controlled private pilot | Conditional candidate |
+| Public pilot | Blocked |
+| Public internet exposure | Blocked |
+| Production customer deployment | Blocked |
+
 For demo, release validation, known limitations, and recommended next actions, see:
 
 - [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)
@@ -75,6 +86,7 @@ For demo, release validation, known limitations, and recommended next actions, s
 - [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md)
 - [docs/POST_IMPLEMENTATION_ACTION_PLAN.md](docs/POST_IMPLEMENTATION_ACTION_PLAN.md)
 - [docs/PILOT_PLAN.md](docs/PILOT_PLAN.md)
+- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 - [docs/ROADMAP.md](docs/ROADMAP.md)
 
 ---

@@ -80,10 +80,10 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] SEC-007 production settings secret persistence is remediated for local files: production resolves LLM/embedding/graph secrets from environment variables, ignores local JSON secret fields, writes blank secret fields to `settings.json`, and keeps restrictive settings-file permissions where supported.
 - [x] Local demo settings can still persist secrets only when explicitly allowed outside production.
 - [x] SEC-009 limiter spoofing hardening is in place: `X-Forwarded-For` is trusted only from configured `RATE_LIMIT_TRUSTED_PROXIES`.
-- [ ] SEC-009 production rate limiting uses an edge/API-gateway or shared Redis-backed limiter; the built-in limiter remains in-memory and local/demo oriented.
+- [ ] SEC-009 production rate limiting requires an edge/API-gateway or shared Redis-backed limiter before public internet exposure; the built-in limiter remains in-memory and local/demo oriented.
 - [x] SEC-012 browser token persistence is reduced: auth tokens use `sessionStorage`, legacy `localStorage` auth tokens are migrated then removed, and browser API keys are not kept in persistent storage for normal UI sessions.
 - [x] SEC-012 CSP/security headers are emitted by the Flask app for API responses.
-- [ ] SEC-012 production auth uses secure HttpOnly cookies, a refresh-token flow, or an equivalent hardened browser-auth strategy.
+- [ ] SEC-012 production auth requires secure HttpOnly cookies, a refresh-token flow, or an equivalent hardened browser-auth strategy before production customer deployment.
 - [ ] SEC-013 long-tail route handlers have been reviewed so route-level validation/errors do not reveal internal paths, object IDs, provider details, or unrecognized secrets.
 - [x] Code supports production secrets through environment variables rather than local JSON settings.
 - [ ] Deployment environment provides real production secrets through environment variables or an external secret manager.
@@ -97,10 +97,10 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] SEC-004 and SEC-006 are fixed for the current local single-org architecture.
 - [x] SEC-007 is fixed for production local-file secret persistence; managed secret-store adoption remains recommended.
 - [x] SEC-009 and SEC-012 are documented accepted risks for local/demo and controlled private pilot contexts only.
-- [x] Local demo readiness: acceptable when demo data is used, no real secrets are entered, and source-mode labels remain visible.
-- [x] Controlled private pilot readiness: conditionally acceptable with trusted users, rotated credentials, environment-provided secrets, no confidential briefs, explicit source labels, and deployment-level rate limiting/CORS/log controls.
+- [x] Local demo readiness: ready when demo data is used, no real secrets are entered, and source-mode labels remain visible.
+- [x] Controlled private pilot readiness: conditional candidate with trusted users, credential rotation evidence, environment-provided secrets, no confidential briefs, explicit source labels, and deployment-level rate limiting/CORS/log controls.
 - [ ] Public pilot readiness: blocked until manual credential rotation is evidenced and deployment owners close SEC-009/SEC-012 public-exposure risks.
-- [ ] Public internet exposure readiness: blocked until production rate limiting, auth storage, and deployment controls are complete.
+- [ ] Public internet exposure readiness: blocked until edge/shared production rate limiting, auth storage, and deployment controls are complete.
 - [ ] Production customer deployment readiness: blocked until manual credential rotation, shared rate limiting, safer auth storage, data-retention policy, storage architecture decisions, and any required multi-org membership feature are complete.
 
 ## Automated Validation
@@ -333,6 +333,6 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 
 This repository is suitable for local demo use with synthetic data and no real secrets.
 
-Controlled private pilot remains conditional: it is acceptable only for trusted participants after manual credential rotation is evidenced, deployment secrets come from environment variables or a secret manager, demo/source labels remain visible, and pilot data-retention expectations are approved.
+Controlled private pilot remains a conditional candidate: it is acceptable only for trusted participants after manual credential rotation is evidenced, deployment secrets come from environment variables or a secret manager, demo/source labels remain visible, and pilot data-retention expectations are approved.
 
 Public pilot, public internet exposure, and production customer deployment are blocked. The current blockers are missing manual credential-rotation evidence, lack of shared/edge production rate limiting, mitigated-but-not-fully-hardened browser auth storage, incomplete external pilot data-retention/deletion approval, and unresolved production storage/legacy-record review work.

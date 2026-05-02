@@ -10,7 +10,7 @@ This review did not make product-code changes. It records release blockers, reme
 
 The repository has several good security foundations: password hashing now uses Werkzeug adaptive hashes, legacy password hashes are rehashed on login, production rejects known fallback auth secrets, public/demo routes are rate-limited, client-facing traceback payloads are sanitized, settings secrets are masked from browser reads, ID-addressed resources are scoped to the authenticated organization in the current local JSON architecture, and demo/local/live/backend-verified source labels exist in the UI.
 
-However, the current repository is not production-ready for external customers. The remaining blockers are manual rotation of previously committed secret-like values, shared production rate limiting, remaining browser token exposure risk, and local/demo storage architecture limitations.
+However, the current repository is not production-ready for external customers. Local demo is ready, controlled private pilot is a conditional candidate, and public pilot, public internet exposure, and production customer deployment remain blocked. The remaining blockers are manual rotation of previously committed secret-like values, edge/shared rate limiting required before public internet exposure, remaining browser token exposure risk, and local/demo storage architecture limitations.
 
 ## Remediation Status Table
 
@@ -24,10 +24,10 @@ However, the current repository is not production-ready for external customers. 
 | SEC-006 | High | fixed by safe disablement | `backend/app/api/auth.py`, `backend/app/middleware/tenant.py`, `backend/tests/test_rbac.py` | Login/register are the only public auth routes. API-key generation is admin-only. Org switching cannot issue cross-org tokens and remains disabled until a real membership model exists. |
 | SEC-007 | High | fixed for production file persistence | `backend/app/models/settings.py`, `backend/app/config.py`, `backend/tests/test_production_hardening.py`, `docs/DEPLOYMENT.md` | Production resolves provider/graph secrets from environment variables and writes blank secret fields to local JSON. A managed secret store is still recommended for mature deployments. |
 | SEC-008 | High | fixed | `backend/app/__init__.py`, `backend/app/utils/response_safety.py`, `backend/app/config.py`, `backend/tests/test_production_hardening.py` | Keep request body logging opt-in and redacted; review new logs for campaign brief or secret leakage. |
-| SEC-009 | Medium | partially fixed | `backend/app/middleware/rate_limit_middleware.py`, `backend/app/config.py`, `backend/tests/test_security_controls.py` | Built-in limiter remains local/demo oriented, but it no longer trusts `X-Forwarded-For` unless the request comes from a configured trusted proxy. Public internet deployments still need edge/API-gateway or shared Redis-backed rate limiting. |
+| SEC-009 | Medium | partially fixed | `backend/app/middleware/rate_limit_middleware.py`, `backend/app/config.py`, `backend/tests/test_security_controls.py` | Built-in limiter remains local/demo oriented, but it no longer trusts `X-Forwarded-For` unless the request comes from a configured trusted proxy. Public internet exposure requires edge/API-gateway or shared Redis-backed rate limiting before deployment. |
 | SEC-010 | Medium | fixed | `backend/app/middleware/tenant.py`, `backend/tests/test_production_hardening.py` | Tokens/API keys must stay in `Authorization: Bearer` or `X-Api-Key`; do not reintroduce query-token auth. |
 | SEC-011 | Medium | fixed | `backend/app/config.py`, `backend/app/__init__.py`, `backend/tests/test_production_hardening.py` | Production startup fails unless explicit trusted `CORS_ALLOWED_ORIGINS` are configured. |
-| SEC-012 | Medium | partially fixed | `frontend/src/api/authStorage.js`, `frontend/src/api/index.js`, `backend/app/__init__.py`, `backend/app/config.py`, `backend/app/services/auth_service.py`, `backend/tests/test_production_hardening.py` | Auth tokens now use session storage with localStorage migration/removal, persistent browser API-key storage is avoided for normal UI sessions, security headers/CSP are added, and production token lifetime defaults shorter. HttpOnly cookie or refresh-token auth remains future work. |
+| SEC-012 | Medium | partially fixed | `frontend/src/api/authStorage.js`, `frontend/src/api/index.js`, `backend/app/__init__.py`, `backend/app/config.py`, `backend/app/services/auth_service.py`, `backend/tests/test_production_hardening.py` | Auth tokens now use session storage with localStorage migration/removal, persistent browser API-key storage is avoided for normal UI sessions, security headers/CSP are added, and production token lifetime defaults shorter. HttpOnly cookie, refresh-token auth, or equivalent hardened browser auth remains required before production customer deployment. |
 | SEC-013 | Medium | partially fixed | `backend/app/utils/response_safety.py`, `backend/app/__init__.py`, `backend/tests/test_public_routes.py`, `backend/tests/test_security_controls.py`, `backend/tests/test_production_hardening.py` | 5xx API errors are sanitized globally, but long-tail route-level 4xx/error messages should continue to be normalized. |
 
 ## Critical Findings
@@ -146,7 +146,7 @@ However, the current repository is not production-ready for external customers. 
 - Original evidence: `frontend/src/api/index.js` read `3c-auth-token` and `3c-api-key` from `localStorage`.
 - Impact: Any XSS in the frontend can exfiltrate tokens/API keys. No CSP was observed in this review.
 - Remediation: Browser auth token access now goes through `frontend/src/api/authStorage.js`, which migrates legacy localStorage tokens into `sessionStorage` and removes persistent localStorage copies. Browser API keys are treated as ephemeral session-only credentials and persistent localStorage API keys are removed. Backend responses include `Content-Security-Policy`, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, and `Permissions-Policy` headers by default. Production auth token lifetime now defaults to 8 hours and can be configured with `AUTH_TOKEN_EXPIRY_SECONDS`.
-- Remaining action: Prefer short-lived access tokens with refresh flow or secure HttpOnly cookies before public/customer production. Session storage still remains script-readable if XSS occurs, so CSP reduces but does not eliminate the risk.
+- Remaining action: Require short-lived access tokens with refresh flow, secure HttpOnly cookies, or an equivalent hardened browser-auth strategy before public/customer production. Session storage still remains script-readable if XSS occurs, so CSP reduces but does not eliminate the risk.
 
 ### SEC-013: Error handling strips tracebacks but still returns raw exception strings in many handlers
 
@@ -246,8 +246,8 @@ Concerns:
 
 ## Release Decision
 
-For controlled local demos, the current repository is acceptable if no real secrets are used and demo/local labels remain visible.
+For controlled local demos, the current repository is ready if no real secrets are used and demo/local labels remain visible.
 
-For a controlled private pilot, the repository is conditionally acceptable only with trusted users, rotated credentials, no confidential customer briefs, explicit source labels, environment-provided secrets, and deployment controls around rate limiting/CORS/logging. PR T did not find evidence that manual credential rotation has been completed, so this remains a conditional gate rather than a blanket go decision. This is not a production-readiness claim.
+For a controlled private pilot, the repository is a conditional candidate only with trusted users, credential rotation evidence, no confidential customer briefs, explicit source labels, environment-provided secrets, and deployment controls around rate limiting/CORS/logging. Current verification has no owner-provided evidence of manual credential rotation, so this remains a conditional gate rather than a blanket go decision. This is not a production-readiness claim.
 
 For a public pilot, public internet exposure, or customer production deployment, the release is not ready while manual SEC-001 credential rotation lacks evidence, SEC-009 still lacks shared/edge enforcement, and SEC-012 remains only partially fixed.
