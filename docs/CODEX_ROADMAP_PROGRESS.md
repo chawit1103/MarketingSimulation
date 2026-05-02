@@ -7,72 +7,60 @@ Controller source: `CODEX_SEQUENTIAL_ORCHESTRATOR_PROMPT.md`
 
 ## Current Stage
 
-Selected roadmap item: **PR Z: Deep Industry Presets**
+Selected roadmap item: **PR AA: Budget Scenario Planner, not ROI Predictor**
 
-## Why PR Z Was Selected
+## Why PR AA Was Selected
 
-PR Y was completed on the current stacked roadmap branch. The next incomplete roadmap item in order is PR Z: Deep Industry Presets.
+PR Z was completed on the current stacked roadmap branch. The next incomplete roadmap item in order is PR AA: Budget Scenario Planner, not ROI Predictor.
 
 Current repository inspection found:
 
 - GitHub default branch: `multilang-v0.3`.
-- Current branch: `codex/pr-z-deep-industry-presets`.
-- Release-candidate, strategy-pack, comparator, and revised-brief roadmap work is present.
-- Industry templates existed for energy and finance, but priority brand/agency presets were still shallow or missing.
-- The Campaigns template selector and campaign creation flow already supported applying template presets, so this PR could focus on richer backend templates plus a small detail-panel improvement.
+- Current branch: `codex/pr-aa-budget-scenario-planner`.
+- Release-candidate, strategy-pack, comparator, revised-brief, and deep-preset roadmap work is present.
+- Decision and impact APIs existed, but there was no dedicated budget/channel allocation what-if planner with explicit safe wording and provenance.
 
-## Completed In PR Z
+## Completed In PR AA
 
-- Added deep built-in industry presets for:
-  - FMCG / CPG.
-  - Insurance / InsurTech.
-  - Retail / Ecommerce.
-  - Real Estate.
-  - EV / Automotive.
-  - Healthcare / Wellness.
-- Each deep preset includes:
-  - target segment archetypes.
-  - common objections.
-  - crisis triggers.
-  - typical KPIs.
-  - channel behavior.
-  - competitor archetypes.
-  - legal/regulatory sensitivities.
-  - proof-point requirements.
-  - sample brief.
-  - sample risk checklist.
-  - sample action-plan hints.
+- Added deterministic backend Budget Scenario Planner service.
+- Added `POST /api/decision/budget-scenario`.
+- Planner inputs include:
+  - total budget.
+  - campaign duration.
+  - target segments.
+  - channel mix.
+  - risk tolerance.
+  - objective: awareness, conversion, retention, or crisis recovery.
+- Planner outputs include:
+  - suggested allocation range by channel.
+  - suggested allocation range by segment.
+  - trade-offs.
+  - confidence level and confidence score.
   - assumptions.
   - limitations.
-- Extended the industry preset API response so campaign setup can receive:
-  - campaign duration.
-  - budget range.
-  - primary KPI.
-  - competitor context.
-  - brand constraints.
-  - risk/legal notes.
-  - deep preset metadata.
-- Added optional validation for `deep_preset` schema when a template includes it.
-- Updated the template detail UI to show common objections, proof requirements, assumptions, and limitations before applying a preset.
-- Added backend tests for deep preset listing, validation, API prefill shape, incomplete deep schema rejection, and conservative healthcare/wellness language.
-- Updated README, demo data, demo script, status, and release notes.
+  - recommended validation step.
+  - source/provenance metadata.
+- Added `/budget-planner` frontend view.
+- Added Budget Planner entry point from Campaigns.
+- Added e2e smoke coverage for Budget Planner source labels and safe wording.
+- Updated README, demo script, user journey, status, checklist, and release notes.
 
-## Not Completed In PR Z
+## Not Completed In PR AA
 
-- No calibration loop was added.
-- No live social listening, CRM import, marketplace import, or paid provider integration was added.
-- No exact ROI, sales forecast, or guaranteed prediction language was added.
-- Healthcare / Wellness remains conservative communication planning only and is not medical advice.
-- Deep presets remain assumption-based starter scaffolds and must be reviewed with real brand, legal, compliance, and market context before pilot or client use.
+- No live ad-platform integration was added.
+- No real media-cost database was added.
+- No billing, CRM import, social listening, or calibration loop was added.
+- No precise ROI/ROAS, CAC, sales forecast, market-share forecast, or budget-optimization certainty is claimed.
+- Planner outputs remain deterministic scenario estimates and must be validated with real benchmarks or pilot results before major spend.
 - Manual credential rotation was not marked complete because it requires repository-owner action outside Codex.
 
 ## Tests And Checks
 
-- `backend/.venv/bin/python -m pytest backend/tests/test_industry_deep_presets.py -q`: passed, 5 passed.
-- `backend/.venv/bin/python -m pytest backend/tests -q`: passed, 70 passed and 38 warnings.
-- JSON validation for six new built-in template files: passed.
+- `backend/.venv/bin/python -m pytest backend/tests/test_budget_scenario_planner.py backend/tests/test_api_contract.py -q`: passed, 6 passed.
+- `backend/.venv/bin/python -m pytest backend/tests -q`: passed, 73 passed and 38 warnings.
 - `cd frontend && npm run build`: passed.
-- `cd frontend && npm run test:e2e -- --project=chromium --workers=1`: passed, 11 passed.
+- `cd frontend && npm run test:e2e -- --project=chromium --workers=1 --grep "budget planner"`: passed, 1 passed.
+- `cd frontend && npm run test:e2e -- --project=chromium --workers=1`: passed, 12 passed.
 - CI-equivalent secret hygiene scan: passed.
 - `git diff --check`: passed.
 
@@ -83,11 +71,11 @@ Current repository inspection found:
 - Browser auth storage is mitigated but still needs HttpOnly cookie, refresh-token, or equivalent production hardening before public/customer deployment.
 - External pilot data-retention and deletion procedures still need approval.
 - Legacy local JSON records without `org_id` need review, backfill, or re-creation before production use.
-- Deep industry presets must be treated as assumptions until calibrated with real campaign data and client-approved market inputs.
+- Deep industry presets and budget plans must be treated as assumptions until calibrated with real campaign data, media benchmarks, and client-approved market inputs.
 
 ## Next Recommended Roadmap Item
 
-After PR Z is reviewed and merged, proceed to **PR AA: Budget Scenario Planner, not ROI Predictor**.
+After PR AA is reviewed and merged, proceed to **PR AB: Manual Data Import + Calibration v1**.
 
 Short prompt for the next run:
 

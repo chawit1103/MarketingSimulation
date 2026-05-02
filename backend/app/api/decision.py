@@ -2,6 +2,7 @@
 
 from flask import Blueprint, jsonify, request
 
+from ..services.budget_scenario_planner import BudgetScenarioPlanner
 from ..services.decision_engine import DecisionEngine
 from ..utils.logger import get_logger
 
@@ -43,5 +44,16 @@ def what_if():
         return jsonify({"success": True, "data": result})
     except Exception as exc:
         logger.error("What-if simulation failed: %s", exc)
-        return jsonify({"success": False, "error": str(exc)}), 500
+        return jsonify({"success": False, "error": "What-if simulation failed"}), 500
 
+
+@decision_bp.route("/budget-scenario", methods=["POST"])
+def budget_scenario():
+    """Create a deterministic budget/channel planning scenario."""
+    data = request.get_json(silent=True) or {}
+    try:
+        result = BudgetScenarioPlanner().plan(data.get("inputs") or data)
+        return jsonify({"success": True, "data": result})
+    except Exception as exc:
+        logger.error("Budget scenario planning failed: %s", exc)
+        return jsonify({"success": False, "error": "Budget scenario planning failed"}), 500

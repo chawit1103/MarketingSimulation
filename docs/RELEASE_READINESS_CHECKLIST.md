@@ -241,6 +241,22 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] CI-equivalent secret hygiene scan run for PR Z: passed on 2026-05-02.
 - [x] `git diff --check` run for PR Z: passed on 2026-05-02.
 
+### PR AA Budget Scenario Planner Run
+
+- [x] Roadmap progress selected PR AA after PR Z.
+- [x] Added `POST /api/decision/budget-scenario`.
+- [x] Budget planner accepts total budget, duration, target segments, channel mix, risk tolerance, and objective.
+- [x] Output includes source/provenance metadata, allocation ranges, segment ranges, trade-offs, confidence level, assumptions, limitations, and recommended validation step.
+- [x] Frontend `/budget-planner` shows source labels and does not silently create local fallback output after backend failure.
+- [x] Planner wording avoids outcome guarantees, precise ROAS claims, and budget-optimization certainty claims.
+- [x] Focused backend tests run for PR AA: `backend/.venv/bin/python -m pytest backend/tests/test_budget_scenario_planner.py backend/tests/test_api_contract.py -q` passed on 2026-05-02: 6 passed.
+- [x] Full backend tests run for PR AA: `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-02: 73 passed, 38 warnings.
+- [x] Frontend build run for PR AA: `cd frontend && npm run build` passed on 2026-05-02.
+- [x] Focused E2E smoke test run for PR AA: `cd frontend && npm run test:e2e -- --project=chromium --workers=1 --grep "budget planner"` passed on 2026-05-02: 1 passed.
+- [x] Full E2E smoke tests run for PR AA: `cd frontend && npm run test:e2e -- --project=chromium --workers=1` passed on 2026-05-02: 12 passed.
+- [x] CI-equivalent secret hygiene scan run for PR AA: passed on 2026-05-02.
+- [x] `git diff --check` run for PR AA: passed on 2026-05-02.
+
 ## Release Decision
 
 This repository is suitable for local demo use with synthetic data and no real secrets.

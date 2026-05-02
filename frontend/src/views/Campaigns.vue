@@ -23,6 +23,9 @@
         <router-link to="/impact" class="btn-impact-nav">
           {{ $t('impact.title') }}
         </router-link>
+        <router-link to="/budget-planner" class="btn-impact-nav">
+          Budget Planner
+        </router-link>
         <router-link to="/comparator" class="btn-compare-nav">
           {{ $t('comparator.navLink') }}
         </router-link>

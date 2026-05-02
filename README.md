@@ -212,6 +212,12 @@ The user can describe where the audience actually lives, beyond the native simul
 - Reddit
 - LinkedIn
 
+### Budget Scenario Planner
+
+Run assumption-based channel mix what-if planning before committing media spend. The planner accepts total budget, duration, target segments, channel mix, risk tolerance, and objective, then returns directional allocation ranges, trade-offs, confidence level, assumptions, limitations, and a recommended validation step.
+
+This is not an exact ROI or ROAS predictor. It does not use live ad-platform cost data unless the user supplies approved planning inputs.
+
 ### OASIS Platform Presets
 
 OASIS remains the core simulation engine. Platform presets translate modern channel intent into supported behavior models:
@@ -473,6 +479,7 @@ All product APIs are registered under `/api/*`.
 | GET | `/api/industry/templates` | Public industry template list |
 | POST | `/api/brief/quality` | Deterministic brief completeness scoring |
 | POST | `/api/brief/revise` | Deterministic Revised Brief v2 from an Action Plan |
+| POST | `/api/decision/budget-scenario` | Deterministic budget/channel scenario planner |
 | GET | `/api/settings/providers` | Safe provider catalog |
 | POST | `/api/settings/readiness` | Secret-safe setup readiness check |
 

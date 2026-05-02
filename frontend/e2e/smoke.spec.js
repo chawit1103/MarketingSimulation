@@ -272,6 +272,53 @@ const revisedBriefResult = {
   disclaimer: 'This revised brief is deterministic planning guidance from the action plan, not a guaranteed performance improvement.',
 }
 
+const budgetScenarioResult = {
+  version: 'budget_scenario_planner_v1',
+  scenario_type: 'assumption_based_budget_planning',
+  objective: 'conversion',
+  total_budget: 2500000,
+  duration_weeks: 8,
+  risk_tolerance: 'medium',
+  source: {
+    type: 'demo_mode',
+    source_mode: 'demo_mode',
+    data_basis: 'demo_fixture',
+    warning: 'Demo fixture for budget-planning walkthrough; not live campaign evidence.',
+  },
+  allocation_ranges: [
+    {
+      channel: 'facebook',
+      recommended_pct_midpoint: 30,
+      budget_range: { low: 615000, midpoint: 750000, high: 885000 },
+      weekly_range: { low: 76875, high: 110625 },
+      role: 'Core reach and audience response testing.',
+      risk_note: 'Validate creative fatigue and audience overlap before scaling.',
+    },
+    {
+      channel: 'tiktok',
+      recommended_pct_midpoint: 25,
+      budget_range: { low: 512500, midpoint: 625000, high: 737500 },
+      weekly_range: { low: 64063, high: 92188 },
+      role: 'Discovery and creative resonance testing.',
+      risk_note: 'Fast amplification can expose weak claims quickly.',
+    },
+  ],
+  segment_allocation_ranges: [
+    { segment: 'Urban families', recommended_pct_midpoint: 46, budget_range: { low: 943000, midpoint: 1150000, high: 1357000 } },
+    { segment: 'Creator-led discovery', recommended_pct_midpoint: 27, budget_range: { low: 553500, midpoint: 675000, high: 796500 } },
+  ],
+  trade_offs: [
+    { choice: 'Reserve validation budget', upside: 'Keeps room for message testing before scale.', risk: 'Reduces short-term reach during the first wave.' },
+  ],
+  confidence_level: 'medium_directional',
+  confidence_score: 82,
+  assumptions: ['Allocation uses deterministic objective weights and any user-supplied channel mix.'],
+  limitations: ['This is not exact ROI, ROAS, CAC, sales, or market-share prediction.'],
+  recommended_validation_step: 'Reserve 10-20% of the budget for a controlled creative/channel test before scaling.',
+  safe_wording: ['scenario estimate', 'assumption-based planning', 'channel mix what-if', 'directional budget guidance'],
+  disclaimer: 'This budget scenario is directional planning guidance, not an exact ROI, ROAS, or media-performance prediction.',
+}
+
 async function installApiMocks(page, options = {}) {
   await page.addInitScript(() => {
     localStorage.removeItem('3c-auth-token')
@@ -328,6 +375,9 @@ async function installApiMocks(page, options = {}) {
     }
     if (path === '/api/decision/what-if') {
       return json(route, { success: true, data: { kpi_deltas: {}, verdict: 'Controlled pilot' } })
+    }
+    if (path === '/api/decision/budget-scenario') {
+      return json(route, { success: true, data: budgetScenarioResult })
     }
     if (path === '/api/comparator/demo/campaigns') {
       return json(route, {
@@ -492,6 +542,18 @@ test('war room displays live backend source for backend simulation', async ({ pa
   await expect(page.getByText('Live Backend').first()).toBeVisible()
   await expect(page.getByText('Decision Console')).toBeVisible()
   await expect(page.getByText('Expected Sentiment Movement')).toBeVisible()
+})
+
+test('budget planner returns directional scenario guidance with source label', async ({ page }) => {
+  await page.goto('/budget-planner')
+
+  await expect(page.getByRole('heading', { name: /Budget Scenario Planner/i })).toBeVisible()
+  await expect(page.getByText('Scenario Estimate').first()).toBeVisible()
+  await expect(page.getByText('Demo Mode').first()).toBeVisible()
+  await expect(page.getByText('Suggested Allocation Range by Channel')).toBeVisible()
+  await expect(page.getByText('Reserve 10-20% of the budget')).toBeVisible()
+  await expect(page.getByText('not exact ROI').first()).toBeVisible()
+  await expect(page.getByText(/not live campaign evidence/i).first()).toBeVisible()
 })
 
 test('war room requires explicit local estimate fallback when backend fails', async ({ page }) => {

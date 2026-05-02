@@ -97,7 +97,25 @@ Screenshots:
 - `docs/screenshots/simulation-dashboard-kpis.png`
 - `docs/screenshots/action-plan.png`
 
-## 3:00-3:35 — A/B/C Comparator
+## 3:00-3:30 — Budget Scenario Planner
+
+Open `/budget-planner`.
+
+Key message:
+
+> Budget Planner is a channel mix what-if tool. It gives directional allocation ranges and trade-offs, not exact ROI or ROAS prediction.
+
+Show:
+
+- Demo Mode or Live Backend source label.
+- Total budget, duration, target segments, channel mix, risk tolerance, and objective.
+- Suggested allocation ranges by channel and segment.
+- Confidence level.
+- Assumptions, limitations, and recommended validation step.
+
+Say clearly that no live ad-platform cost data is used unless the user provides approved planning inputs.
+
+## 3:30-4:00 — A/B/C Comparator
 
 Open `/comparator`.
 
@@ -113,7 +131,7 @@ Show:
 - Trade-offs and recommended use case.
 - Source label on the comparison result.
 
-## 3:35-4:25 — War Room
+## 4:00-4:40 — War Room
 
 Open `/war-room`.
 
@@ -132,7 +150,7 @@ Show:
 
 Screenshot: `docs/screenshots/war-room.png`
 
-## 4:25-5:00 — Settings Wizard And Close
+## 4:40-5:00 — Settings Wizard And Close
 
 Open `/settings`.
 

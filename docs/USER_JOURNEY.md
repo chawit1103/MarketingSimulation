@@ -1,6 +1,6 @@
 # First-Time User Journey
 
-Updated: 2026-05-01
+Updated: 2026-05-02
 
 This journey describes the recommended path for a new user evaluating 3C Simulator.
 
@@ -141,7 +141,23 @@ Screenshot:
 
 - `docs/screenshots/war-room.png`
 
-## 7. Configure The Runtime
+## 7. Explore Budget Scenarios
+
+Open Budget Planner.
+
+Goal:
+
+- Explore budget and channel mix what-if scenarios before approving spend.
+- Discuss trade-offs and validation steps without treating the output as exact ROI or ROAS prediction.
+
+Recommended action:
+
+- Enter total budget, duration, target segments, channel mix, risk tolerance, and objective.
+- Review allocation ranges by channel and segment.
+- Read assumptions and limitations before sharing with a client, manager, or finance team.
+- Validate the recommended range with pilot results or approved media benchmarks before committing major spend.
+
+## 8. Configure The Runtime
 
 Open Settings.
 

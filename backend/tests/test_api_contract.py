@@ -61,6 +61,7 @@ def test_critical_frontend_routes_exist_in_backend_url_map(monkeypatch):
         ("POST", "/api/brief/revise"),
         ("POST", "/api/decision/analyze"),
         ("POST", "/api/decision/what-if"),
+        ("POST", "/api/decision/budget-scenario"),
         ("POST", "/api/comparator/compare"),
         ("GET", "/api/comparator/metrics"),
         ("GET", "/api/comparator/demo/campaigns"),

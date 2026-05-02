@@ -150,3 +150,24 @@ This pass adds richer planner-ready industry presets without adding live social 
 - Frontend build passed: `cd frontend && npm run build`.
 - E2E smoke tests passed: `cd frontend && npm run test:e2e -- --project=chromium --workers=1`.
 - CI-equivalent secret hygiene scan and `git diff --check` passed.
+
+## PR AA: Budget Scenario Planner
+
+This pass adds a deterministic budget/channel what-if planner for demo and controlled planning workflows. It does not add live ad-platform integrations, exact ROI/ROAS prediction, billing, or calibration.
+
+### What Changed
+
+- Added `POST /api/decision/budget-scenario`.
+- Added a deterministic budget planner service that accepts total budget, duration, target segments, channel mix, risk tolerance, and objective.
+- Planner output includes channel allocation ranges, segment ranges, trade-offs, confidence level, assumptions, limitations, recommended validation step, and source/provenance metadata.
+- Added `/budget-planner` frontend view with Demo Mode/Live Backend source labels and visible no-auto-fallback error behavior.
+- Added Campaigns navigation entry for Budget Planner.
+
+### Validation
+
+- Focused backend budget/API contract tests passed: `backend/.venv/bin/python -m pytest backend/tests/test_budget_scenario_planner.py backend/tests/test_api_contract.py -q`.
+- Full backend tests passed: `backend/.venv/bin/python -m pytest backend/tests -q`.
+- Frontend build passed: `cd frontend && npm run build`.
+- Focused e2e smoke test passed: `cd frontend && npm run test:e2e -- --project=chromium --workers=1 --grep "budget planner"`.
+- Full e2e smoke tests passed: `cd frontend && npm run test:e2e -- --project=chromium --workers=1`.
+- CI-equivalent secret hygiene scan and `git diff --check` passed.
