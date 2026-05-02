@@ -6,8 +6,11 @@ const ALLOWED_EVENTS = new Set([
   'dashboard_viewed',
   'war_room_scenario_run',
   'action_plan_viewed',
+  'revised_brief_created',
+  'comparator_used',
+  'budget_scenario_run',
   'export_clicked',
-  'provider_test_failed',
+  'settings_provider_test_failed',
   'feedback_submitted',
 ])
 
@@ -39,7 +42,7 @@ const SECRET_PATTERNS = [
 ]
 
 export function analyticsEnabled() {
-  const envValue = String(import.meta.env.VITE_ANALYTICS_ENABLED ?? 'true').toLowerCase()
+  const envValue = String(import.meta.env?.VITE_ANALYTICS_ENABLED ?? 'true').toLowerCase()
   return !['0', 'false', 'off', 'no'].includes(envValue)
 }
 
@@ -54,13 +57,19 @@ export function trackEvent(eventName, payload = {}) {
     properties: sanitizePayload(payload),
   }
 
-  window.dispatchEvent(new CustomEvent('3c:analytics', { detail: event }))
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('3c:analytics', { detail: event }))
+  }
 
-  if (String(import.meta.env.VITE_ANALYTICS_DEBUG || '').toLowerCase() === 'true') {
+  if (String(import.meta.env?.VITE_ANALYTICS_DEBUG || '').toLowerCase() === 'true') {
     console.info('[analytics]', event)
   }
 
   return true
+}
+
+export function isAllowedAnalyticsEvent(eventName) {
+  return ALLOWED_EVENTS.has(eventName)
 }
 
 export function routeBucket(route) {
@@ -81,7 +90,7 @@ export function sourceModeFromValue(value) {
   return allowed.includes(normalized) ? normalized : 'unknown'
 }
 
-function sanitizePayload(payload) {
+export function sanitizeAnalyticsPayload(payload) {
   const clean = {}
   const input = payload && typeof payload === 'object' ? payload : {}
 
@@ -97,6 +106,8 @@ function sanitizePayload(payload) {
 
   return clean
 }
+
+const sanitizePayload = sanitizeAnalyticsPayload
 
 function sanitizeValue(value) {
   if (value == null) return undefined

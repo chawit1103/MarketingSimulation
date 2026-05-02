@@ -1,6 +1,6 @@
 # Analytics And Feedback
 
-Updated: 2026-05-01
+Updated: 2026-05-02
 
 This release adds a lightweight, provider-neutral frontend analytics abstraction and a small feedback widget. It is designed for product-learning during demos and pilots without sending data to third-party analytics services by default.
 
@@ -10,7 +10,7 @@ This release adds a lightweight, provider-neutral frontend analytics abstraction
 - No third-party analytics SDK is installed.
 - No network request is made by the analytics service.
 - No raw campaign brief, prompt, customer data, API key, auth token, password, or secret should be included in event properties.
-- Free-form feedback text is intentionally not collected. The feedback widget only sends a 1-5 usefulness rating and a fixed confusion category.
+- Free-form feedback text is intentionally not collected. The feedback widget only sends a 1-5 usefulness rating, fixed confusion category, fixed missing-need category, and whether source/confidence felt clear.
 
 ## Disable Analytics
 
@@ -39,9 +39,12 @@ Debug mode logs sanitized events to the browser console. Do not enable debug log
 | `dashboard_viewed` | Dashboard usage | campaign name, full route path |
 | `war_room_scenario_run` | War Room scenario engagement | campaign content, competitor free text |
 | `action_plan_viewed` | Action Plan visibility | recommendation text, raw action plan |
+| `revised_brief_created` | Revised Brief v2 engagement | original/revised brief text, campaign name |
+| `comparator_used` | A/B/C comparison engagement | campaign names, raw campaign descriptions |
+| `budget_scenario_run` | Budget planner engagement | campaign name, brief content, exact confidential budget notes |
 | `export_clicked` | Export intent | report title, campaign name, file content |
-| `provider_test_failed` | Setup friction | API keys, provider error dumps, passwords |
-| `feedback_submitted` | Usefulness/confusion feedback | free-form text, PII |
+| `settings_provider_test_failed` | Setup friction | API keys, provider error dumps, passwords |
+| `feedback_submitted` | Usefulness/confusion/missing-need feedback | free-form text, PII |
 
 ## Sanitization
 
@@ -65,6 +68,13 @@ The frontend analytics service drops fields whose keys look sensitive, including
 - `token`
 
 String values are truncated and common provider-key patterns are redacted as a second guardrail.
+
+Analytics sanitization tests live in `frontend/src/services/analytics.test.js` and can be run with:
+
+```bash
+cd frontend
+npm run test:analytics
+```
 
 ## Future Provider Integration
 

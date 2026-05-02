@@ -7,56 +7,59 @@ Controller source: `CODEX_SEQUENTIAL_ORCHESTRATOR_PROMPT.md`
 
 ## Current Stage
 
-Selected roadmap item: **PR AB: Manual Data Import + Calibration v1**
+Selected roadmap item: **PR AC: Pilot Feedback Analytics**
 
-## Why PR AB Was Selected
+## Why PR AC Was Selected
 
-PR AA was completed on the current stacked roadmap branch. The next incomplete roadmap item in order is PR AB: Manual Data Import + Calibration v1.
+PR AB was completed on the current stacked roadmap branch. The next incomplete roadmap item in order is PR AC: Pilot Feedback Analytics.
 
 Current repository inspection found:
 
 - GitHub default branch: `multilang-v0.3`.
-- Current branch: `codex/pr-ab-manual-calibration-v1`.
+- Current branch: `codex/pr-ac-pilot-feedback-analytics`.
 - Release-candidate, strategy-pack, comparator, revised-brief, and deep-preset roadmap work is present.
-- Budget Scenario Planner is present.
-- There was no manual aggregate actual-results workflow or estimate-vs-actual calibration comparison.
+- Budget Scenario Planner and Manual Calibration v1 are present.
+- A lightweight analytics/feedback foundation existed, but the allowlist and feedback payload did not yet cover the full PR AC pilot-learning scope.
 
-## Completed In PR AB
+## Completed In PR AC
 
-- Added deterministic backend Calibration Service for manual aggregate actual-results import.
-- Added `POST /api/calibration/actual-results` for analyst/admin import.
-- Added `GET /api/calibration/status/<campaign_id>` for authenticated calibration status reads.
-- Supported manual JSON payloads and single-row aggregate CSV/JSON uploads.
-- Supported actual result fields include:
-  - campaign ID and date range.
-  - impressions, clicks, CTR, conversion count/rate, sales lift, sentiment score, and crisis incident flag.
-  - optional anonymized qualitative notes.
-  - optional prior estimates for estimate-vs-actual deltas.
-- Added calibration output for:
-  - estimate vs actual comparison.
-  - metric delta and absolute error percentage.
-  - matched/missed risk classification.
-  - segment assumption gaps when supplied.
-  - calibration status: `not_calibrated`, `partially_calibrated`, or `calibrated_with_n_campaigns`.
-  - privacy review, limitations, and recommended next validation step.
-- Added privacy safeguards that reject PII-like fields, raw CRM/contact data, raw social posts/comments, and PII-like notes.
-- Added `/calibration` frontend view for manual import and upload workflow.
-- Added Campaigns navigation entry for Calibration.
-- Added e2e smoke coverage for calibration status, manual evidence labeling, and privacy wording.
-- Updated status, limitations, pilot plan, checklist, release notes, and roadmap progress.
+- Expanded the provider-neutral frontend analytics allowlist to include PR AC pilot journey events:
+  - `demo_dashboard_opened`
+  - `brief_quality_scored`
+  - `simulation_started`
+  - `simulation_completed`
+  - `dashboard_viewed`
+  - `action_plan_viewed`
+  - `revised_brief_created`
+  - `comparator_used`
+  - `budget_scenario_run`
+  - `export_clicked`
+  - `war_room_scenario_run`
+  - `settings_provider_test_failed`
+  - `feedback_submitted`
+- Connected missing event instrumentation for Comparator and Budget Scenario Planner.
+- Renamed settings provider failure tracking to the explicit `settings_provider_test_failed` event.
+- Improved the global feedback widget with fixed-choice pilot questions:
+  - usefulness rating.
+  - confusion area.
+  - missing need.
+  - source/confidence clarity.
+- Preserved the no-free-text feedback approach to avoid collecting raw briefs, PII, secrets, tokens, or customer data.
+- Added dependency-free Node analytics sanitization tests.
+- Updated e2e smoke feedback assertions and analytics docs.
 
-## Not Completed In PR AB
+## Not Completed In PR AC
 
-- No live CRM, ad-platform, or social-listening integrations were added.
-- No raw customer lists, CRM contact data, raw social posts, or PII ingestion was added.
-- Calibration does not retrain, self-improve, overwrite, or automatically adjust existing simulation output.
-- Calibration records are local JSON aggregate records scoped by organization in the current storage architecture.
-- Calibration status is directional and depends on user-supplied aggregate actuals and prior estimates.
+- No third-party analytics SDK or network destination was added.
+- Analytics remains browser-local `CustomEvent` emission unless a future provider integration is explicitly reviewed and documented.
+- No free-form feedback text, raw campaign brief, PII, tokens, API keys, secrets, or customer records are collected.
+- No backend event ingestion, dashboard, or product analytics database was added.
 - Manual credential rotation was not marked complete because it requires repository-owner action outside Codex.
 
 ## Tests And Checks
 
-- `backend/.venv/bin/python -m pytest backend/tests/test_calibration_service.py backend/tests/test_api_contract.py -q`: passed, 9 passed.
+- `cd frontend && npm run test:analytics`: passed, 2 passed.
+- `python3 -m json.tool frontend/src/locales/en.json` and `frontend/src/locales/th.json`: passed.
 - `backend/.venv/bin/python -m pytest backend/tests -q`: passed, 79 passed and 49 warnings.
 - `cd frontend && npm run build`: passed.
 - `cd frontend && npm run test:e2e -- --project=chromium --workers=1`: passed, 13 passed.
@@ -70,11 +73,12 @@ Current repository inspection found:
 - Browser auth storage is mitigated but still needs HttpOnly cookie, refresh-token, or equivalent production hardening before public/customer deployment.
 - External pilot data-retention and deletion procedures still need approval.
 - Legacy local JSON records without `org_id` need review, backfill, or re-creation before production use.
+- Pilot analytics are local/provider-neutral by default. Any third-party analytics destination still needs privacy, retention, opt-out, and data-owner review.
 - Deep industry presets, budget plans, and calibration comparisons must be treated as directional evidence until enough approved real campaign outcomes are imported and reviewed.
 
 ## Next Recommended Roadmap Item
 
-After PR AB is reviewed and merged, proceed to the next incomplete item in `CODEX_BRAND_AGENCY_VALUE_ROADMAP_PROMPTS.md`.
+After PR AC is reviewed and merged, proceed to **PR AD: Final Brand/Agency Go-No-Go + screenshots/docs refresh**.
 
 Short prompt for the next run:
 

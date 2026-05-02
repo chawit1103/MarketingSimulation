@@ -190,3 +190,21 @@ This pass adds manual aggregate actual-results import and deterministic estimate
 
 - Focused backend calibration/API contract tests passed: `backend/.venv/bin/python -m pytest backend/tests/test_calibration_service.py backend/tests/test_api_contract.py -q`.
 - Full backend, frontend build, e2e, secret scan, and diff validation are recorded in `docs/RELEASE_READINESS_CHECKLIST.md`.
+
+## PR AC: Pilot Feedback Analytics
+
+This pass improves privacy-conscious product analytics for controlled pilots. It does not add a third-party analytics SDK, backend event ingestion, or free-form feedback collection.
+
+### What Changed
+
+- Expanded the analytics event allowlist for pilot journeys: demo dashboard, brief quality, simulation start/complete, dashboard view, action plan view, revised brief, comparator, budget scenario, export, War Room, settings provider failures, and feedback.
+- Connected missing event instrumentation for Comparator and Budget Scenario Planner.
+- Renamed settings failure tracking to `settings_provider_test_failed`.
+- Improved the global feedback widget with fixed-choice usefulness, confusion, missing-need, and source/confidence clarity inputs.
+- Added dependency-free analytics sanitization tests.
+- Updated analytics docs and e2e feedback assertions.
+
+### Validation
+
+- Analytics sanitization tests passed: `cd frontend && npm run test:analytics`.
+- Full frontend build/e2e, backend, secret scan, and diff validation are recorded in `docs/RELEASE_READINESS_CHECKLIST.md`.

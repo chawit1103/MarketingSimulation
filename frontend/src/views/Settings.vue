@@ -480,7 +480,7 @@ async function testConnection() {
   } catch (e) {
     message.value = t('settings.connectionFailed')
     messageType.value = 'error'
-    trackEvent('provider_test_failed', {
+    trackEvent('settings_provider_test_failed', {
       provider_type: 'readiness',
       mode: wizardMode.value,
     })
@@ -591,7 +591,7 @@ async function runReadinessCheck() {
   } catch (e) {
     wizardMessage.value = safeClientError(e)
     wizardMessageType.value = 'error'
-    trackEvent('provider_test_failed', {
+    trackEvent('settings_provider_test_failed', {
       provider_type: 'readiness',
       mode: wizardMode.value,
     })
@@ -610,7 +610,7 @@ async function testLLMProvider() {
   } catch (e) {
     wizardMessage.value = safeClientError(e)
     wizardMessageType.value = 'error'
-    trackEvent('provider_test_failed', {
+    trackEvent('settings_provider_test_failed', {
       provider_type: 'llm',
       provider: config.llm.provider,
       mode: wizardMode.value,

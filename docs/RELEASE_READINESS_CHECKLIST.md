@@ -273,6 +273,21 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] CI-equivalent secret hygiene scan run for PR AB: passed on 2026-05-02.
 - [x] `git diff --check` run for PR AB: passed on 2026-05-02.
 
+### PR AC Pilot Feedback Analytics Run
+
+- [x] Roadmap progress selected PR AC after PR AB.
+- [x] Analytics remains provider-neutral and emits browser `3c:analytics` events without network requests by default.
+- [x] Analytics allowlist includes demo dashboard, brief quality, simulation start/complete, dashboard view, action plan view, revised brief, comparator, budget scenario, export, War Room, settings provider failure, and feedback events.
+- [x] Feedback widget uses fixed-choice usefulness, confusion, missing-need, and source/confidence clarity fields without collecting free-form text.
+- [x] Sanitization drops sensitive field keys and redacts common provider-key patterns.
+- [x] Analytics can be disabled with `VITE_ANALYTICS_ENABLED=false`.
+- [x] Analytics sanitization tests run for PR AC: `cd frontend && npm run test:analytics` passed on 2026-05-02: 2 passed.
+- [x] Frontend build run for PR AC: `cd frontend && npm run build` passed on 2026-05-02.
+- [x] Full E2E smoke tests run for PR AC: `cd frontend && npm run test:e2e -- --project=chromium --workers=1` passed on 2026-05-02: 13 passed.
+- [x] Backend tests run for PR AC: `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-02: 79 passed, 49 warnings.
+- [x] CI-equivalent secret hygiene scan run for PR AC: passed on 2026-05-02.
+- [x] `git diff --check` run for PR AC: passed on 2026-05-02.
+
 ## Release Decision
 
 This repository is suitable for local demo use with synthetic data and no real secrets.

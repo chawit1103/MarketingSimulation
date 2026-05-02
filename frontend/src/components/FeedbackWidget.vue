@@ -47,6 +47,24 @@
           <option value="other">{{ $t('feedback.other') }}</option>
         </select>
 
+        <label class="feedback-label" for="feedback-missing">{{ $t('feedback.missingLabel') }}</label>
+        <select id="feedback-missing" v-model="missingNeed" class="feedback-select">
+          <option value="none">{{ $t('feedback.missingNone') }}</option>
+          <option value="better_evidence">{{ $t('feedback.missingEvidence') }}</option>
+          <option value="clearer_actions">{{ $t('feedback.missingActions') }}</option>
+          <option value="export_storyline">{{ $t('feedback.missingExport') }}</option>
+          <option value="calibration">{{ $t('feedback.missingCalibration') }}</option>
+          <option value="collaboration">{{ $t('feedback.missingCollaboration') }}</option>
+          <option value="other">{{ $t('feedback.other') }}</option>
+        </select>
+
+        <label class="feedback-label" for="feedback-source-clear">{{ $t('feedback.sourceConfidenceLabel') }}</label>
+        <select id="feedback-source-clear" v-model="sourceConfidenceClear" class="feedback-select">
+          <option value="yes">{{ $t('feedback.yes') }}</option>
+          <option value="partial">{{ $t('feedback.partial') }}</option>
+          <option value="no">{{ $t('feedback.no') }}</option>
+        </select>
+
         <button class="feedback-submit" type="submit" :disabled="!rating">
           {{ $t('feedback.submit') }}
         </button>
@@ -65,12 +83,17 @@ const open = ref(false)
 const submitted = ref(false)
 const rating = ref(null)
 const confusionArea = ref('none')
+const missingNeed = ref('none')
+const sourceConfidenceClear = ref('yes')
 const ratings = [1, 2, 3, 4, 5]
 
 function submitFeedback() {
   trackEvent('feedback_submitted', {
     rating: rating.value,
     confusion_area: confusionArea.value,
+    missing_need: missingNeed.value,
+    source_confidence_clear: sourceConfidenceClear.value,
+    useful_for_decision: Number(rating.value || 0) >= 4,
     route_bucket: routeBucket(route),
   })
   submitted.value = true
@@ -79,6 +102,8 @@ function submitFeedback() {
     submitted.value = false
     rating.value = null
     confusionArea.value = 'none'
+    missingNeed.value = 'none'
+    sourceConfidenceClear.value = 'yes'
   }, 1800)
 }
 </script>

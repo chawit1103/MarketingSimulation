@@ -647,6 +647,8 @@ test('feedback widget emits sanitized local analytics event', async ({ page }) =
   await page.getByRole('button', { name: 'Feedback' }).click()
   await page.getByRole('button', { name: '4' }).click()
   await page.locator('#feedback-confusion').selectOption('source_labels')
+  await page.locator('#feedback-missing').selectOption('better_evidence')
+  await page.locator('#feedback-source-clear').selectOption('partial')
   await page.getByRole('button', { name: 'Send feedback' }).click()
 
   const feedbackEvent = await page.waitForFunction(() => (
@@ -657,6 +659,9 @@ test('feedback widget emits sanitized local analytics event', async ({ page }) =
   expect(event.properties).toEqual({
     rating: 4,
     confusion_area: 'source_labels',
+    missing_need: 'better_evidence',
+    source_confidence_clear: 'partial',
+    useful_for_decision: true,
     route_bucket: 'home',
   })
   expect(JSON.stringify(event)).not.toContain('api_key')

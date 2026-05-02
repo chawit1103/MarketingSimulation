@@ -34,6 +34,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - Deep industry presets are available for FMCG/CPG, Insurance/InsurTech, Retail/Ecommerce, Real Estate, EV/Automotive, and Healthcare/Wellness. Each preset includes assumptions, limitations, common objections, crisis triggers, proof requirements, risk checklist, and action-plan hints.
 - Budget Scenario Planner is available at `POST /api/decision/budget-scenario` and `/budget-planner`; it provides assumption-based channel/segment allocation ranges, trade-offs, confidence, assumptions, limitations, and validation steps without claiming exact ROI or ROAS prediction.
 - Manual Calibration v1 is available at `POST /api/calibration/actual-results`, `GET /api/calibration/status/<campaign_id>`, and `/calibration`; it compares aggregate actual campaign results against prior estimates without live CRM/social ingestion or model self-learning claims.
+- Provider-neutral pilot analytics emits sanitized browser `3c:analytics` events for key journeys and feedback without installing a third-party SDK or sending network requests by default.
 - Critical frontend route contracts are covered by backend smoke tests for demo, impact, decision, comparator, competitor, export, settings readiness, and report status endpoints.
 - API response safety removes raw traceback keys and redacts common secret-like strings before JSON responses reach clients.
 
@@ -46,6 +47,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - Quick impact scenarios are deterministic business estimates based on sentiment and supplied business inputs.
 - Budget Scenario Planner outputs are deterministic scenario estimates. Demo mode uses synthetic fixtures, and backend planner output is directional guidance rather than calibrated media performance evidence.
 - Manual Calibration v1 stores user-supplied aggregate actuals as local organization-scoped JSON records. It is calibration evidence capture, not live market sensing or automatic model improvement.
+- Pilot analytics is local/browser-event based by default. A real analytics destination, retention policy, opt-out behavior, and privacy review are still required before external customer analytics collection.
 
 ## Recently Fixed / Hardened
 

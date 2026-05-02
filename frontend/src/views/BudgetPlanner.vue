@@ -197,6 +197,7 @@
 import { computed, reactive, ref, onMounted } from 'vue'
 import ResultSourceBadge from '@/components/ResultSourceBadge.vue'
 import { runBudgetScenario } from '@/api/budget'
+import { sourceModeFromValue, trackEvent } from '@/services/analytics'
 
 const channels = [
   { key: 'facebook', label: 'Facebook' },
@@ -247,6 +248,15 @@ async function runScenario() {
       currency: 'THB',
     })
     result.value = response.data || response
+    trackEvent('budget_scenario_run', {
+      source_mode: sourceModeFromValue(result.value?.source?.type || result.value?.source?.source_mode),
+      objective: result.value?.objective || form.objective,
+      risk_tolerance: result.value?.risk_tolerance || form.risk_tolerance,
+      channel_count: Object.values(form.channel_mix).filter(value => Number(value || 0) > 0).length,
+      segment_count: targetSegments().length,
+      duration_weeks: Number(form.duration_weeks || 0),
+      demo: Boolean(form.demo),
+    })
   } catch (err) {
     error.value = 'Budget scenario planner is unavailable. No local estimate was generated automatically.'
   } finally {

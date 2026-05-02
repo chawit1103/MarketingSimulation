@@ -161,6 +161,7 @@ import { hasBrowserAuth } from '@/api/authStorage'
 import { compareCampaigns, compareDemoCampaigns, listDemoComparatorCampaigns } from '@/api/comparator'
 import ExportButton from '@/components/ExportButton.vue'
 import ResultSourceBadge from '@/components/ResultSourceBadge.vue'
+import { sourceModeFromValue, trackEvent } from '@/services/analytics'
 
 const { t } = useI18n()
 
@@ -244,6 +245,12 @@ async function runComparison() {
     const data = res.data || res
     comparisonResult.value = data
     resultSource.value = normalizeResultSource(data.source || data)
+    trackEvent('comparator_used', {
+      source_mode: sourceModeFromValue(resultSource.value.source),
+      campaign_count: selectedIds.value.length,
+      used_backend: true,
+      used_local_estimate: false,
+    })
   } catch (e) {
     console.error('Comparison failed:', e)
     comparisonResult.value = null
@@ -276,6 +283,12 @@ function runLocalEstimate() {
     source: 'local_estimate',
     warning: t('comparator.localEstimateWarning'),
   }
+  trackEvent('comparator_used', {
+    source_mode: 'local_estimate',
+    campaign_count: selectedIds.value.length,
+    used_backend: false,
+    used_local_estimate: true,
+  })
   backendFailureWarning.value = ''
 }
 
