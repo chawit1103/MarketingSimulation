@@ -1,6 +1,6 @@
 # Known Limitations
 
-Updated: 2026-05-01
+Updated: 2026-05-02
 
 This document separates what the system currently does from what should not yet be claimed.
 
@@ -10,7 +10,8 @@ This document separates what the system currently does from what should not yet 
 - War Room output is deterministic scenario planning and should not be treated as calibrated social-listening prediction.
 - Decision Engine, What-if, and Action Plan recommendations are rule-based guidance. They are not guaranteed campaign outcomes.
 - Confidence values describe data completeness and provenance signals where available; they are not statistical confidence intervals.
-- KPI and business-impact estimates still need calibration against real campaign results.
+- Manual Calibration v1 can compare aggregate actual campaign results against prior estimates, but it does not retrain models, self-improve future simulations, or overwrite original simulation outputs.
+- Calibration status depends on approved user-supplied aggregate actuals and prior estimate fields. Missing or inconsistent actuals should be treated as incomplete evidence.
 
 ## Fallback Behavior
 
@@ -19,6 +20,7 @@ This document separates what the system currently does from what should not yet 
 - Comparator still has browser-side demo fallback. A backend demo comparator fixture should replace it later.
 - Demo dashboards are strongest for `demo-premium-water`; broader demo campaign coverage remains pending.
 - Any new dashboard, export, or recommendation surface must inherit and show source-mode metadata before being considered release-ready.
+- Calibration import accepts manual JSON and one-row aggregate CSV/JSON uploads only. It does not connect to live CRM, ad-platform, or social-listening systems.
 
 ## Infrastructure
 
@@ -54,6 +56,7 @@ This document separates what the system currently does from what should not yet 
 - Frontend unit tests, lint, and typecheck scripts are not configured yet.
 - More backend coverage is needed for campaign CRUD, export edge cases, report generation flows, and full OASIS runner lifecycle.
 - Manual pilot scripts and screenshot checks are documented, but not yet automated.
+- Manual Calibration v1 records are local JSON aggregate records scoped by organization. Production deployments still need retention/deletion policy approval and a more durable governed storage model before broad external use.
 
 ## Privacy And Governance
 
@@ -67,6 +70,7 @@ Do not claim:
 
 - real-world outcome prediction accuracy,
 - calibrated market-share forecasting,
+- automatic model self-improvement from imported actual results,
 - guaranteed crisis prevention,
 - live social-listening integration,
 - enterprise compliance certification,

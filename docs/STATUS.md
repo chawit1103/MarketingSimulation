@@ -33,6 +33,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - Revised Brief v2 is available from dashboard Action Plans through `POST /api/brief/revise`; it preserves action-plan provenance and can be reviewed against the original brief.
 - Deep industry presets are available for FMCG/CPG, Insurance/InsurTech, Retail/Ecommerce, Real Estate, EV/Automotive, and Healthcare/Wellness. Each preset includes assumptions, limitations, common objections, crisis triggers, proof requirements, risk checklist, and action-plan hints.
 - Budget Scenario Planner is available at `POST /api/decision/budget-scenario` and `/budget-planner`; it provides assumption-based channel/segment allocation ranges, trade-offs, confidence, assumptions, limitations, and validation steps without claiming exact ROI or ROAS prediction.
+- Manual Calibration v1 is available at `POST /api/calibration/actual-results`, `GET /api/calibration/status/<campaign_id>`, and `/calibration`; it compares aggregate actual campaign results against prior estimates without live CRM/social ingestion or model self-learning claims.
 - Critical frontend route contracts are covered by backend smoke tests for demo, impact, decision, comparator, competitor, export, settings readiness, and report status endpoints.
 - API response safety removes raw traceback keys and redacts common secret-like strings before JSON responses reach clients.
 
@@ -44,6 +45,7 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - Comparator can use browser-side output only after the user explicitly runs Local Estimate; backend demo fixtures are preferred for no-key demo comparison.
 - Quick impact scenarios are deterministic business estimates based on sentiment and supplied business inputs.
 - Budget Scenario Planner outputs are deterministic scenario estimates. Demo mode uses synthetic fixtures, and backend planner output is directional guidance rather than calibrated media performance evidence.
+- Manual Calibration v1 stores user-supplied aggregate actuals as local organization-scoped JSON records. It is calibration evidence capture, not live market sensing or automatic model improvement.
 
 ## Recently Fixed / Hardened
 
@@ -85,3 +87,4 @@ This document lists implemented controls and remaining gaps. It does not claim t
 - Demo dashboards should be expanded for every demo campaign instead of relying on one premium-water sample shape.
 - Production deployment still needs environment-specific secret rotation, TLS, backup, observability, and CI gates.
 - KPI and Decision Engine scoring should be calibrated against real campaign outcomes.
+- Manual Calibration v1 needs real approved aggregate campaign outcomes from multiple comparable campaigns before any calibration status should influence high-stakes spend decisions.

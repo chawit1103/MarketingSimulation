@@ -319,6 +319,49 @@ const budgetScenarioResult = {
   disclaimer: 'This budget scenario is directional planning guidance, not an exact ROI, ROAS, or media-performance prediction.',
 }
 
+const calibrationResult = {
+  record_id: 'cal_smoke',
+  campaign_id: 'demo-premium-water',
+  imported_at: '2026-05-02T00:00:00+00:00',
+  actual: {
+    impressions: 120000,
+    ctr: 3,
+    conversion_rate: 1.4,
+    sentiment_score: 62,
+  },
+  estimate: {
+    impressions: 100000,
+    ctr: 2.5,
+    conversion_rate: 1.2,
+    sentiment_score: 58,
+    crisis_risk: 25,
+  },
+  comparison: [
+    { metric: 'impressions', estimate: 100000, actual: 120000, delta: 20000, absolute_error_pct: 20 },
+    { metric: 'ctr', estimate: 2.5, actual: 3, delta: 0.5, absolute_error_pct: 20 },
+    { metric: 'conversion_rate', estimate: 1.2, actual: 1.4, delta: 0.2, absolute_error_pct: 16.67 },
+    { metric: 'sentiment_score', estimate: 58, actual: 62, delta: 4, absolute_error_pct: 6.9 },
+  ],
+  risk_classification: 'matched_no_crisis',
+  segment_assumption_gaps: [],
+  calibration_status: 'partially_calibrated',
+  source: {
+    source_mode: 'live_backend',
+    data_basis: 'manual_actual_import',
+    warning: 'Manual actual results supplied by the user; this is not live CRM or social listening ingestion.',
+  },
+  privacy_review: {
+    pii_detected: false,
+    notes_stored: true,
+    rejected_fields: [],
+  },
+  limitations: [
+    'Calibration uses user-supplied aggregate actuals only.',
+    'No raw customer lists, CRM contacts, or social posts are ingested.',
+  ],
+  recommended_validation_step: 'Add actual results from at least three comparable campaigns before treating calibration as directional evidence.',
+}
+
 async function installApiMocks(page, options = {}) {
   await page.addInitScript(() => {
     localStorage.removeItem('3c-auth-token')
@@ -378,6 +421,9 @@ async function installApiMocks(page, options = {}) {
     }
     if (path === '/api/decision/budget-scenario') {
       return json(route, { success: true, data: budgetScenarioResult })
+    }
+    if (path === '/api/calibration/actual-results') {
+      return json(route, { success: true, data: calibrationResult }, 201)
     }
     if (path === '/api/comparator/demo/campaigns') {
       return json(route, {
@@ -554,6 +600,19 @@ test('budget planner returns directional scenario guidance with source label', a
   await expect(page.getByText('Reserve 10-20% of the budget')).toBeVisible()
   await expect(page.getByText('not exact ROI').first()).toBeVisible()
   await expect(page.getByText(/not live campaign evidence/i).first()).toBeVisible()
+})
+
+test('calibration imports aggregate actuals and labels manual evidence', async ({ page }) => {
+  await page.goto('/calibration')
+
+  await expect(page.getByRole('heading', { name: /Calibration v1/i })).toBeVisible()
+  await expect(page.getByText('No PII or raw posts')).toBeVisible()
+  await page.getByRole('button', { name: 'Import Actual Results' }).click()
+  await expect(page.getByText('Live Backend').first()).toBeVisible()
+  await expect(page.getByText('partially calibrated').first()).toBeVisible()
+  await expect(page.getByText('Estimate vs Actual')).toBeVisible()
+  await expect(page.getByText('manual actual results supplied by the user', { exact: false }).first()).toBeVisible()
+  await expect(page.getByText('No raw customer lists, CRM contacts, or social posts are ingested.')).toBeVisible()
 })
 
 test('war room requires explicit local estimate fallback when backend fails', async ({ page }) => {

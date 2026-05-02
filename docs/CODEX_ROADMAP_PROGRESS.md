@@ -7,60 +7,59 @@ Controller source: `CODEX_SEQUENTIAL_ORCHESTRATOR_PROMPT.md`
 
 ## Current Stage
 
-Selected roadmap item: **PR AA: Budget Scenario Planner, not ROI Predictor**
+Selected roadmap item: **PR AB: Manual Data Import + Calibration v1**
 
-## Why PR AA Was Selected
+## Why PR AB Was Selected
 
-PR Z was completed on the current stacked roadmap branch. The next incomplete roadmap item in order is PR AA: Budget Scenario Planner, not ROI Predictor.
+PR AA was completed on the current stacked roadmap branch. The next incomplete roadmap item in order is PR AB: Manual Data Import + Calibration v1.
 
 Current repository inspection found:
 
 - GitHub default branch: `multilang-v0.3`.
-- Current branch: `codex/pr-aa-budget-scenario-planner`.
+- Current branch: `codex/pr-ab-manual-calibration-v1`.
 - Release-candidate, strategy-pack, comparator, revised-brief, and deep-preset roadmap work is present.
-- Decision and impact APIs existed, but there was no dedicated budget/channel allocation what-if planner with explicit safe wording and provenance.
+- Budget Scenario Planner is present.
+- There was no manual aggregate actual-results workflow or estimate-vs-actual calibration comparison.
 
-## Completed In PR AA
+## Completed In PR AB
 
-- Added deterministic backend Budget Scenario Planner service.
-- Added `POST /api/decision/budget-scenario`.
-- Planner inputs include:
-  - total budget.
-  - campaign duration.
-  - target segments.
-  - channel mix.
-  - risk tolerance.
-  - objective: awareness, conversion, retention, or crisis recovery.
-- Planner outputs include:
-  - suggested allocation range by channel.
-  - suggested allocation range by segment.
-  - trade-offs.
-  - confidence level and confidence score.
-  - assumptions.
-  - limitations.
-  - recommended validation step.
-  - source/provenance metadata.
-- Added `/budget-planner` frontend view.
-- Added Budget Planner entry point from Campaigns.
-- Added e2e smoke coverage for Budget Planner source labels and safe wording.
-- Updated README, demo script, user journey, status, checklist, and release notes.
+- Added deterministic backend Calibration Service for manual aggregate actual-results import.
+- Added `POST /api/calibration/actual-results` for analyst/admin import.
+- Added `GET /api/calibration/status/<campaign_id>` for authenticated calibration status reads.
+- Supported manual JSON payloads and single-row aggregate CSV/JSON uploads.
+- Supported actual result fields include:
+  - campaign ID and date range.
+  - impressions, clicks, CTR, conversion count/rate, sales lift, sentiment score, and crisis incident flag.
+  - optional anonymized qualitative notes.
+  - optional prior estimates for estimate-vs-actual deltas.
+- Added calibration output for:
+  - estimate vs actual comparison.
+  - metric delta and absolute error percentage.
+  - matched/missed risk classification.
+  - segment assumption gaps when supplied.
+  - calibration status: `not_calibrated`, `partially_calibrated`, or `calibrated_with_n_campaigns`.
+  - privacy review, limitations, and recommended next validation step.
+- Added privacy safeguards that reject PII-like fields, raw CRM/contact data, raw social posts/comments, and PII-like notes.
+- Added `/calibration` frontend view for manual import and upload workflow.
+- Added Campaigns navigation entry for Calibration.
+- Added e2e smoke coverage for calibration status, manual evidence labeling, and privacy wording.
+- Updated status, limitations, pilot plan, checklist, release notes, and roadmap progress.
 
-## Not Completed In PR AA
+## Not Completed In PR AB
 
-- No live ad-platform integration was added.
-- No real media-cost database was added.
-- No billing, CRM import, social listening, or calibration loop was added.
-- No precise ROI/ROAS, CAC, sales forecast, market-share forecast, or budget-optimization certainty is claimed.
-- Planner outputs remain deterministic scenario estimates and must be validated with real benchmarks or pilot results before major spend.
+- No live CRM, ad-platform, or social-listening integrations were added.
+- No raw customer lists, CRM contact data, raw social posts, or PII ingestion was added.
+- Calibration does not retrain, self-improve, overwrite, or automatically adjust existing simulation output.
+- Calibration records are local JSON aggregate records scoped by organization in the current storage architecture.
+- Calibration status is directional and depends on user-supplied aggregate actuals and prior estimates.
 - Manual credential rotation was not marked complete because it requires repository-owner action outside Codex.
 
 ## Tests And Checks
 
-- `backend/.venv/bin/python -m pytest backend/tests/test_budget_scenario_planner.py backend/tests/test_api_contract.py -q`: passed, 6 passed.
-- `backend/.venv/bin/python -m pytest backend/tests -q`: passed, 73 passed and 38 warnings.
+- `backend/.venv/bin/python -m pytest backend/tests/test_calibration_service.py backend/tests/test_api_contract.py -q`: passed, 9 passed.
+- `backend/.venv/bin/python -m pytest backend/tests -q`: passed, 79 passed and 49 warnings.
 - `cd frontend && npm run build`: passed.
-- `cd frontend && npm run test:e2e -- --project=chromium --workers=1 --grep "budget planner"`: passed, 1 passed.
-- `cd frontend && npm run test:e2e -- --project=chromium --workers=1`: passed, 12 passed.
+- `cd frontend && npm run test:e2e -- --project=chromium --workers=1`: passed, 13 passed.
 - CI-equivalent secret hygiene scan: passed.
 - `git diff --check`: passed.
 
@@ -71,11 +70,11 @@ Current repository inspection found:
 - Browser auth storage is mitigated but still needs HttpOnly cookie, refresh-token, or equivalent production hardening before public/customer deployment.
 - External pilot data-retention and deletion procedures still need approval.
 - Legacy local JSON records without `org_id` need review, backfill, or re-creation before production use.
-- Deep industry presets and budget plans must be treated as assumptions until calibrated with real campaign data, media benchmarks, and client-approved market inputs.
+- Deep industry presets, budget plans, and calibration comparisons must be treated as directional evidence until enough approved real campaign outcomes are imported and reviewed.
 
 ## Next Recommended Roadmap Item
 
-After PR AA is reviewed and merged, proceed to **PR AB: Manual Data Import + Calibration v1**.
+After PR AB is reviewed and merged, proceed to the next incomplete item in `CODEX_BRAND_AGENCY_VALUE_ROADMAP_PROMPTS.md`.
 
 Short prompt for the next run:
 

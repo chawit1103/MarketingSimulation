@@ -14,6 +14,7 @@ const ComparatorView = () => import('../views/ComparatorView.vue')
 const ImpactSimulator = () => import('../views/ImpactSimulator.vue')
 const WarRoom = () => import('../views/WarRoom.vue')
 const BudgetPlanner = () => import('../views/BudgetPlanner.vue')
+const CalibrationView = () => import('../views/CalibrationView.vue')
 
 const routes = [
   {
@@ -81,6 +82,11 @@ const routes = [
     path: '/budget-planner',
     name: 'BudgetPlanner',
     component: BudgetPlanner
+  },
+  {
+    path: '/calibration',
+    name: 'Calibration',
+    component: CalibrationView
   },
   {
     path: '/war-room',

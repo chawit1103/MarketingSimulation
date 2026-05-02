@@ -257,6 +257,22 @@ Backend smoke tests cover these contracts through `backend/tests/test_api_contra
 - [x] CI-equivalent secret hygiene scan run for PR AA: passed on 2026-05-02.
 - [x] `git diff --check` run for PR AA: passed on 2026-05-02.
 
+### PR AB Manual Data Import + Calibration v1 Run
+
+- [x] Roadmap progress selected PR AB after PR AA.
+- [x] Added `POST /api/calibration/actual-results` for analyst/admin aggregate actual-results import.
+- [x] Added `GET /api/calibration/status/<campaign_id>` for authenticated calibration status reads.
+- [x] Calibration comparison output includes estimate-vs-actual deltas, absolute error percentage, matched/missed risk classification, optional segment assumption gaps, calibration status, privacy review, limitations, and next validation step.
+- [x] Calibration labels include `not_calibrated`, `partially_calibrated`, and `calibrated_with_n_campaigns`.
+- [x] Privacy safeguards reject PII-like fields, raw contact/CRM data, raw social posts/comments, and PII-like notes.
+- [x] Frontend `/calibration` shows manual actual-results import, file upload, source label, privacy warning, and no silent local calibration fallback.
+- [x] Focused backend tests run for PR AB: `backend/.venv/bin/python -m pytest backend/tests/test_calibration_service.py backend/tests/test_api_contract.py -q` passed on 2026-05-02: 9 passed.
+- [x] Full backend tests run for PR AB: `backend/.venv/bin/python -m pytest backend/tests -q` passed on 2026-05-02: 79 passed, 49 warnings.
+- [x] Frontend build run for PR AB: `cd frontend && npm run build` passed on 2026-05-02.
+- [x] Full E2E smoke tests run for PR AB: `cd frontend && npm run test:e2e -- --project=chromium --workers=1` passed on 2026-05-02: 13 passed.
+- [x] CI-equivalent secret hygiene scan run for PR AB: passed on 2026-05-02.
+- [x] `git diff --check` run for PR AB: passed on 2026-05-02.
+
 ## Release Decision
 
 This repository is suitable for local demo use with synthetic data and no real secrets.

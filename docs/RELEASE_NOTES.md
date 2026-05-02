@@ -171,3 +171,22 @@ This pass adds a deterministic budget/channel what-if planner for demo and contr
 - Focused e2e smoke test passed: `cd frontend && npm run test:e2e -- --project=chromium --workers=1 --grep "budget planner"`.
 - Full e2e smoke tests passed: `cd frontend && npm run test:e2e -- --project=chromium --workers=1`.
 - CI-equivalent secret hygiene scan and `git diff --check` passed.
+
+## PR AB: Manual Data Import + Calibration v1
+
+This pass adds manual aggregate actual-results import and deterministic estimate-vs-actual calibration comparison. It does not add live CRM/social-listening integrations, raw customer data ingestion, or model self-learning.
+
+### What Changed
+
+- Added `POST /api/calibration/actual-results` for analyst/admin actual-results import.
+- Added `GET /api/calibration/status/<campaign_id>` for authenticated calibration status reads.
+- Added a backend Calibration Service that supports JSON payloads plus one-row aggregate CSV/JSON uploads.
+- Calibration output includes estimate-vs-actual delta, absolute error percentage by metric, matched/missed risk classification, optional segment assumption gaps, privacy review, limitations, and next validation step.
+- Added privacy safeguards that reject PII-like fields, raw CRM/contact data, raw social posts/comments, and PII-like qualitative notes.
+- Added `/calibration` frontend view and Campaigns navigation entry.
+- Added e2e smoke coverage for calibration manual-evidence labels and privacy wording.
+
+### Validation
+
+- Focused backend calibration/API contract tests passed: `backend/.venv/bin/python -m pytest backend/tests/test_calibration_service.py backend/tests/test_api_contract.py -q`.
+- Full backend, frontend build, e2e, secret scan, and diff validation are recorded in `docs/RELEASE_READINESS_CHECKLIST.md`.

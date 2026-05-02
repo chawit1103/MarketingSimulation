@@ -139,6 +139,10 @@ The Settings Wizard checks readiness for demo-only, local model, and cloud API s
 
 ![Settings Wizard](docs/screenshots/settings-wizard.png)
 
+### 8. Import Aggregate Actuals For Calibration
+
+Calibration v1 lets analyst/admin users enter approved aggregate actual campaign results and compare them against prior estimates. It rejects raw customer data, CRM records, raw social posts, and PII-like notes.
+
 For a presenter-friendly run-through, see [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md). For safe sample briefs, see [docs/DEMO_DATA.md](docs/DEMO_DATA.md). For expected buyer and pilot-user questions, see [docs/FAQ.md](docs/FAQ.md). For a first-time user path, see [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md).
 
 ---
@@ -217,6 +221,20 @@ The user can describe where the audience actually lives, beyond the native simul
 Run assumption-based channel mix what-if planning before committing media spend. The planner accepts total budget, duration, target segments, channel mix, risk tolerance, and objective, then returns directional allocation ranges, trade-offs, confidence level, assumptions, limitations, and a recommended validation step.
 
 This is not an exact ROI or ROAS predictor. It does not use live ad-platform cost data unless the user supplies approved planning inputs.
+
+### Manual Calibration v1
+
+Import approved aggregate actual campaign results through `/calibration` or `POST /api/calibration/actual-results`.
+
+Supported fields include campaign ID, date range, impressions, clicks, CTR, conversion count/rate, sales lift, sentiment score or summary, crisis incident flag, anonymized qualitative notes, and optional prior estimate fields.
+
+The output shows estimate-vs-actual deltas, error by metric, matched/missed risk classification, segment assumption gaps when supplied, privacy review, limitations, and calibration status:
+
+- `not_calibrated`
+- `partially_calibrated`
+- `calibrated_with_n_campaigns`
+
+This is not live CRM, ad-platform, or social-listening ingestion. It does not retrain the model or overwrite original simulation outputs.
 
 ### OASIS Platform Presets
 
@@ -492,6 +510,13 @@ All product APIs are registered under `/api/*`.
 | GET | `/api/auth/me` | Current user profile |
 | POST | `/api/auth/api-key` | Generate API key |
 
+### Calibration
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/calibration/actual-results` | Import aggregate actual results and compare against prior estimates |
+| GET | `/api/calibration/status/{campaign_id}` | Read calibration status for an organization campaign |
+
 ### Campaigns
 
 | Method | Endpoint | Description |
@@ -581,6 +606,7 @@ Flask Backend
   Demo API
   Status API
   Export Engine
+  Calibration Service
   OASIS Simulation Runner
         |
         v

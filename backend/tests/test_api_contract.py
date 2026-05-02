@@ -23,6 +23,7 @@ def test_product_blueprints_are_registered_under_api_prefix():
         "/api/status",
         "/api/decision",
         "/api/brief",
+        "/api/calibration",
     ]
 
     for prefix in expected_prefixes:
@@ -62,6 +63,8 @@ def test_critical_frontend_routes_exist_in_backend_url_map(monkeypatch):
         ("POST", "/api/decision/analyze"),
         ("POST", "/api/decision/what-if"),
         ("POST", "/api/decision/budget-scenario"),
+        ("POST", "/api/calibration/actual-results"),
+        ("GET", "/api/calibration/status/<campaign_id>"),
         ("POST", "/api/comparator/compare"),
         ("GET", "/api/comparator/metrics"),
         ("GET", "/api/comparator/demo/campaigns"),

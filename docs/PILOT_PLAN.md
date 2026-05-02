@@ -1,8 +1,8 @@
 # Pilot Plan
 
-Updated: 2026-05-01
+Updated: 2026-05-02
 
-This plan is for controlled testing with 3-5 real users or internal stakeholders. The goal is to validate workflow value, trust, and decision usefulness before broad release. It is not a calibration study by itself.
+This plan is for controlled testing with 3-5 real users or internal stakeholders. The goal is to validate workflow value, trust, and decision usefulness before broad release. It is not a calibration study by itself, although approved aggregate campaign actuals can now be imported separately for Calibration v1.
 
 ## Pilot Objectives
 
@@ -42,6 +42,7 @@ Recommended starting routes:
 - `/dashboard/demo-premium-water`
 - `/campaigns`
 - `/war-room`
+- `/calibration`
 - `/settings`
 
 ## Session Structure
@@ -57,6 +58,7 @@ Show:
 - War Room with source label.
 - Action Plan.
 - Settings Wizard.
+- Calibration v1 with aggregate actuals only, if using approved sample data.
 
 ### 5-20 minutes: User Task
 
@@ -68,6 +70,7 @@ Ask the participant to complete one scenario:
 4. Identify the top risk segment.
 5. Choose one recommended action.
 6. Explain what they would validate before launch.
+7. Optional: enter approved aggregate actual results in Calibration v1 and compare estimate-vs-actual deltas.
 
 ### 20-30 minutes: Feedback Interview
 
@@ -105,6 +108,13 @@ Do not capture:
 - regulated personal data,
 - confidential campaign budgets unless explicitly approved for research.
 
+Calibration v1 import rules:
+
+- Accept aggregate campaign summaries only.
+- Do not import customer lists, CRM records, raw social posts, raw comments, names, phone numbers, emails, handles, tokens, or API keys.
+- Use synthetic actuals or owner-approved aggregate campaign readouts for early pilots.
+- Treat `partially_calibrated` as directional evidence, not proof of predictive accuracy.
+
 ## Success Criteria
 
 Pilot is successful if:
@@ -114,6 +124,7 @@ Pilot is successful if:
 - At least 3 participants can identify one recommended action and one validation step.
 - At least 3 participants say the Action Plan or Confidence & Evidence panel would help in a real campaign discussion.
 - No participant mistakes local fallback output for measured live simulation output.
+- If Calibration v1 is tested, participants understand that imported actuals are manual aggregate evidence and do not automatically retrain the simulation engine.
 
 ## Exit Criteria Before Public Demo
 
@@ -159,4 +170,5 @@ After each pilot:
 2. Add product issues for repeated confusion points.
 3. Update docs if users misunderstood product scope or output limitations.
 4. Keep calibration evidence separate from anecdotal usability feedback.
-5. Do not publish case studies until assumptions and data permissions are validated.
+5. Store Calibration v1 evidence only when approved by the data owner and delete it on request.
+6. Do not publish case studies until assumptions and data permissions are validated.

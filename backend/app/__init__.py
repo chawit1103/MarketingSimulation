@@ -146,6 +146,7 @@ def create_app(config_class=Config):
     from .api.status import status_bp
     from .api.decision import decision_bp
     from .api.brief import brief_bp
+    from .api.calibration import calibration_bp
     app.register_blueprint(graph_bp, url_prefix='/api/graph')
     app.register_blueprint(simulation_bp, url_prefix='/api/simulation')
     app.register_blueprint(report_bp, url_prefix='/api/report')
@@ -163,6 +164,7 @@ def create_app(config_class=Config):
     app.register_blueprint(status_bp, url_prefix='/api/status')
     app.register_blueprint(decision_bp, url_prefix='/api/decision')
     app.register_blueprint(brief_bp, url_prefix='/api/brief')
+    app.register_blueprint(calibration_bp, url_prefix='/api/calibration')
 
     # Health check
     @app.route('/health')

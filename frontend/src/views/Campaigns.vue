@@ -26,6 +26,9 @@
         <router-link to="/budget-planner" class="btn-impact-nav">
           Budget Planner
         </router-link>
+        <router-link to="/calibration" class="btn-impact-nav">
+          Calibration
+        </router-link>
         <router-link to="/comparator" class="btn-compare-nav">
           {{ $t('comparator.navLink') }}
         </router-link>
