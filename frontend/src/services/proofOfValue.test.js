@@ -30,6 +30,27 @@ function approvedIntake() {
   return intake
 }
 
+function expectBlockedAndRedacted(fieldKey, payloadKey, unsafeValue, expectedReason) {
+  const intake = approvedIntake()
+  intake[fieldKey] = unsafeValue
+
+  const validation = validateProofOfValueIntake(intake)
+  const pack = buildProofOfValuePackage(intake)
+  const payloadJson = JSON.stringify(pack.intake_summary)
+
+  expect(validation.ready).toBe(false)
+  expect(validation.unsafeSignals).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        key: fieldKey,
+        reason: expect.stringContaining(expectedReason),
+      }),
+    ]),
+  )
+  expect(pack.intake_summary[payloadKey]).toBe('[blocked: unsafe intake signal]')
+  expect(payloadJson).not.toContain(unsafeValue)
+}
+
 describe('proof-of-value intake workflow', () => {
   it('builds a ready package from approved business context', () => {
     const intake = approvedIntake()
@@ -61,5 +82,62 @@ describe('proof-of-value intake workflow', () => {
     expect(JSON.stringify(pack.intake_summary)).not.toContain('API key')
     expect(pack.intake_summary.market_context).toBe('[blocked: unsafe intake signal]')
     expect(pack.intake_summary.risk_concerns).toBe('[blocked: unsafe intake signal]')
+  })
+
+  it('flags and redacts phone-like values', () => {
+    expectBlockedAndRedacted(
+      'targetSegment',
+      'target_segment',
+      'Pilot decision maker phone +1 555 010 0199',
+      'Phone-like',
+    )
+  })
+
+  it('flags and redacts SSN or national-ID-like values', () => {
+    expectBlockedAndRedacted(
+      'marketContext',
+      'market_context',
+      'Historical note includes SSN 000-00-0000',
+      'National ID',
+    )
+  })
+
+  it('flags and redacts long account or customer identifiers', () => {
+    expectBlockedAndRedacted(
+      'competitorContext',
+      'competitor_context',
+      'Compare against customer id CUST-PLACEHOLDER-1234567890',
+      'Long account',
+    )
+  })
+
+  it('flags and redacts sk-style placeholder tokens', () => {
+    const fakeToken = ['sk', 'FAKEPLACEHOLDER'].join('-')
+    expectBlockedAndRedacted(
+      'riskConcerns',
+      'risk_concerns',
+      `Operator pasted ${fakeToken} by mistake`,
+      'Key-shaped',
+    )
+  })
+
+  it('flags and redacts ghp-style placeholder tokens', () => {
+    const fakeToken = ['ghp', 'FAKEPLACEHOLDER'].join('_')
+    expectBlockedAndRedacted(
+      'creativeA',
+      'creative_direction_a',
+      `Do not use ${fakeToken}`,
+      'GitHub token-like',
+    )
+  })
+
+  it('flags and redacts Bearer-style placeholder tokens', () => {
+    const fakeToken = ['Bearer', 'FAKEPLACEHOLDER'].join(' ')
+    expectBlockedAndRedacted(
+      'aggregateActuals',
+      'aggregate_actuals',
+      `Aggregate note accidentally included ${fakeToken}`,
+      'Bearer token-like',
+    )
   })
 })

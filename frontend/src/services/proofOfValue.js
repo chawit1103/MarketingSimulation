@@ -30,8 +30,48 @@ const unsafePatterns = [
     pattern: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i,
   },
   {
+    reason: 'Phone-like personal contact numbers must be removed.',
+    pattern: /\b(?:\+?\d{1,3}[\s.-])?(?:\(?\d{2,4}\)?[\s.-]){2,3}\d{2,4}\b/,
+  },
+  {
+    reason: 'National ID, SSN, passport, or tax identifier-like text must be removed.',
+    pattern: /\b(?:\d{3}-\d{2}-\d{4}|(?:ssn|national id|citizen id|passport|tax id)\s*[:#-]?\s*[A-Z0-9-]{4,})\b/i,
+  },
+  {
+    reason: 'Long account, customer, member, client, or user identifiers must be removed.',
+    pattern: /\b(?:account|customer|member|client|user)\s*(?:id|number|no\.?|#)\s*[:#-]?\s*[A-Z0-9][A-Z0-9_-]{10,}\b/i,
+  },
+  {
+    reason: 'Personal contact identifier patterns must be removed.',
+    pattern: /\b(?:contact|phone|mobile|tel|line id|wechat|whatsapp)\s*[:#-]?\s*[+@A-Z0-9._ -]{4,}\b/i,
+  },
+  {
     reason: 'Raw CRM, contact, or customer-list language must be removed.',
     pattern: /\b(raw crm|crm export|customer list|email list|phone list|contact list|subscriber list|row-level|individual-level|household-level|account-level)\b/i,
+  },
+  {
+    reason: 'Key-shaped API tokens must be removed.',
+    pattern: /\b(?:sk|sk-ant|sk-or)-[A-Za-z0-9_=-]{8,}\b|\bgsk_[A-Za-z0-9_=-]{8,}\b/,
+  },
+  {
+    reason: 'GitHub token-like values must be removed.',
+    pattern: /\bgh[pousr]_[A-Za-z0-9_]{8,}\b/,
+  },
+  {
+    reason: 'AWS access key-like values must be removed.',
+    pattern: /\b(?:AKIA|ASIA)[0-9A-Z]{12,20}\b/,
+  },
+  {
+    reason: 'Bearer token-like values must be removed.',
+    pattern: /\bBearer\s+[A-Za-z0-9._~+/=-]{8,}\b/i,
+  },
+  {
+    reason: 'Private key header text must be removed.',
+    pattern: /-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/i,
+  },
+  {
+    reason: 'Long high-entropy token-like strings must be removed.',
+    pattern: /\b(?=[A-Za-z0-9_=-]{32,}\b)(?=(?:.*[A-Z]){2,})(?=(?:.*[a-z]){2,})(?=(?:.*\d){2,})[A-Za-z0-9_=-]{32,}\b/,
   },
   {
     reason: 'Secrets or credential language must be removed.',
