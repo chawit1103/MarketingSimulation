@@ -74,6 +74,15 @@ Current release readiness:
 
 For demo, release validation, known limitations, and recommended next actions, see:
 
+- [docs/CUSTOMER_PILOT_PLAYBOOK.md](docs/CUSTOMER_PILOT_PLAYBOOK.md)
+- [docs/CUSTOMER_DATA_HANDLING.md](docs/CUSTOMER_DATA_HANDLING.md)
+- [docs/PILOT_DISCOVERY_QUESTIONS.md](docs/PILOT_DISCOVERY_QUESTIONS.md)
+- [docs/PILOT_SUCCESS_CRITERIA.md](docs/PILOT_SUCCESS_CRITERIA.md)
+- [docs/SAMPLE_PILOT_SOW.md](docs/SAMPLE_PILOT_SOW.md)
+- [docs/PILOT_PRICING_PACKAGES.md](docs/PILOT_PRICING_PACKAGES.md)
+- [docs/PILOT_ONBOARDING_GUIDE.md](docs/PILOT_ONBOARDING_GUIDE.md)
+- [docs/PILOT_EXIT_CHECKLIST.md](docs/PILOT_EXIT_CHECKLIST.md)
+- [docs/SALES_FAQ.md](docs/SALES_FAQ.md)
 - [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)
 - [docs/DEMO_DATA.md](docs/DEMO_DATA.md)
 - [docs/FAQ.md](docs/FAQ.md)
@@ -88,6 +97,42 @@ For demo, release validation, known limitations, and recommended next actions, s
 - [docs/PILOT_PLAN.md](docs/PILOT_PLAN.md)
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 - [docs/ROADMAP.md](docs/ROADMAP.md)
+
+---
+
+## Customer Pilot
+
+3C Simulator can be packaged as a controlled paid pilot for brand teams, agencies, PR teams, and strategy teams that need decision support before campaign spend.
+
+Pilot positioning:
+
+- Local demo: ready.
+- Controlled private pilot: conditional candidate.
+- Public pilot: blocked.
+- Public internet exposure: blocked.
+- Production customer deployment: blocked.
+
+The pilot should be sold as a guided engagement, not production SaaS. Outputs are decision-support estimates, not guaranteed predictions of sentiment, conversion, revenue, ROI, crisis probability, or market share.
+
+Customer data rules for the first pilot:
+
+- No PII.
+- No raw CRM records.
+- No live social-listening, CRM, ad-platform, or marketing automation integration.
+- Use anonymized or explicitly approved campaign briefs only.
+- Keep Demo Mode, Local Estimate, Live Backend, Backend Verified, and Unknown Source labels visible in the UI, screenshots, exports, and decks.
+
+Recommended customer-pilot docs:
+
+- [Customer Pilot Playbook](docs/CUSTOMER_PILOT_PLAYBOOK.md)
+- [Customer Data Handling](docs/CUSTOMER_DATA_HANDLING.md)
+- [Pilot Discovery Questions](docs/PILOT_DISCOVERY_QUESTIONS.md)
+- [Pilot Success Criteria](docs/PILOT_SUCCESS_CRITERIA.md)
+- [Sample Pilot SOW](docs/SAMPLE_PILOT_SOW.md)
+- [Pilot Pricing Packages](docs/PILOT_PRICING_PACKAGES.md)
+- [Pilot Onboarding Guide](docs/PILOT_ONBOARDING_GUIDE.md)
+- [Pilot Exit Checklist](docs/PILOT_EXIT_CHECKLIST.md)
+- [Sales FAQ](docs/SALES_FAQ.md)
 
 ---
 
