@@ -51,8 +51,11 @@ Outputs remain decision-support estimates, not guaranteed predictions.
 ## CORS Restricted Origins
 
 - [ ] Configure exact allowed HTTPS origins through environment variables.
-- [ ] Set `CORS_ALLOWED_ORIGINS` to the approved frontend origin.
-- [ ] Set `CONTENT_SECURITY_POLICY` and restrict `connect-src` to `'self'` plus the approved pilot API origin.
+- [ ] Confirm the controlled-pilot origins: frontend `https://pilot.example.com`, backend API `https://api-pilot.example.com`.
+- [ ] Set `CORS_ALLOWED_ORIGINS` to the approved frontend origin, for example `https://pilot.example.com`.
+- [ ] Set `CONTENT_SECURITY_POLICY` and restrict `connect-src` to `'self'` plus the approved pilot API origin, for example `https://api-pilot.example.com`.
+- [ ] Set frontend `VITE_API_BASE_URL` to the backend API origin, for example `https://api-pilot.example.com`.
+- [ ] Use the frontend origin as `VITE_API_BASE_URL` only when `/api` is reverse-proxied from the frontend host to the backend.
 - [ ] Do not use wildcard CORS origins for any hosted pilot.
 - [ ] Confirm preflight responses only allow the pilot frontend origin.
 - [ ] Confirm cookies/tokens are not accepted from unapproved origins.
