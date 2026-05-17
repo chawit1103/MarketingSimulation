@@ -76,6 +76,33 @@ def test_audit_log_service_writes_org_scoped_jsonl_without_raw_content(tmp_path)
     assert service.audit_log_path("org_a").endswith("organizations/org_a/audit/audit_events.jsonl")
 
 
+@pytest.mark.parametrize(
+    "org_id",
+    [
+        "",
+        "   ",
+        "../outside",
+        "org/child",
+        "org\\child",
+        "org..child",
+        "org child",
+        "org.child",
+    ],
+)
+def test_audit_log_service_rejects_invalid_org_path_segments(tmp_path, org_id):
+    service = AuditLogService(upload_folder=str(tmp_path))
+
+    with pytest.raises(ValueError):
+        service.record_event(
+            org_id=org_id,
+            event_type="campaign_updated",
+            metadata={"changed_fields": ["status"]},
+        )
+
+    assert not (tmp_path / "outside").exists()
+    assert not (tmp_path.parent / "outside").exists()
+
+
 @pytest.fixture()
 def audit_api_context(tmp_path, monkeypatch):
     monkeypatch.setattr(Config, "UPLOAD_FOLDER", str(tmp_path))
