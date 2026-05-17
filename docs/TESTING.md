@@ -1,6 +1,6 @@
 # Testing
 
-Updated: 2026-05-01
+Updated: 2026-05-17
 
 This repo has backend contract/smoke tests, a frontend production build check, and Playwright smoke tests for the main user journeys.
 
@@ -66,6 +66,7 @@ Current unit coverage verifies:
 - Budget Planner disclaimer wording for assumption-based planning, not exact ROI/ROAS prediction.
 - Calibration privacy warnings for aggregate-only actuals.
 - Strategy Pack source/provenance formatting for slide footer and validation-summary rendering.
+- Customer pilot readiness copy for controlled-pilot language without production-readiness claims.
 
 ## E2E Smoke Tests
 
