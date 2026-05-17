@@ -10,6 +10,7 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
 from app import create_app  # noqa: E402
+from app.api.export import _safe_export_type  # noqa: E402
 from app.config import Config  # noqa: E402
 from app.models.settings import SettingsManager  # noqa: E402
 from app.models.user import UserRole  # noqa: E402
@@ -45,6 +46,15 @@ def test_audit_redaction_removes_secrets_pii_and_raw_content():
     assert "sk-test-secret-value" not in rendered
     assert "person@example.com" not in rendered
     assert "+1 555 111 2222" not in rendered
+
+
+def test_export_audit_type_normalization_rejects_arbitrary_request_text():
+    assert _safe_export_type("dashboard") == "dashboard"
+    assert _safe_export_type("strategy-pack") == "strategy_pack"
+    assert _safe_export_type("Campaign Name With Sensitive Brief") == "unknown"
+    assert _safe_export_type("person@example.com") == "unknown"
+    assert _safe_export_type("sk-sensitive-token-value") == "unknown"
+    assert _safe_export_type(None) == "generic"
 
 
 def test_audit_log_service_writes_org_scoped_jsonl_without_raw_content(tmp_path):
