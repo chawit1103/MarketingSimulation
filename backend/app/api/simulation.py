@@ -13,6 +13,7 @@ from ..services.entity_reader import EntityReader
 from ..services.oasis_profile_generator import OasisProfileGenerator
 from ..services.simulation_manager import SimulationManager, SimulationStatus
 from ..services.simulation_runner import SimulationRunner, RunnerStatus
+from ..services.audit_log_service import record_audit_event
 from ..authz import ANALYST_ROLES, role_required
 from ..utils.logger import get_logger
 from ..models.project import ProjectManager
@@ -1637,6 +1638,19 @@ def start_simulation():
         response_data['force_restarted'] = force_restarted
         if enable_graph_memory_update:
             response_data['graph_id'] = graph_id
+        record_audit_event(
+            org_id=_get_org_id(),
+            event_type="simulation_started",
+            resource_type="simulation",
+            resource_id=simulation_id,
+            metadata={
+                "platform": platform,
+                "max_rounds_applied": max_rounds,
+                "force_requested": bool(force),
+                "force_restarted": force_restarted,
+                "graph_memory_update_enabled": bool(enable_graph_memory_update),
+            },
+        )
         
         return jsonify({
             "success": True,
@@ -1697,6 +1711,13 @@ def stop_simulation():
         if state:
             state.status = SimulationStatus.PAUSED
             manager._save_simulation_state(state)
+        record_audit_event(
+            org_id=_get_org_id(),
+            event_type="simulation_stopped",
+            resource_type="simulation",
+            resource_id=simulation_id,
+            metadata={"runner_status": run_state.runner_status.value},
+        )
         
         return jsonify({
             "success": True,

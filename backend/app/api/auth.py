@@ -8,6 +8,7 @@ from flask import Blueprint, request, jsonify, g
 from ..services.organization_service import OrganizationService
 from ..services.user_service import UserService
 from ..services.auth_service import AuthService
+from ..services.audit_log_service import record_audit_event
 from ..models.user import User, UserRole
 from ..authz import ADMIN_ROLES, ANY_AUTHENTICATED_ROLES, role_required
 from ..utils.logger import get_logger
@@ -152,6 +153,14 @@ def login():
 
         # 4. Generate token
         token = auth_svc.create_token(user)
+        record_audit_event(
+            org_id=user.org_id,
+            event_type="login",
+            actor_user_id=user.user_id,
+            resource_type="user",
+            resource_id=user.user_id,
+            metadata={"auth_method": "password"},
+        )
 
         return jsonify({'success': True, 'data': {
             'user': user.to_dict(),

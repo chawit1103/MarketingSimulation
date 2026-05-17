@@ -3,9 +3,11 @@ import re
 from copy import deepcopy
 from typing import Any
 
-from flask import Blueprint, request, jsonify
-from ..models.settings import SettingsManager, ProviderType, EmbeddingProviderType, GraphDBMode
+from flask import Blueprint, request, jsonify, g
+from ..models.settings import AppSettings, SettingsManager, ProviderType, EmbeddingProviderType, GraphDBMode
 from ..authz import ADMIN_ROLES, role_required
+from ..services.audit_log_service import record_audit_event
+from ..utils.audit_redaction import audit_changed_fields
 
 settings_bp = Blueprint('settings', __name__)
 
@@ -27,6 +29,16 @@ SECRET_PRESENCE_FIELDS = {
     "password_present",
     "has_password",
 }
+
+
+def _settings_audit_sections() -> set[str]:
+    """Return the AppSettings top-level sections allowed in audit metadata."""
+    return set(AppSettings.model_fields.keys())
+
+
+def _settings_sections_changed(payload: dict) -> list[str]:
+    """Return changed known settings sections without persisting arbitrary keys."""
+    return audit_changed_fields(payload, _settings_audit_sections())
 
 
 def _sanitize_error(error: Exception | str) -> str:
@@ -260,6 +272,14 @@ def update_settings():
     try:
         mgr = SettingsManager()
         mgr.update(_merge_settings_update(mgr.get(), data))
+        org_id = g.get("current_org_id")
+        if org_id:
+            record_audit_event(
+                org_id=str(org_id),
+                event_type="settings_updated",
+                resource_type="settings",
+                metadata={"sections_changed": _settings_sections_changed(data)},
+            )
         return jsonify({'success': True, 'message': 'Settings updated and providers reinitialized'})
     except Exception as e:
         return jsonify({'success': False, 'error': _sanitize_error(e)}), 400

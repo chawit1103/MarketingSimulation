@@ -190,7 +190,7 @@ class SettingsManager:
                 llm=LLMSettings(
                     provider=ProviderType.OLLAMA,
                     model=Config.LLM_MODEL_NAME,
-                    api_key=Config.LLM_API_KEY,
+                    api_key=Config.LLM_API_KEY or "",
                     base_url=Config.LLM_BASE_URL,
                 ),
                 embedding=EmbeddingSettings(
