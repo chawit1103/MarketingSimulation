@@ -24,6 +24,9 @@ export const proofOfValueConfirmations = [
   { key: 'noLiveIntegrations', label: 'No live integrations', required: true },
 ]
 
+const SAFETY_CONFIRMATIONS_REQUIRED_PLACEHOLDER = '[blocked: safety confirmations required]'
+const UNSAFE_INTAKE_SIGNAL_PLACEHOLDER = '[blocked: unsafe intake signal]'
+
 const unsafePatterns = [
   {
     reason: 'Email-like text is not allowed in proof-of-value intake.',
@@ -153,18 +156,23 @@ export function validateProofOfValueIntake(intake) {
   }
 }
 
-function safeValue(intake, field, unsafeKeys) {
-  if (unsafeKeys.has(field.key)) return '[blocked: unsafe intake signal]'
+function safeValue(intake, field, unsafeKeys, canExposeRawFields) {
+  if (unsafeKeys.has(field.key)) return UNSAFE_INTAKE_SIGNAL_PLACEHOLDER
+  if (!canExposeRawFields) return SAFETY_CONFIRMATIONS_REQUIRED_PLACEHOLDER
   return fieldValue(intake, field.key) || null
 }
 
 export function buildProofOfValuePackage(intake) {
   const validation = validateProofOfValueIntake(intake)
   const unsafeKeys = new Set(validation.unsafeSignals.map((item) => item.key))
+  const canExposeRawFields =
+    validation.missingFields.length === 0 &&
+    validation.missingConfirmations.length === 0 &&
+    validation.unsafeSignals.length === 0
   const intakeSummary = {}
 
   for (const field of proofOfValueTextFields) {
-    intakeSummary[field.payloadKey] = safeValue(intake, field, unsafeKeys)
+    intakeSummary[field.payloadKey] = safeValue(intake, field, unsafeKeys, canExposeRawFields)
   }
 
   return {

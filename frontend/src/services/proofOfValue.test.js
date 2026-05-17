@@ -6,6 +6,9 @@ import {
   validateProofOfValueIntake,
 } from './proofOfValue'
 
+const safetyConfirmationPlaceholder = '[blocked: safety confirmations required]'
+const unsafeSignalPlaceholder = '[blocked: unsafe intake signal]'
+
 function approvedIntake() {
   const intake = defaultProofOfValueIntake()
   Object.assign(intake, {
@@ -47,7 +50,7 @@ function expectBlockedAndRedacted(fieldKey, payloadKey, unsafeValue, expectedRea
       }),
     ]),
   )
-  expect(pack.intake_summary[payloadKey]).toBe('[blocked: unsafe intake signal]')
+  expect(pack.intake_summary[payloadKey]).toBe(unsafeSignalPlaceholder)
   expect(payloadJson).not.toContain(unsafeValue)
 }
 
@@ -92,8 +95,65 @@ describe('proof-of-value intake workflow', () => {
     expect(validation.unsafeSignals.map((item) => item.field)).toContain('Risk concerns')
     expect(JSON.stringify(pack.intake_summary)).not.toContain('person@example.test')
     expect(JSON.stringify(pack.intake_summary)).not.toContain('API key')
-    expect(pack.intake_summary.market_context).toBe('[blocked: unsafe intake signal]')
-    expect(pack.intake_summary.risk_concerns).toBe('[blocked: unsafe intake signal]')
+    expect(pack.intake_summary.campaign_name_or_code).toBe(safetyConfirmationPlaceholder)
+    expect(pack.intake_summary.market_context).toBe(unsafeSignalPlaceholder)
+    expect(pack.intake_summary.risk_concerns).toBe(unsafeSignalPlaceholder)
+  })
+
+  it('suppresses raw intake summary values until required safety confirmations pass', () => {
+    const intake = approvedIntake()
+    intake.confirmations.noPii = false
+    intake.confirmations.noSecrets = false
+
+    const validation = validateProofOfValueIntake(intake)
+    const pack = buildProofOfValuePackage(intake)
+    const payloadJson = JSON.stringify(pack.intake_summary)
+
+    expect(validation.ready).toBe(false)
+    expect(validation.missingConfirmations).toEqual(expect.arrayContaining(['No PII', 'No secrets']))
+    expect(pack.status).toBe('blocked_until_safe_and_approved')
+    expect(Object.values(pack.intake_summary).every((value) => value === safetyConfirmationPlaceholder)).toBe(true)
+    expect(payloadJson).not.toContain('POV-ENERGY-001')
+    expect(payloadJson).not.toContain('Community energy plan')
+    expect(payloadJson).not.toContain('Aggregate reach band only')
+  })
+
+  it('suppresses raw intake summary values until aggregate actuals approval passes', () => {
+    const intake = approvedIntake()
+    intake.confirmations.aggregateActualsApproved = false
+
+    const validation = validateProofOfValueIntake(intake)
+    const pack = buildProofOfValuePackage(intake)
+
+    expect(validation.ready).toBe(false)
+    expect(validation.missingConfirmations).toContain('Aggregate actuals are approved and aggregate-only')
+    expect(pack.intake_summary.aggregate_actuals).toBe(safetyConfirmationPlaceholder)
+    expect(JSON.stringify(pack.intake_summary)).not.toContain('Aggregate reach band only')
+  })
+
+  it('includes safe intake summary values after confirmations and unsafe checks pass', () => {
+    const intake = approvedIntake()
+    const validation = validateProofOfValueIntake(intake)
+    const pack = buildProofOfValuePackage(intake)
+
+    expect(validation.ready).toBe(true)
+    expect(pack.intake_summary.campaign_name_or_code).toBe('POV-ENERGY-001')
+    expect(pack.intake_summary.product_service).toBe('Community energy plan')
+    expect(pack.intake_summary.market_context).toBe('Competitive retail energy market')
+    expect(pack.intake_summary.aggregate_actuals).toBe('Aggregate reach band only')
+  })
+
+  it('keeps unsafe fields redacted even after confirmations pass', () => {
+    const intake = approvedIntake()
+    intake.marketContext = 'Includes contact person@example.test from a CRM export'
+
+    const validation = validateProofOfValueIntake(intake)
+    const pack = buildProofOfValuePackage(intake)
+
+    expect(validation.ready).toBe(false)
+    expect(validation.missingConfirmations).toEqual([])
+    expect(pack.intake_summary.market_context).toBe(unsafeSignalPlaceholder)
+    expect(JSON.stringify(pack.intake_summary)).not.toContain('person@example.test')
   })
 
   it('flags and redacts phone-like values', () => {
