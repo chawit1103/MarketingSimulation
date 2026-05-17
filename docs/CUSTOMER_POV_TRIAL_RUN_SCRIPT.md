@@ -35,6 +35,7 @@ This is a customer proof-of-value trial, not a production SaaS deployment or pub
 - [ ] Customer has confirmed the intake contains no API keys, provider tokens, OAuth credentials, passwords, graph credentials, private keys, or other secrets.
 - [ ] Customer has confirmed no live CRM, social-listening, ad-platform, analytics, or marketing automation integration is required.
 - [ ] Optional historical actuals, if used, are approved and aggregate-only.
+- [ ] Customer has provided Creative directions A/B/C, or has approved the operator to define three safe working creative routes from the approved brief before the session.
 - [ ] Operator can access `/proof-of-value` and `/resources`.
 - [ ] Operator has reviewed [Proof-of-Value Output Package](PROOF_OF_VALUE_OUTPUT_PACKAGE.md) and [Sample Proof-of-Value Package](SAMPLE_PROOF_OF_VALUE_PACKAGE.md).
 - [ ] Operator has confirmed source/provenance labels remain visible in any customer-facing output.
@@ -57,7 +58,7 @@ Please include only the information needed to evaluate the campaign decision:
 - channel plan,
 - budget band,
 - competitor context,
-- creative directions if available,
+- creative directions A/B/C, or explicit permission for the operator to define three safe working creative routes from the approved brief before the session,
 - risk concerns,
 - success KPIs,
 - aggregate historical actuals if approved.
@@ -82,13 +83,16 @@ If the customer cannot confirm the boundary, pause the session and ask for an an
 1. Open `/proof-of-value`.
 2. Enter only approved intake fields from the customer brief.
 3. Use an anonymized campaign code if the real campaign name is not approved for pilot use.
-4. Enter aggregate actuals only if they are approved and aggregate-only.
-5. Complete the approval confirmations with the customer.
-6. Check the status panel.
-7. If status is blocked, resolve missing fields, missing confirmations, or unsafe intake signals before continuing.
-8. Confirm the structured payload no longer contains blocked placeholders.
-9. Copy the structured payload for operator use.
-10. Keep any copied payload inside the agreed pilot storage boundary.
+4. If the customer did not provide Creative directions A/B/C, create three neutral safe working routes from the approved brief before entering the intake.
+5. Clearly label operator-created routes as working routes, such as "Operator-created working route A/B/C."
+6. Do not invent unsupported claims, customer facts, risky performance promises, guaranteed outcomes, or precise financial-return expectations.
+7. Enter aggregate actuals only if they are approved and aggregate-only.
+8. Complete the approval confirmations with the customer.
+9. Check the status panel.
+10. If status is blocked, resolve missing fields, missing confirmations, or unsafe intake signals before continuing.
+11. Confirm the structured payload no longer contains blocked placeholders.
+12. Copy the structured payload for operator use.
+13. Keep any copied payload inside the agreed pilot storage boundary.
 
 Do not paste disallowed data into screenshots, issue comments, public docs, chat tools, or customer-facing decks.
 
@@ -100,7 +104,7 @@ Do not paste disallowed data into screenshots, issue comments, public docs, chat
 | 3-6 min | Confirm data boundary | Use the data boundary confirmation above. Pause if any disallowed data is present. |
 | 6-10 min | Review intake readiness | Open `/proof-of-value`, confirm approvals, and show whether the structured payload is ready. |
 | 10-15 min | Brief quality finding | Review the strongest brief inputs, missing assumptions, and recommended cleanup. |
-| 15-20 min | Simulation and creative readout | Review directional segment reactions and A/B/C creative comparison if creative directions are present. |
+| 15-20 min | Simulation and creative readout | Review directional segment reactions and the A/B/C creative comparison using customer-provided routes or approved operator-created working routes. |
 | 20-24 min | Risks and revised brief | Review risk watchouts and the Revised Brief v2 direction. |
 | 24-27 min | Output package preview | Show the expected proof-of-value package structure and visible provenance labels. |
 | 27-30 min | Decision close | Ask whether the result is useful enough to scope a controlled paid pilot with agreed data handling, success criteria, and retention/deletion ownership. |
@@ -129,7 +133,7 @@ Minimum package:
 - one-page executive summary,
 - brief quality finding,
 - campaign simulation summary,
-- A/B/C creative comparison if creative directions are present,
+- A/B/C creative comparison using customer-provided routes or approved operator-created working routes,
 - risk and crisis watchouts,
 - Revised Brief v2,
 - Strategy Pack PPTX outline or export,
