@@ -10,7 +10,7 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
 from app import create_app  # noqa: E402
-from app.api.export import _safe_export_type  # noqa: E402
+from app.api.export import _safe_export_type, _safe_source_metadata  # noqa: E402
 from app.config import Config  # noqa: E402
 from app.models.settings import SettingsManager  # noqa: E402
 from app.models.user import UserRole  # noqa: E402
@@ -25,7 +25,7 @@ def test_audit_redaction_removes_secrets_pii_and_raw_content():
     metadata = {
         "campaign_id": "cmp_safe",
         "campaign_brief": "Launch the confidential customer retention offer.",
-        "api_key": "sk-test-secret-value",
+        "api_key": "placeholder-key-for-redaction-test",
         "nested": {
             "email": "person@example.com",
             "raw_crm_records": [{"phone": "+1 555 111 2222"}],
@@ -43,7 +43,7 @@ def test_audit_redaction_removes_secrets_pii_and_raw_content():
     assert redacted["nested"]["raw_crm_records"] == REDACTED
     assert redacted["nested"]["safe_flag"] is True
     assert "confidential customer retention" not in rendered
-    assert "sk-test-secret-value" not in rendered
+    assert "placeholder-key-for-redaction-test" not in rendered
     assert "person@example.com" not in rendered
     assert "+1 555 111 2222" not in rendered
 
@@ -53,8 +53,23 @@ def test_export_audit_type_normalization_rejects_arbitrary_request_text():
     assert _safe_export_type("strategy-pack") == "strategy_pack"
     assert _safe_export_type("Campaign Name With Sensitive Brief") == "unknown"
     assert _safe_export_type("person@example.com") == "unknown"
-    assert _safe_export_type("sk-sensitive-token-value") == "unknown"
+    assert _safe_export_type("confidential-campaign-token-text") == "unknown"
     assert _safe_export_type(None) == "generic"
+
+
+def test_strategy_pack_source_audit_metadata_is_categorical_only():
+    assert _safe_source_metadata({
+        "source_mode": "demo-mode",
+        "data_basis": "demo-fixture",
+    }) == {"source_mode": "demo_mode", "data_basis": "demo_fixture"}
+    assert _safe_source_metadata({
+        "source_mode": "Confidential Campaign Name",
+        "data_basis": "person@example.com",
+    }) == {"source_mode": "unknown", "data_basis": "unknown"}
+    assert _safe_source_metadata({
+        "source_mode": "backend_verified",
+        "data_basis": "real_simulation",
+    }) == {"source_mode": "backend_verified", "data_basis": "real_simulation"}
 
 
 def test_audit_log_service_writes_org_scoped_jsonl_without_raw_content(tmp_path):
@@ -69,7 +84,7 @@ def test_audit_log_service_writes_org_scoped_jsonl_without_raw_content(tmp_path)
         metadata={
             "changed_fields": ["description", "status"],
             "brief_text": "Raw customer brief text should not be persisted.",
-            "provider_token": "Bearer super-secret-token",
+            "provider_token": "placeholder-provider-token-for-test",
         },
     )
 
@@ -82,7 +97,7 @@ def test_audit_log_service_writes_org_scoped_jsonl_without_raw_content(tmp_path)
     assert events[0]["metadata"]["brief_text"] == REDACTED
     assert events[0]["metadata"]["provider_token"] == REDACTED
     assert "Raw customer brief" not in rendered
-    assert "super-secret-token" not in rendered
+    assert "placeholder-provider-token-for-test" not in rendered
     assert service.audit_log_path("org_a").endswith("organizations/org_a/audit/audit_events.jsonl")
 
 
