@@ -91,6 +91,7 @@ For demo, release validation, known limitations, and recommended next actions, s
 - [docs/SAMPLE_STRATEGY_PACK_EXPORTS.md](docs/SAMPLE_STRATEGY_PACK_EXPORTS.md)
 - [docs/SAMPLE_DEMO_BRIEFS.md](docs/SAMPLE_DEMO_BRIEFS.md)
 - [docs/DEMO_ARTIFACT_CHECKLIST.md](docs/DEMO_ARTIFACT_CHECKLIST.md)
+- [docs/CUSTOMER_DEMO_READINESS_REVIEW.md](docs/CUSTOMER_DEMO_READINESS_REVIEW.md)
 - [docs/FAQ.md](docs/FAQ.md)
 - [docs/ANALYTICS.md](docs/ANALYTICS.md)
 - [docs/SCREENSHOT_GUIDE.md](docs/SCREENSHOT_GUIDE.md)
@@ -147,6 +148,7 @@ Recommended customer-pilot docs:
 - [Sample Strategy Pack Exports](docs/SAMPLE_STRATEGY_PACK_EXPORTS.md)
 - [Sample Demo Briefs](docs/SAMPLE_DEMO_BRIEFS.md)
 - [Demo Artifact Checklist](docs/DEMO_ARTIFACT_CHECKLIST.md)
+- [Customer Demo Readiness Review](docs/CUSTOMER_DEMO_READINESS_REVIEW.md)
 
 ---
 
