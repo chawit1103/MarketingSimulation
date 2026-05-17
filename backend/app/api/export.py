@@ -24,6 +24,21 @@ _ALLOWED_EXPORT_TYPES = {
     "budget_scenario",
     "calibration",
 }
+_ALLOWED_SOURCE_MODES = {
+    "demo_mode",
+    "local_estimate",
+    "live_backend",
+    "backend_verified",
+    "unknown",
+}
+_ALLOWED_DATA_BASIS = {
+    "demo_fixture",
+    "local_estimate",
+    "real_simulation",
+    "manual_input",
+    "rule_based",
+    "unknown",
+}
 
 
 def _safe_pptx_filename(value: str | None, fallback: str) -> str:
@@ -32,12 +47,24 @@ def _safe_pptx_filename(value: str | None, fallback: str) -> str:
     return base if base.lower().endswith(".pptx") else f"{base}.pptx"
 
 
+def _safe_category(value: object, allowed: set[str], fallback: str = "unknown") -> str:
+    normalized = re.sub(r"[^a-z0-9_]+", "_", str(value or fallback).strip().lower()).strip("_")
+    if normalized in allowed:
+        return normalized
+    return fallback
+
+
 def _safe_export_type(value: object, fallback: str = "generic") -> str:
     """Return a categorical export type safe for audit metadata."""
-    normalized = re.sub(r"[^a-z0-9_]+", "_", str(value or fallback).strip().lower()).strip("_")
-    if normalized in _ALLOWED_EXPORT_TYPES:
-        return normalized
-    return "unknown"
+    return _safe_category(value, _ALLOWED_EXPORT_TYPES, fallback=fallback)
+
+
+def _safe_source_metadata(source: dict | None) -> dict:
+    source = source or {}
+    return {
+        "source_mode": _safe_category(source.get("source_mode"), _ALLOWED_SOURCE_MODES),
+        "data_basis": _safe_category(source.get("data_basis"), _ALLOWED_DATA_BASIS),
+    }
 
 
 def _get_org_id() -> str | None:
@@ -68,14 +95,10 @@ def export_strategy_pack():
 
     try:
         pack = StrategyPackService().build(data)
-        source = pack.get("source") or {}
         _audit_export(
             "json",
             "strategy_pack",
-            {
-                "source_mode": source.get("source_mode"),
-                "data_basis": source.get("data_basis"),
-            },
+            _safe_source_metadata(pack.get("source")),
         )
         return jsonify({
             "success": True,
@@ -109,14 +132,10 @@ def export_strategy_pack_pptx():
             data.get("filename") or white_label.get("campaign_name"),
             "strategy_pack",
         )
-        source = pack.get("source") or {}
         _audit_export(
             "pptx",
             "strategy_pack",
-            {
-                "source_mode": source.get("source_mode"),
-                "data_basis": source.get("data_basis"),
-            },
+            _safe_source_metadata(pack.get("source")),
         )
         return send_file(
             buffer,
