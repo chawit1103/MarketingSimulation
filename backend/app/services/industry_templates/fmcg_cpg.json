@@ -1,0 +1,126 @@
+{
+  "id": "fmcg_cpg",
+  "name_th": "FMCG / CPG",
+  "name_en": "FMCG / Consumer Packaged Goods",
+  "description_th": "Deep preset for packaged goods launches, price-pack changes, promotion strategy, shopper trust, and competitor response.",
+  "description_en": "Deep preset for packaged goods launches, price-pack changes, promotion strategy, shopper trust, and competitor response.",
+  "icon": "F",
+  "color": "#2f7d62",
+  "industry_depth": "deep_preset",
+  "objectives": ["message_testing", "brand_perception", "competitor_response", "crisis_simulation"],
+  "default_objective": "message_testing",
+  "default_platform": "both",
+  "default_max_rounds": 18,
+  "default_language": "th",
+  "campaign_duration": "6-8 weeks launch or relaunch window",
+  "budget_range": "THB 1M-8M test budget; replace with actual media plan before launch",
+  "primary_kpi": "Message acceptance, trial intent, price-pack objection rate",
+  "competitor_context": "Large incumbent brands, private labels, promotion-heavy challengers, and social commerce sellers.",
+  "brand_constraints": "Avoid overclaiming product benefits, include substantiation for nutrition, safety, or sustainability claims.",
+  "risk_legal_notes": "Check Thai FDA/labeling rules, comparative advertising language, promotion terms, influencer disclosure, and giveaway rules.",
+  "target_audience": {
+    "age_range": [18, 55],
+    "gender": "all",
+    "regions": ["bangkok", "central", "northeast", "north", "south"],
+    "channels": ["facebook", "tiktok", "instagram", "line", "youtube"],
+    "persona_count": 120
+  },
+  "persona_segments": [
+    {
+      "id": "value_shoppers",
+      "name_th": "Value-conscious household shoppers",
+      "name_en": "Value-conscious household shoppers",
+      "count": 55,
+      "interests": ["promotion", "family budget", "retail deals", "product reviews"],
+      "archetypes": [
+        {
+          "id": "family_budget_buyer",
+          "name_th": "Family budget buyer",
+          "name_en": "Family budget buyer",
+          "age_range": [28, 48],
+          "income": "middle",
+          "regions": ["bangkok", "central", "northeast"],
+          "occupation_th": "Household purchaser",
+          "channels": ["facebook", "line", "tiktok"],
+          "narrative_th": "Compares price per unit, promo bundles, and family acceptance before trying a new packaged product.",
+          "purchase_style": "price_sensitive"
+        },
+        {
+          "id": "modern_trade_browser",
+          "name_th": "Modern trade browser",
+          "name_en": "Modern trade browser",
+          "age_range": [22, 40],
+          "income": "lower_middle",
+          "regions": ["bangkok", "central"],
+          "occupation_th": "Office worker",
+          "channels": ["tiktok", "instagram", "facebook"],
+          "narrative_th": "Discovers new snacks, beverages, and personal care items from short video reviews and in-store promotions.",
+          "purchase_style": "impulsive"
+        }
+      ]
+    },
+    {
+      "id": "trust_seekers",
+      "name_th": "Health and trust seekers",
+      "name_en": "Health and trust seekers",
+      "count": 45,
+      "interests": ["ingredient transparency", "reviews", "safety", "sustainability"],
+      "archetypes": [
+        {
+          "id": "ingredient_checker",
+          "name_th": "Ingredient checker",
+          "name_en": "Ingredient checker",
+          "age_range": [25, 45],
+          "income": "upper_middle",
+          "regions": ["bangkok", "north"],
+          "occupation_th": "Professional / parent",
+          "channels": ["instagram", "youtube", "facebook"],
+          "narrative_th": "Reads labels, reviews claims, and looks for credible proof before recommending a product to family.",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "social_commerce_follower",
+          "name_th": "Social commerce follower",
+          "name_en": "Social commerce follower",
+          "age_range": [18, 32],
+          "income": "middle",
+          "regions": ["bangkok", "south"],
+          "occupation_th": "Creator audience / buyer",
+          "channels": ["tiktok", "instagram", "line"],
+          "narrative_th": "Trusts creators and user comments but reacts quickly if claims feel exaggerated or paid without disclosure.",
+          "purchase_style": "social_proof"
+        }
+      ]
+    }
+  ],
+  "crisis_scenarios": [
+    {"id": "price_pack_backlash", "name_th": "Price-pack backlash", "name_en": "Price-pack backlash", "trigger": "Consumers notice a smaller pack size at the same price and accuse the brand of shrinkflation.", "event_tag": "shrinkflation", "impact": "negative", "intensity": 8},
+    {"id": "claim_challenge", "name_th": "Product claim challenge", "name_en": "Product claim challenge", "trigger": "A creator challenges the brand's benefit claim and asks for proof in a viral post.", "event_tag": "claim-proof", "impact": "negative", "intensity": 7},
+    {"id": "creator_trial_wave", "name_th": "Creator trial wave", "name_en": "Creator trial wave", "trigger": "A coordinated creator seeding wave drives trial, but comments split between taste praise and price concerns.", "event_tag": "trial-wave", "impact": "mixed", "intensity": 5}
+  ],
+  "document_seeds": [
+    {
+      "id": "launch_brief",
+      "name_th": "FMCG launch brief",
+      "name_en": "FMCG launch brief",
+      "description_th": "Starter brief for a packaged goods launch or relaunch.",
+      "description_en": "Starter brief for a packaged goods launch or relaunch.",
+      "content": "# FMCG Launch Brief\n\nProduct: [product]\nObjective: drive trial while protecting trust.\nAudience: household shoppers and social commerce buyers.\nKey proof: [ingredient / quality / price-pack value].\nChannels: TikTok, Instagram, Facebook, LINE, retail media.\nRisks: price-pack backlash, unsupported claims, creator disclosure issues.\nValidation: run message pre-test, compare objections by segment, and verify legal claims before launch."
+    }
+  ],
+  "deep_preset": {
+    "target_segment_archetypes": ["Family budget buyer", "Modern trade browser", "Ingredient checker", "Social commerce follower"],
+    "common_objections": ["Too expensive for everyday use", "Benefit claim needs proof", "Pack size feels smaller", "Creator endorsement may feel paid"],
+    "crisis_triggers": ["Shrinkflation accusations", "Unsupported health or safety claims", "Influencer disclosure complaints", "Retail availability mismatch"],
+    "typical_kpis": ["Trial intent", "Price-pack objection rate", "Share of positive product mentions", "Creator content save/share rate", "Retail search lift"],
+    "channel_behavior": ["TikTok drives discovery and fast backlash", "Facebook and LINE amplify family-budget concerns", "Instagram supports product aesthetics and creator proof", "Retail media closes conversion"],
+    "competitor_archetypes": ["Promotion-heavy incumbent", "Private-label value challenger", "Premium niche brand", "Fast social-commerce seller"],
+    "legal_regulatory_sensitivities": ["FDA and labeling substantiation", "Comparative claim wording", "Promotion terms", "Influencer disclosure"],
+    "proof_point_requirements": ["Ingredient or performance substantiation", "Clear price-pack value", "Retail availability proof", "Creator disclosure language"],
+    "sample_brief": "Launch a new everyday packaged product with a value-plus-quality message for household shoppers and creator-led discovery audiences.",
+    "sample_risk_checklist": ["Can every product claim be substantiated?", "Is pack-size language clear?", "Are creator posts disclosed?", "Is promotion fine print visible?"],
+    "sample_action_plan_hints": ["Lead with concrete value proof", "Prepare price-pack FAQ", "Use creator demos with clear disclosure", "Monitor comments for claim challenges"],
+    "assumptions": ["This preset is an assumption-based starting point for Thailand-oriented consumer campaigns.", "Budget and channel mix must be replaced with the user's actual plan."],
+    "limitations": ["Does not represent real sales forecast or market research.", "Regulatory review remains required before campaign launch."]
+  }
+}

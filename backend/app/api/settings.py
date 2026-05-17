@@ -1,34 +1,256 @@
 """Settings API — read/update runtime configuration at /api/settings."""
+import re
+from copy import deepcopy
+from typing import Any
+
 from flask import Blueprint, request, jsonify
 from ..models.settings import SettingsManager, ProviderType, EmbeddingProviderType, GraphDBMode
+from ..authz import ADMIN_ROLES, role_required
 
 settings_bp = Blueprint('settings', __name__)
 
+SECRET_FIELD_NAMES = {
+    "api_key",
+    "apikey",
+    "apiKey",
+    "password",
+    "token",
+    "access_token",
+    "refresh_token",
+    "secret",
+    "credential",
+    "credentials",
+}
+SECRET_PRESENCE_FIELDS = {
+    "api_key_present",
+    "has_api_key",
+    "password_present",
+    "has_password",
+}
 
-def _mask_key(key: str) -> str:
-    """Mask API key for safe display: '••••abcd'."""
-    if not key or len(key) < 5:
-        return '••••' if key else ''
-    return '••••' + key[-4:]
+
+def _sanitize_error(error: Exception | str) -> str:
+    """Return an actionable error without leaking keys/tokens/long internals."""
+    message = str(error)
+    message = re.sub(r"(sk-[A-Za-z0-9_\-]{8,})", "sk-***", message)
+    message = re.sub(r"([A-Za-z0-9_\-]{24,})", "***", message)
+    message = message.replace("\n", " ")
+    return message[:220] or "Connection failed"
+
+
+def _is_masked_secret(value: str | None) -> bool:
+    return bool(value) and ("••••" in value or "****" in value)
+
+
+def _is_blank_secret(value: Any) -> bool:
+    return value is None or str(value).strip() == ""
+
+
+def _is_secret_field(key: str) -> bool:
+    normalized = str(key).replace("-", "_").lower()
+    if normalized in SECRET_PRESENCE_FIELDS:
+        return False
+    return normalized in {item.lower() for item in SECRET_FIELD_NAMES}
+
+
+def _secret_present(value: Any) -> bool:
+    return not _is_blank_secret(value)
+
+
+def _without_secret_fields(value: Any) -> Any:
+    """Remove credential-like fields from nested settings responses."""
+    if isinstance(value, dict):
+        clean = {}
+        for key, item in value.items():
+            if _is_secret_field(key):
+                continue
+            clean[key] = _without_secret_fields(item)
+        return clean
+    if isinstance(value, list):
+        return [_without_secret_fields(item) for item in value]
+    return value
+
+
+def _safe_settings_response(settings) -> dict:
+    """Return settings for browsers with secret presence flags only."""
+    data = settings.model_dump()
+
+    llm = data.get("llm") or {}
+    llm["api_key_present"] = _secret_present(llm.get("api_key"))
+    llm.pop("api_key", None)
+
+    embedding = data.get("embedding") or {}
+    embedding["api_key_present"] = _secret_present(embedding.get("api_key"))
+    embedding.pop("api_key", None)
+
+    graph_db = data.get("graph_db") or {}
+    graph_db["password_present"] = _secret_present(graph_db.get("password"))
+    graph_db.pop("password", None)
+
+    return _without_secret_fields(data)
+
+
+def _merge_secret_value(existing: dict, incoming: dict, field: str, clear_flag: str) -> None:
+    """Merge one secret field without letting blank/masked placeholders erase it."""
+    if incoming.get(clear_flag) is True:
+        existing[field] = ""
+        return
+
+    if field not in incoming:
+        return
+
+    value = incoming.get(field)
+    if _is_blank_secret(value) or _is_masked_secret(str(value)):
+        return
+
+    existing[field] = str(value)
+
+
+def _merge_settings_update(existing_settings, incoming: dict) -> dict:
+    """Merge browser settings updates while preserving saved secrets by default."""
+    merged = deepcopy(existing_settings.model_dump())
+
+    for key, value in incoming.items():
+        if key in SECRET_PRESENCE_FIELDS:
+            continue
+        if key not in {"llm", "embedding", "graph_db"}:
+            merged[key] = value
+
+    for section_name in ("llm", "embedding", "graph_db"):
+        section_payload = incoming.get(section_name)
+        if not isinstance(section_payload, dict):
+            continue
+
+        merged_section = merged.setdefault(section_name, {})
+        secret_field = "password" if section_name == "graph_db" else "api_key"
+        clear_flag = "password_clear" if section_name == "graph_db" else "api_key_clear"
+
+        for key, value in section_payload.items():
+            if key in SECRET_PRESENCE_FIELDS or key == clear_flag:
+                continue
+            if _is_secret_field(key):
+                continue
+            merged_section[key] = value
+
+        _merge_secret_value(merged_section, section_payload, secret_field, clear_flag)
+
+    return merged
+
+
+def _safe_provider(provider: str, enum_cls) -> str:
+    try:
+        return enum_cls(provider).value
+    except Exception:
+        return ""
+
+
+def _check_provider_config(config: dict, enum_cls, *, local_provider: str = "ollama") -> dict:
+    provider = _safe_provider(str(config.get("provider") or ""), enum_cls)
+    model = str(config.get("model") or "").strip()
+    api_key = str(config.get("api_key") or config.get("apiKey") or "").strip()
+    api_key_present = bool(config.get("api_key_present") or config.get("has_api_key") or api_key)
+    base_url = str(config.get("base_url") or config.get("baseUrl") or "").strip()
+    issues = []
+
+    if not provider:
+        issues.append("Unsupported provider selected.")
+    if not model:
+        issues.append("Model name is required.")
+    if provider == local_provider and not base_url:
+        issues.append("Local provider requires a base URL.")
+    if provider and provider != local_provider and not api_key_present:
+        issues.append("Cloud provider requires an API key.")
+    if _is_masked_secret(api_key):
+        issues.append("Saved API key is masked; enter the key again before testing or saving.")
+
+    return {
+        "status": "ready" if not issues else "needs_attention",
+        "provider": provider or config.get("provider") or "unknown",
+        "model": model or "not set",
+        "issues": issues,
+        "safe_detail": "Configuration is complete." if not issues else issues[0],
+    }
+
+
+def _check_graph_config(config: dict) -> dict:
+    uri = str(config.get("uri") or "").strip()
+    user = str(config.get("user") or "").strip()
+    password = str(config.get("password") or "").strip()
+    password_present = bool(config.get("password_present") or config.get("has_password") or password)
+    mode = str(config.get("mode") or "local")
+    issues = []
+
+    if mode not in ("local", "cloud", "neo4j", "bolt"):
+        issues.append("Unsupported graph mode selected.")
+    if not uri:
+        issues.append("Neo4j URI is required.")
+    if not user:
+        issues.append("Neo4j user is required.")
+    if not password_present:
+        issues.append("Neo4j password is required.")
+    if _is_masked_secret(password):
+        issues.append("Saved graph password is masked; enter it again before testing or saving.")
+
+    return {
+        "status": "ready" if not issues else "needs_attention",
+        "mode": mode,
+        "uri": uri or "not set",
+        "issues": issues,
+        "safe_detail": "Neo4j configuration is complete." if not issues else issues[0],
+    }
+
+
+def _readiness_payload(data: dict) -> dict:
+    mode = data.get("mode") or "demo"
+    llm = data.get("llm") or {}
+    embedding = data.get("embedding") or {}
+    graph = data.get("graph_db") or data.get("graphdb") or {}
+
+    if mode == "demo":
+        checks = {
+            "llm": {"status": "skipped", "safe_detail": "Demo mode does not require an LLM provider."},
+            "embedding": {"status": "skipped", "safe_detail": "Demo mode does not require an embedding provider."},
+            "neo4j": {"status": "skipped", "safe_detail": "Demo mode does not require Neo4j."},
+        }
+    else:
+        checks = {
+            "llm": _check_provider_config(llm, ProviderType),
+            "embedding": _check_provider_config(embedding, EmbeddingProviderType),
+            "neo4j": _check_graph_config(graph),
+        }
+
+    ready = all(item["status"] in ("ready", "skipped") for item in checks.values())
+    return {
+        "mode": mode,
+        "ready": ready,
+        "checks": checks,
+        "sample_simulation": {
+            "status": "available" if ready else "blocked",
+            "label": "Try Sample Campaign",
+            "detail": "Use a deterministic demo campaign to verify the UI flow before live spend.",
+        },
+        "cost_estimate": {
+            "label": "Directional estimate only",
+            "currency": "USD",
+            "per_100_personas": 0 if mode in ("demo", "local") else 1.2,
+            "disclaimer": "Estimate only. Actual model costs depend on provider pricing, tokens, retries, and prompt length.",
+        },
+    }
 
 
 @settings_bp.route('', methods=['GET'])
+@role_required(*ADMIN_ROLES)
 def get_settings():
-    """Get current settings (masks API keys in response)."""
+    """Get current settings with secret presence flags only."""
     mgr = SettingsManager()
     settings = mgr.get()
-    data = settings.model_dump()
-
-    # Mask API keys
-    if data.get('llm', {}).get('api_key'):
-        data['llm']['api_key'] = _mask_key(data['llm']['api_key'])
-    if data.get('embedding', {}).get('api_key'):
-        data['embedding']['api_key'] = _mask_key(data['embedding']['api_key'])
+    data = _safe_settings_response(settings)
 
     return jsonify({'success': True, 'settings': data})
 
 
 @settings_bp.route('', methods=['PUT'])
+@role_required(*ADMIN_ROLES)
 def update_settings():
     """Update runtime settings. Triggers provider reinitialization."""
     data = request.get_json()
@@ -37,10 +259,10 @@ def update_settings():
 
     try:
         mgr = SettingsManager()
-        mgr.update(data)
+        mgr.update(_merge_settings_update(mgr.get(), data))
         return jsonify({'success': True, 'message': 'Settings updated and providers reinitialized'})
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 400
+        return jsonify({'success': False, 'error': _sanitize_error(e)}), 400
 
 
 @settings_bp.route('/providers', methods=['GET'])
@@ -290,7 +512,15 @@ def list_providers():
     })
 
 
+@settings_bp.route('/readiness', methods=['POST'])
+def check_readiness():
+    """Validate setup readiness without making live provider/network calls."""
+    data = request.get_json(silent=True) or {}
+    return jsonify({'success': True, 'data': _readiness_payload(data)})
+
+
 @settings_bp.route('/test-llm', methods=['POST'])
+@role_required(*ADMIN_ROLES)
 def test_llm_connection():
     """Test LLM provider connection with a simple ping message."""
     data = request.get_json()
@@ -377,4 +607,4 @@ def test_llm_connection():
             return jsonify({'success': False, 'error': f'Provider {provider_type} not supported yet'}), 400
 
     except Exception as e:
-        return jsonify({'success': False, 'error': f'Connection failed: {str(e)}'}), 400
+        return jsonify({'success': False, 'error': f'Connection failed: {_sanitize_error(e)}'}), 400

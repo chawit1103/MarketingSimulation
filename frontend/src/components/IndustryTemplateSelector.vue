@@ -49,6 +49,33 @@
         </div>
       </div>
 
+      <div v-if="deepPreset" class="detail-section deep-preset-panel">
+        <h4>Deep Preset / Industry Assumptions</h4>
+        <div class="deep-grid">
+          <div>
+            <strong>Common objections</strong>
+            <ul>
+              <li v-for="item in deepPreset.common_objections?.slice(0, 4)" :key="item">{{ item }}</li>
+            </ul>
+          </div>
+          <div>
+            <strong>Proof required</strong>
+            <ul>
+              <li v-for="item in deepPreset.proof_point_requirements?.slice(0, 4)" :key="item">{{ item }}</li>
+            </ul>
+          </div>
+        </div>
+        <div class="assumption-list">
+          <span
+            v-for="item in [...(deepPreset.assumptions || []), ...(deepPreset.limitations || [])].slice(0, 4)"
+            :key="item"
+            class="assumption-chip"
+          >
+            {{ item }}
+          </span>
+        </div>
+      </div>
+
       <!-- Persona Segments -->
       <div class="detail-section">
         <h4>{{ $t('industry.personaSegments') }} ({{ selectedTemplate.persona_segments.length }})</h4>
@@ -139,6 +166,7 @@ const selectedTemplate = ref(null)
 const selectedSeeds = ref(new Set())
 const hoveredTemplate = ref(null)
 const loading = ref(true)
+const deepPreset = computed(() => selectedTemplate.value?.deep_preset || null)
 
 onMounted(async () => {
   try {
@@ -244,6 +272,12 @@ function crisisImpactLabel(impact) {
 .detail-icon { width: 56px; height: 56px; border: 1px solid var(--border-accent); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: var(--text-xl); font-weight: 900; color: var(--accent); background: var(--accent-subtle); flex-shrink: 0; }
 .detail-section { margin-bottom: 24px; }
 .detail-section h4 { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0; margin-bottom: 12px; }
+.deep-preset-panel { padding: 14px; border: 1px solid var(--border-default); border-radius: var(--radius-lg); background: var(--bg-elevated); }
+.deep-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.deep-grid strong { display: block; color: var(--text-primary); font-size: var(--text-xs); margin-bottom: 6px; }
+.deep-grid ul { margin: 0; padding-left: 18px; color: var(--text-secondary); font-size: var(--text-xs); line-height: 1.55; }
+.assumption-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.assumption-chip { display: inline-flex; padding: 5px 8px; border: 1px solid var(--border-default); border-radius: var(--radius-sm); color: var(--text-secondary); background: var(--bg-surface); font-size: 11px; line-height: 1.35; }
 .segment-list { display: flex; flex-direction: column; gap: 8px; }
 .segment-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px; background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); }
 .segment-number { font-family: var(--font-mono); font-weight: 800; color: var(--accent); font-size: var(--text-sm); }

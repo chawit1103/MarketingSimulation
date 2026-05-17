@@ -1,4 +1,5 @@
 import service from './index'
+import { hasBrowserAuth } from './authStorage'
 
 export const createCampaign = (data) => {
   return service.post('/api/campaign', data)
@@ -29,5 +30,5 @@ export const getPipelineStatus = (id) => {
 }
 
 export const hasCampaignAuth = () => {
-  return Boolean(localStorage.getItem('3c-auth-token') || localStorage.getItem('3c-api-key'))
+  return hasBrowserAuth()
 }

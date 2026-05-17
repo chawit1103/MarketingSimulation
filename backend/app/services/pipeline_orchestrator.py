@@ -45,8 +45,9 @@ class PipelineStep(str, Enum):
 class PipelineProgress:
     """Mutable progress tracker stored alongside a campaign during pipeline runs."""
 
-    def __init__(self, campaign_id: str, total_steps: int = 5):
+    def __init__(self, campaign_id: str, org_id: str = "", total_steps: int = 5):
         self.campaign_id = campaign_id
+        self.org_id = org_id
         self.current_step: PipelineStep = PipelineStep.CREATING
         self.current_step_number: int = 0
         self.total_steps: int = total_steps
@@ -65,6 +66,7 @@ class PipelineProgress:
     def to_dict(self) -> Dict[str, Any]:
         return {
             "campaign_id": self.campaign_id,
+            "org_id": self.org_id,
             "current_step": self.current_step.value,
             "current_step_number": self.current_step_number,
             "total_steps": self.total_steps,
@@ -116,7 +118,7 @@ class PipelineOrchestrator:
         Can be called synchronously (blocks until done or fails) or used
         for polling via get_pipeline_status().
         """
-        progress = PipelineProgress(campaign_id)
+        progress = PipelineProgress(campaign_id, org_id=org_id)
         progress.started_at = datetime.now(timezone.utc).isoformat()
 
         with self._lock:
@@ -137,20 +139,23 @@ class PipelineOrchestrator:
 
         return progress
 
-    def get_pipeline_status(self, campaign_id: str) -> Optional[Dict[str, Any]]:
+    def get_pipeline_status(self, campaign_id: str, org_id: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """Get current pipeline progress for a campaign."""
         with self._lock:
             progress = self._active.get(campaign_id)
         if progress:
+            if org_id is not None and progress.org_id != org_id:
+                return None
             return progress.to_dict()
 
         # Check if campaign exists and return its status
-        campaign = self.campaign_service.get_campaign(campaign_id)
+        campaign = self.campaign_service.get_campaign(campaign_id, org_id=org_id)
         if campaign is None:
             return None
 
         return {
             "campaign_id": campaign.campaign_id,
+            "org_id": campaign.org_id,
             "campaign_status": campaign.status.value,
             "current_step": None,
             "current_step_number": 0,
@@ -378,6 +383,8 @@ class PipelineOrchestrator:
                 sim_state = self.simulation_manager.create_simulation(
                     project_id=campaign.project_id or campaign.campaign_id,
                     graph_id=campaign.graph_id or campaign.campaign_id,
+                    org_id=campaign.org_id,
+                    campaign_id=campaign.campaign_id,
                     enable_twitter=enable_twitter,
                     enable_reddit=enable_reddit,
                     language=language,

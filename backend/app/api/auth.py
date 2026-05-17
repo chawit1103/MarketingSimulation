@@ -3,13 +3,13 @@ Auth API — registration, login, API key management, and org switching.
 
 All endpoints return {success: bool, data/error: ...} JSON responses.
 """
-import traceback
 from flask import Blueprint, request, jsonify, g
 
 from ..services.organization_service import OrganizationService
 from ..services.user_service import UserService
 from ..services.auth_service import AuthService
-from ..models.user import User
+from ..models.user import User, UserRole
+from ..authz import ADMIN_ROLES, ANY_AUTHENTICATED_ROLES, role_required
 from ..utils.logger import get_logger
 
 logger = get_logger('mirofish.api.auth')
@@ -32,52 +32,6 @@ def _get_org_service() -> OrganizationService:
 
 def _get_user_service() -> UserService:
     return UserService()
-
-
-def auth_required(f):
-    """
-    Decorator: require a valid JWT token.
-
-    Expects Authorization: Bearer <token> header.
-    Sets g.current_user_id, g.current_org_id, g.current_user, g.current_org.
-    The tenant_middleware also runs as before_request and populates
-    g.tenant_org_id, but auth_required ensures the user is authenticated.
-    """
-    from functools import wraps
-
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        auth_header = request.headers.get('Authorization', '')
-        if not auth_header.startswith('Bearer '):
-            return jsonify({'success': False, 'error': 'Missing or invalid Authorization header'}), 401
-
-        token = auth_header[7:]  # strip "Bearer "
-        auth_svc = _get_auth_service()
-
-        try:
-            payload = auth_svc.validate_token(token)
-        except Exception as e:
-            return jsonify({'success': False, 'error': f'Invalid or expired token: {str(e)}'}), 401
-
-        g.current_user_id = payload.get('sub')
-        g.current_org_id = payload.get('org')
-        g.current_user_role = payload.get('role', 'analyst')
-
-        # Optionally load full user/org objects for convenience
-        try:
-            user_svc = UserService()
-            g.current_user = user_svc.get_user(g.current_user_id)
-            org_svc = OrganizationService()
-            g.current_org = org_svc.get_org(g.current_org_id)
-        except Exception:
-            # Token valid but user/org lookup failed — still allow the request;
-            # downstream can check g.current_user / g.current_org
-            g.current_user = None
-            g.current_org = None
-
-        return f(*args, **kwargs)
-
-    return decorated
 
 
 # ---------------------------------------------------------------------------
@@ -142,7 +96,7 @@ def register():
         return jsonify({'success': False, 'error': str(e)}), 409
     except Exception as e:
         logger.error(f"Registration failed: {str(e)}")
-        return jsonify({'success': False, 'error': str(e), 'traceback': traceback.format_exc()}), 500
+        return jsonify({'success': False, 'error': 'Registration failed'}), 500
 
 
 # ---------------------------------------------------------------------------
@@ -185,6 +139,12 @@ def login():
         if not User.verify_password(password, user.password_hash):
             raise ValueError('Invalid email or password')
 
+        if User.password_needs_rehash(user.password_hash):
+            logger.info("Rehashing legacy password hash for user %s", user.user_id)
+            refreshed = user_svc.update_user(user.org_id, user.user_id, {'password': password})
+            if refreshed is not None:
+                user = refreshed
+
         # 3. Check org is active
         org = org_svc.get_org(user.org_id)
         if not org or org.status.value != 'active':
@@ -203,7 +163,7 @@ def login():
         return jsonify({'success': False, 'error': str(e)}), 401
     except Exception as e:
         logger.error(f"Login failed: {str(e)}")
-        return jsonify({'success': False, 'error': str(e), 'traceback': traceback.format_exc()}), 500
+        return jsonify({'success': False, 'error': 'Login failed'}), 500
 
 
 # ---------------------------------------------------------------------------
@@ -211,7 +171,7 @@ def login():
 # ---------------------------------------------------------------------------
 
 @auth_bp.route('/me', methods=['GET'])
-@auth_required
+@role_required(*ANY_AUTHENTICATED_ROLES)
 def me():
     """
     Return the currently authenticated user and their active organization.
@@ -222,8 +182,13 @@ def me():
         { success: true, data: { user: {...}, org: {...} } }
     """
     try:
-        user_dict = g.current_user.to_dict() if hasattr(g.current_user, 'to_dict') else (g.current_user if g.current_user else None)
-        org_dict = g.current_org.to_dict() if hasattr(g.current_org, 'to_dict') else (g.current_org if g.current_org else None)
+        user_svc = _get_user_service()
+        org_svc = _get_org_service()
+        user = user_svc.get_user(g.current_user_id, org_id=g.current_org_id)
+        org = org_svc.get_org(g.current_org_id)
+
+        user_dict = user.to_dict() if user else None
+        org_dict = org.to_dict() if org else None
 
         if not user_dict:
             return jsonify({'success': False, 'error': 'User not found'}), 404
@@ -235,7 +200,7 @@ def me():
 
     except Exception as e:
         logger.error(f"GET /me failed: {str(e)}")
-        return jsonify({'success': False, 'error': str(e), 'traceback': traceback.format_exc()}), 500
+        return jsonify({'success': False, 'error': 'Unable to load current user'}), 500
 
 
 # ---------------------------------------------------------------------------
@@ -243,7 +208,7 @@ def me():
 # ---------------------------------------------------------------------------
 
 @auth_bp.route('/api-key', methods=['POST'])
-@auth_required
+@role_required(*ADMIN_ROLES)
 def generate_api_key():
     """
     Generate a new API key for the current user.
@@ -257,17 +222,19 @@ def generate_api_key():
         { success: true, data: { api_key: "ms_...", prefix: "ms_abcd1234..." } }
     """
     try:
-        user_svc = UserService()
-        raw_key, key_hash, prefix = user_svc.generate_and_store_api_key(g.current_user_id)
+        user_svc = _get_user_service()
+        generated = user_svc.generate_api_key(g.current_org_id, g.current_user_id)
+        if generated is None:
+            return jsonify({'success': False, 'error': 'User not found'}), 404
 
         return jsonify({'success': True, 'data': {
-            'api_key': raw_key,
-            'prefix': prefix,
+            'api_key': generated["raw_key"],
+            'prefix': generated["prefix"],
         }})
 
     except Exception as e:
         logger.error(f"API key generation failed: {str(e)}")
-        return jsonify({'success': False, 'error': str(e), 'traceback': traceback.format_exc()}), 500
+        return jsonify({'success': False, 'error': 'API key generation failed'}), 500
 
 
 # ---------------------------------------------------------------------------
@@ -275,7 +242,7 @@ def generate_api_key():
 # ---------------------------------------------------------------------------
 
 @auth_bp.route('/switch-org', methods=['POST'])
-@auth_required
+@role_required(UserRole.ADMIN)
 def switch_org():
     """
     Switch the active organization for the current user.
@@ -290,25 +257,28 @@ def switch_org():
         { success: true, data: { user: {...}, token: "...", org: {...} } }
     """
     try:
-        data = request.get_json()
-        if not data:
-            return jsonify({'success': False, 'error': 'Request body is required'}), 400
-
-        target_org_id = data.get('org_id')
+        data = request.get_json(silent=True) or {}
+        target_org_id = str(data.get('org_id') or '').strip()
         if not target_org_id:
-            return jsonify({'success': False, 'error': 'org_id is required'}), 400
+            return jsonify({'success': False, 'error': 'Target organization is required'}), 400
 
-        auth_svc = _get_auth_service()
-        result = auth_svc.switch_org(
-            user_id=g.current_user_id,
-            current_org_id=g.current_org_id,
-            target_org_id=target_org_id,
-        )
+        # The current local JSON user model supports exactly one organization
+        # per user. Until a real membership model exists, never issue a token
+        # for any other org and use one generic denial message so callers
+        # cannot probe organization existence.
+        if target_org_id != g.current_org_id:
+            return jsonify({
+                'success': False,
+                'error': 'Organization switch is not available for this user',
+            }), 403
 
-        return jsonify({'success': True, 'data': result})
+        return jsonify({
+            'success': False,
+            'error': 'Organization switching is disabled until multi-org membership is implemented',
+        }), 501
 
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 403
     except Exception as e:
         logger.error(f"Org switch failed: {str(e)}")
-        return jsonify({'success': False, 'error': str(e), 'traceback': traceback.format_exc()}), 500
+        return jsonify({'success': False, 'error': 'Organization switch failed'}), 500

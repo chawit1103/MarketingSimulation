@@ -6,7 +6,7 @@ Uses project context mechanism with server-side state persistence
 import os
 import traceback
 import threading
-from flask import request, jsonify, current_app
+from flask import request, jsonify, current_app, g
 
 from . import graph_bp
 from ..config import Config
@@ -14,12 +14,50 @@ from ..services.ontology_generator import OntologyGenerator
 from ..services.graph_builder import GraphBuilderService
 from ..services.text_processor import TextProcessor
 from ..utils.file_parser import FileParser
+from ..authz import ADMIN_ROLES, ANALYST_ROLES, role_required
 from ..utils.logger import get_logger
 from ..models.task import TaskManager, TaskStatus
 from ..models.project import ProjectManager, ProjectStatus
 
 # Get logger
 logger = get_logger('mirofish.api')
+
+
+def _get_org_id() -> str:
+    org_id = g.get("current_org_id")
+    if not org_id and g.get("current_user"):
+        org_id = g.current_user.get("org_id")
+    if not org_id:
+        raise ValueError("Authentication required")
+    return org_id
+
+
+def _resource_not_found():
+    return jsonify({"success": False, "error": "Resource not found"}), 404
+
+
+def _project_for_graph(graph_id: str):
+    for project in ProjectManager.list_projects(limit=1000, org_id=_get_org_id()):
+        if project.graph_id == graph_id:
+            return project
+    return None
+
+
+def _task_for_org(task_id: str):
+    task = TaskManager().get_task(task_id)
+    if not task:
+        return None
+    if task.metadata.get("org_id") != _get_org_id():
+        return None
+    return task
+
+
+def _task_payload(task):
+    payload = task.to_dict()
+    metadata = dict(payload.get("metadata") or {})
+    metadata.pop("org_id", None)
+    payload["metadata"] = metadata
+    return payload
 
 
 def _get_storage():
@@ -45,12 +83,12 @@ def get_project(project_id: str):
     """
     Get project details
     """
-    project = ProjectManager.get_project(project_id)
+    project = ProjectManager.get_project(project_id, org_id=_get_org_id())
     
     if not project:
         return jsonify({
             "success": False,
-            "error": f"Project does not exist: {project_id}"
+            "error": "Resource not found"
         }), 404
     
     return jsonify({
@@ -65,7 +103,7 @@ def list_projects():
     List all projects
     """
     limit = request.args.get('limit', 50, type=int)
-    projects = ProjectManager.list_projects(limit=limit)
+    projects = ProjectManager.list_projects(limit=limit, org_id=_get_org_id())
     
     return jsonify({
         "success": True,
@@ -75,35 +113,37 @@ def list_projects():
 
 
 @graph_bp.route('/project/<project_id>', methods=['DELETE'])
+@role_required(*ADMIN_ROLES)
 def delete_project(project_id: str):
     """
     Delete project
     """
-    success = ProjectManager.delete_project(project_id)
+    success = ProjectManager.delete_project(project_id, org_id=_get_org_id())
 
     if not success:
         return jsonify({
             "success": False,
-            "error": f"Project does not exist or deletion failed: {project_id}"
+            "error": "Resource not found"
         }), 404
 
     return jsonify({
         "success": True,
-        "message": f"Project deleted: {project_id}"
+        "message": "Project deleted"
     })
 
 
 @graph_bp.route('/project/<project_id>/reset', methods=['POST'])
+@role_required(*ADMIN_ROLES)
 def reset_project(project_id: str):
     """
     Reset project status (for rebuilding graph)
     """
-    project = ProjectManager.get_project(project_id)
+    project = ProjectManager.get_project(project_id, org_id=_get_org_id())
 
     if not project:
         return jsonify({
             "success": False,
-            "error": f"Project does not exist: {project_id}"
+            "error": "Resource not found"
         }), 404
 
     # Reset to ontology generated state
@@ -127,6 +167,7 @@ def reset_project(project_id: str):
 # ============== Interface 1: Upload Files and Generate Ontology ==============
 
 @graph_bp.route('/ontology/generate', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def generate_ontology():
     """
     Interface 1: Upload files and analyze to generate ontology definition
@@ -182,7 +223,7 @@ def generate_ontology():
             }), 400
 
         # Create project
-        project = ProjectManager.create_project(name=project_name)
+        project = ProjectManager.create_project(name=project_name, org_id=_get_org_id())
         project.simulation_requirement = simulation_requirement
         logger.info(f"Project created: {project.project_id}")
         
@@ -210,7 +251,7 @@ def generate_ontology():
                 all_text += f"\n\n=== {file_info['original_filename']} ===\n{text}"
 
         if not document_texts:
-            ProjectManager.delete_project(project.project_id)
+            ProjectManager.delete_project(project.project_id, org_id=_get_org_id())
             return jsonify({
                 "success": False,
                 "error": "No documents successfully processed. Please check file format"
@@ -267,6 +308,7 @@ def generate_ontology():
 # ============== Interface 2: Build Graph ==============
 
 @graph_bp.route('/build', methods=['POST'])
+@role_required(*ANALYST_ROLES)
 def build_graph():
     """
     Interface 2: Build graph based on project_id
@@ -304,11 +346,11 @@ def build_graph():
             }), 400
 
         # Get project
-        project = ProjectManager.get_project(project_id)
+        project = ProjectManager.get_project(project_id, org_id=_get_org_id())
         if not project:
             return jsonify({
                 "success": False,
-                "error": f"Project does not exist: {project_id}"
+                "error": "Resource not found"
             }), 404
 
         # Check project status
@@ -364,7 +406,15 @@ def build_graph():
 
         # Create async task
         task_manager = TaskManager()
-        task_id = task_manager.create_task(f"Build graph: {graph_name}")
+        org_id = _get_org_id()
+        task_id = task_manager.create_task(
+            "graph_build",
+            metadata={
+                "org_id": org_id,
+                "project_id": project_id,
+                "graph_name": graph_name,
+            },
+        )
         logger.info(f"Graph build task created: task_id={task_id}, project_id={project_id}")
         
         # Update project status
@@ -492,7 +542,7 @@ def build_graph():
                     task_id,
                     status=TaskStatus.FAILED,
                     message=f"Build failed: {str(e)}",
-                    error=traceback.format_exc()
+                    error=str(e)
                 )
 
         # Start background thread
@@ -523,17 +573,14 @@ def get_task(task_id: str):
     """
     Query task status
     """
-    task = TaskManager().get_task(task_id)
+    task = _task_for_org(task_id)
 
     if not task:
-        return jsonify({
-            "success": False,
-            "error": f"Task does not exist: {task_id}"
-        }), 404
+        return _resource_not_found()
 
     return jsonify({
         "success": True,
-        "data": task.to_dict()
+        "data": _task_payload(task)
     })
 
 
@@ -542,11 +589,19 @@ def list_tasks():
     """
     List all tasks
     """
-    tasks = TaskManager().list_tasks()
+    org_id = _get_org_id()
+    tasks = [
+        t
+        for t in TaskManager().list_tasks()
+        if (t.get("metadata") or {}).get("org_id") == org_id
+    ]
     
     return jsonify({
         "success": True,
-        "data": [t.to_dict() for t in tasks],
+        "data": [
+            {**t, "metadata": {k: v for k, v in (t.get("metadata") or {}).items() if k != "org_id"}}
+            for t in tasks
+        ],
         "count": len(tasks)
     })
 
@@ -559,6 +614,8 @@ def get_graph_data(graph_id: str):
     Get graph data (nodes and edges)
     """
     try:
+        if not _project_for_graph(graph_id):
+            return _resource_not_found()
         storage = _get_storage()
         builder = GraphBuilderService(storage=storage)
         graph_data = builder.get_graph_data(graph_id)
@@ -577,18 +634,21 @@ def get_graph_data(graph_id: str):
 
 
 @graph_bp.route('/delete/<graph_id>', methods=['DELETE'])
+@role_required(*ADMIN_ROLES)
 def delete_graph(graph_id: str):
     """
     Delete graph
     """
     try:
+        if not _project_for_graph(graph_id):
+            return _resource_not_found()
         storage = _get_storage()
         builder = GraphBuilderService(storage=storage)
         builder.delete_graph(graph_id)
 
         return jsonify({
             "success": True,
-            "message": f"Graph deleted: {graph_id}"
+            "message": "Graph deleted"
         })
 
     except Exception as e:

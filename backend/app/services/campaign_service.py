@@ -53,6 +53,8 @@ class CampaignService:
         objective: str = "message_testing",
         target: Optional[Dict[str, Any]] = None,
         sim_config: Optional[Dict[str, Any]] = None,
+        brief_quality: Optional[Dict[str, Any]] = None,
+        brief_metadata: Optional[Dict[str, Any]] = None,
         created_by: Optional[str] = None,
     ) -> Campaign:
         """Create a new campaign for an organization.
@@ -110,6 +112,11 @@ class CampaignService:
         # Simulation config
         if sim_config:
             campaign.sim_config = SimulationConfig(**sim_config)
+
+        if brief_quality:
+            campaign.brief_quality = brief_quality
+        if brief_metadata:
+            campaign.brief_metadata = brief_metadata
 
         if created_by:
             campaign.created_by = created_by

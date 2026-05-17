@@ -27,7 +27,7 @@ It works like a **flight simulator for market decisions**:
 2. Generate culturally grounded synthetic personas.
 3. Run multi-agent social simulation through OASIS-style behavior models.
 4. Review KPIs, segment reactions, risk drivers, assumptions, and simulated quotes.
-5. Export the evidence into a boardroom-ready slide deck.
+5. Export the evidence into a boardroom-ready slide deck or client-ready strategy pack.
 
 This is not positioned as an AI playground. It is a decision-support system for answering:
 
@@ -36,6 +36,58 @@ This is not positioned as an AI playground. It is a decision-support system for 
 - What risk could become a crisis?
 - How should we revise the campaign before spending real media budget?
 - What should we show leadership or a client?
+
+## Who It Is For
+
+### Marketing Manager / Brand Team
+
+Use 3C Simulator to pressure-test a launch, campaign, competitor move, or crisis-sensitive message before real spend. The recommended brand flow is:
+
+1. Start with a safe demo or approved brief.
+2. Check Brief Quality Score before simulation.
+3. Review Dashboard evidence, Confidence & Evidence, and source labels.
+4. Use Action Plan and Revised Brief v2 to decide what to change.
+5. Use Budget Planner and Calibration v1 as directional planning inputs, not guaranteed forecasts.
+6. Export a Brand Executive Summary for leadership review.
+
+### Marketing Agency / Strategy Team
+
+Use 3C Simulator to compare creative directions and turn scenario evidence into a client-ready recommendation. The recommended agency flow is:
+
+1. Open the Demo Dashboard to establish source-labeling and evidence rules.
+2. Compare 2-5 campaign directions in A/B/C Comparator.
+3. Stress-test competitor or crisis reactions in War Room.
+4. Package the recommendation as an Agency Client Pitch Summary.
+5. Use pilot feedback analytics to learn where clients trust, doubt, or need more proof.
+
+For the current production/demo readiness matrix, see [docs/STATUS.md](docs/STATUS.md).
+
+Current release readiness:
+
+| Path | Status |
+| --- | --- |
+| Local demo | Ready |
+| Controlled private pilot | Conditional candidate |
+| Public pilot | Blocked |
+| Public internet exposure | Blocked |
+| Production customer deployment | Blocked |
+
+For demo, release validation, known limitations, and recommended next actions, see:
+
+- [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)
+- [docs/DEMO_DATA.md](docs/DEMO_DATA.md)
+- [docs/FAQ.md](docs/FAQ.md)
+- [docs/ANALYTICS.md](docs/ANALYTICS.md)
+- [docs/SCREENSHOT_GUIDE.md](docs/SCREENSHOT_GUIDE.md)
+- [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md)
+- [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md)
+- [docs/RELEASE_READINESS_CHECKLIST.md](docs/RELEASE_READINESS_CHECKLIST.md)
+- [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md)
+- [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md)
+- [docs/POST_IMPLEMENTATION_ACTION_PLAN.md](docs/POST_IMPLEMENTATION_ACTION_PLAN.md)
+- [docs/PILOT_PLAN.md](docs/PILOT_PLAN.md)
+- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+- [docs/ROADMAP.md](docs/ROADMAP.md)
 
 ---
 
@@ -46,18 +98,28 @@ New users should be able to see value before configuring an LLM provider.
 The product includes a public no-key demo flow:
 
 - Demo campaign list: `GET /api/demo/campaigns`
-- Demo dashboard: `GET /api/demo/campaigns/demo-premium-water/dashboard`
+- Demo dashboard: `GET /api/demo/campaigns/{id}/dashboard`
 - Frontend sample route: `/dashboard/demo-premium-water`
 
-The sample dashboard includes:
+Current public demo dashboards:
+
+- `demo-premium-water`: FMCG / premium water launch.
+- `demo-insurtech-trust`: InsurTech trust recovery after claim delays.
+- `demo-energy-community`: community energy and clean-power narrative.
+
+Each demo dashboard includes:
 
 - campaign brief
 - 7 executive KPIs
 - confidence score
 - assumptions
+- limitations
 - why-this-score explanations
 - risk drivers
 - simulated persona quotes
+- segment breakdown
+- structured action plan
+- recommended validation step
 - priority recommended actions
 
 For local development:
@@ -73,6 +135,69 @@ Open:
 ```text
 http://127.0.0.1:5174/dashboard/demo-premium-water
 ```
+
+---
+
+## Product Walkthrough
+
+Screenshots below were reviewed after the PR AD roadmap pass and use the local demo flow with no auth token, API key, or real customer data. They show product workflow only; they do not claim public-pilot or production readiness.
+
+For a 5-minute presenter script, use one of the two tracks in [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md):
+
+- Brand Safety / C-Level Decision Demo.
+- Agency Pitch / A/B/C Campaign Comparison Demo.
+
+### 1. Start From The Landing Page
+
+The first screen positions 3C Simulator as a decision-intelligence product, not an AI playground.
+
+![Home landing page](docs/screenshots/home-landing.png)
+
+### 2. Open The Demo Dashboard
+
+The no-key demo shows source-labeled synthetic demo data, decision context, confidence/evidence, KPI cards, and recommended validation steps.
+
+![Demo dashboard with source label](docs/screenshots/demo-dashboard-overview.png)
+
+### 3. Check Brief Quality Before Simulation
+
+Before spending simulation time, the Brief Quality Score checks objective, audience, market, budget, KPI, channels, competitor context, constraints, and risk/legal notes.
+
+![Brief Quality Score](docs/screenshots/brief-quality-score.png)
+
+### 4. Review Simulation Evidence
+
+The dashboard keeps result-source labeling visible and separates assumptions, confidence, KPI evidence, and next validation steps.
+
+![Simulation dashboard evidence](docs/screenshots/simulation-dashboard-kpis.png)
+
+### 5. Stress-Test Competitive Scenarios
+
+War Room defaults to backend deterministic simulation and labels the output as Live Backend. Local estimates are only shown as explicit fallback.
+
+![Competitor War Room](docs/screenshots/war-room.png)
+
+### 6. Turn Results Into Action
+
+The Action Plan translates results into creative adjustment, channel allocation, crisis prevention, and validation guidance while preserving the result source.
+
+![Structured Action Plan](docs/screenshots/action-plan.png)
+
+### 7. Configure Demo, Local, Or Cloud Mode
+
+The Settings Wizard checks readiness for demo-only, local model, and cloud API setups without exposing API keys or graph passwords.
+
+![Settings Wizard](docs/screenshots/settings-wizard.png)
+
+### 8. Import Aggregate Actuals For Calibration
+
+Calibration v1 lets analyst/admin users enter approved aggregate actual campaign results and compare them against prior estimates. It rejects raw customer data, CRM records, raw social posts, and PII-like notes.
+
+### 9. Capture Pilot Feedback Privately
+
+Pilot analytics emits sanitized browser `3c:analytics` events and fixed-choice feedback only. No third-party analytics SDK is installed, no network destination is configured by default, and no raw campaign brief, PII, token, API key, or customer record should be collected.
+
+For a presenter-friendly run-through, see [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md). For safe sample briefs, see [docs/DEMO_DATA.md](docs/DEMO_DATA.md). For expected buyer and pilot-user questions, see [docs/FAQ.md](docs/FAQ.md). For a first-time user path, see [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md).
 
 ---
 
@@ -117,15 +242,20 @@ Users can open a sample campaign and see a full executive dashboard without regi
 
 Start from industry-specific persona segments, crisis seeds, document seeds, and campaign defaults.
 
-Current and importable template areas include:
+Deep built-in presets now include richer planner scaffolding: target segment archetypes, common objections, crisis triggers, typical KPIs, channel behavior, competitor archetypes, regulatory sensitivities, proof-point requirements, sample brief, risk checklist, action-plan hints, assumptions, and limitations.
+
+Current built-in and importable template areas include:
 
 - energy
 - finance
+- FMCG / CPG
 - insurance / InsurTech
 - retail / ecommerce
 - real estate
-- healthcare
-- FMCG
+- EV / automotive
+- healthcare / wellness
+
+Templates are assumptions for scenario planning, not market-truth or regulated advice. Replace sample budget, duration, KPI, competitor context, risk/legal notes, and channel mix with the user's actual campaign plan before running a simulation.
 
 ### Audience Channels
 
@@ -139,6 +269,26 @@ The user can describe where the audience actually lives, beyond the native simul
 - Twitter/X
 - Reddit
 - LinkedIn
+
+### Budget Scenario Planner
+
+Run assumption-based channel mix what-if planning before committing media spend. The planner accepts total budget, duration, target segments, channel mix, risk tolerance, and objective, then returns directional allocation ranges, trade-offs, confidence level, assumptions, limitations, and a recommended validation step.
+
+This is not an exact ROI or ROAS predictor. It does not use live ad-platform cost data unless the user supplies approved planning inputs.
+
+### Manual Calibration v1
+
+Import approved aggregate actual campaign results through `/calibration` or `POST /api/calibration/actual-results`.
+
+Supported fields include campaign ID, date range, impressions, clicks, CTR, conversion count/rate, sales lift, sentiment score or summary, crisis incident flag, anonymized qualitative notes, and optional prior estimate fields.
+
+The output shows estimate-vs-actual deltas, error by metric, matched/missed risk classification, segment assumption gaps when supplied, privacy review, limitations, and calibration status:
+
+- `not_calibrated`
+- `partially_calibrated`
+- `calibrated_with_n_campaigns`
+
+This is not live CRM, ad-platform, or social-listening ingestion. It does not retrain the model or overwrite original simulation outputs.
 
 ### OASIS Platform Presets
 
@@ -168,7 +318,7 @@ It includes:
 - opinion polarization
 - sentiment timeline
 - segment breakdown
-- top influencers
+- simulated influence nodes
 - action plan
 - Thai executive summary
 
@@ -217,6 +367,33 @@ Run lightweight what-if analysis from dashboard KPIs:
 
 The what-if engine returns KPI deltas, adjusted business impact, and an updated decision recommendation.
 
+### Client-Ready Strategy Packs
+
+For decision meetings, the backend can package existing dashboard/simulation payloads into two structured report modes:
+
+- **Brand Executive Summary** for internal launch/revise/do-not-launch review.
+- **Agency Client Pitch Summary** for agency-to-client strategy discussion.
+
+Each pack includes executive decision summary, launch recommendation, KPI summary, segment reactions, risk drivers, crisis watchouts, recommended action plan, and next validation steps. Every section inherits source/provenance metadata such as `source_mode`, `data_basis`, confidence level, assumptions, limitations, and recommended validation step.
+
+Strategy packs can also be rendered as native PowerPoint decks through `POST /api/export/strategy-pack/pptx`. Optional white-label fields include agency name, client name, prepared by, report date, campaign name, scenario name, and a safe logo placeholder. The export does not fetch or embed remote logo URLs. Every slide includes provenance footer metadata, and the deck ends with limitations and recommended validation. It is scenario-planning material, not guaranteed ROI or production-readiness evidence.
+
+### Revised Brief v2
+
+Dashboard Action Plans can be turned into a reviewable revised brief before the next simulation or creative review. The revised brief includes objective, target segments, key message, tone and voice, proof points, channel recommendations, risk guardrails, validation plan, and creative team notes.
+
+The brief keeps provenance from the source action plan and is deterministic planning guidance, not a guarantee of improved market outcomes.
+
+### Backend-First Comparator
+
+The A/B/C Comparator compares 2-5 campaign directions through the backend first. It includes backend demo fixtures for:
+
+- Emotional / storytelling direction.
+- Proof-led / trust direction.
+- Price / promotion direction.
+
+Comparator output includes ranked recommendation, metric wins, segment strengths and weaknesses, conversion and engagement estimates, crisis/risk comparison, trade-offs, recommended use case, and source/provenance metadata per variant and for the overall comparison. Browser-side output is available only as an explicit Local Estimate fallback.
+
 ### Export To Slide
 
 Export simulation output into client- or leadership-ready files:
@@ -233,9 +410,39 @@ Recommended deck structure:
 4. Risk & Crisis Drivers
 5. Recommended Action Plan
 
+Strategy pack PPTX structure:
+
+1. Cover / white-label context
+2. Executive Decision Summary
+3. Decision Gate & KPI Summary
+4. Segment Reactions
+5. Risk Drivers & Crisis Watchouts
+6. Recommended Action Plan
+7. Limitations & Recommended Validation
+
 ### System Health
 
 Settings includes a system health view backed by `GET /api/status`.
+
+### Settings Wizard
+
+Settings includes a setup wizard for three supported modes:
+
+- **Demo only**: no LLM, embedding provider, or Neo4j connection required.
+- **Local model**: configuration readiness for local Ollama-style LLM/embedding and local Neo4j.
+- **Cloud API**: configuration readiness for supported cloud LLM/embedding providers and Neo4j Aura-style graph storage.
+
+The readiness endpoint (`POST /api/settings/readiness`) is deterministic and does not make live provider calls. It validates required fields using secret-presence flags, so API keys and passwords are not echoed back to the browser. The optional LLM live test remains an authenticated runtime check and depends on real provider availability.
+
+### Result Source Labels
+
+The UI labels simulation and decision outputs with one of the supported result-source modes:
+
+- **Demo Mode**: deterministic sample data intended for onboarding and product exploration.
+- **Local Estimate**: browser-side deterministic fallback, visibly warned and not presented as live backend output.
+- **Live Backend**: backend-generated deterministic output.
+- **Backend Verified**: persisted real simulation KPI/evidence was loaded for an owned campaign/run. Backend route success by itself is not enough for this label.
+- **Unknown Source**: source metadata was unavailable and should be treated conservatively.
 
 It checks:
 
@@ -326,18 +533,18 @@ Example `.env`:
 
 ```bash
 LLM_PROVIDER=deepseek
-LLM_API_KEY=sk-your-key
+LLM_API_KEY=replace-with-provider-api-key
 LLM_MODEL_NAME=deepseek-chat
 
 EMBEDDING_PROVIDER=openai
-EMBEDDING_API_KEY=sk-your-key
+EMBEDDING_API_KEY=replace-with-embedding-api-key
 
 NEO4J_URI=bolt://localhost:7687
 NEO4J_USER=neo4j
-NEO4J_PASSWORD=password
+NEO4J_PASSWORD=replace-with-neo4j-password
 ```
 
-The Settings page can manage runtime provider values, task-specific model overrides, language, and system health.
+The Settings page can manage runtime provider values, per-task model overrides, language, and system health.
 
 ---
 
@@ -354,6 +561,11 @@ All product APIs are registered under `/api/*`.
 | GET | `/api/demo/campaigns` | No-key demo campaign list |
 | GET | `/api/demo/campaigns/{id}/dashboard` | No-key demo dashboard |
 | GET | `/api/industry/templates` | Public industry template list |
+| POST | `/api/brief/quality` | Deterministic brief completeness scoring |
+| POST | `/api/brief/revise` | Deterministic Revised Brief v2 from an Action Plan |
+| POST | `/api/decision/budget-scenario` | Deterministic budget/channel scenario planner |
+| GET | `/api/settings/providers` | Safe provider catalog |
+| POST | `/api/settings/readiness` | Secret-safe setup readiness check |
 
 ### Auth
 
@@ -363,6 +575,13 @@ All product APIs are registered under `/api/*`.
 | POST | `/api/auth/login` | Login and receive JWT |
 | GET | `/api/auth/me` | Current user profile |
 | POST | `/api/auth/api-key` | Generate API key |
+
+### Calibration
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/calibration/actual-results` | Import aggregate actual results and compare against prior estimates |
+| GET | `/api/calibration/status/{campaign_id}` | Read calibration status for an organization campaign |
 
 ### Campaigns
 
@@ -417,12 +636,16 @@ All product APIs are registered under `/api/*`.
 | POST | `/api/decision/what-if` | Run deterministic what-if strategy simulation |
 | POST | `/api/comparator/compare` | Compare 2-5 campaigns |
 | GET | `/api/comparator/metrics` | Comparator metric definitions |
+| GET | `/api/comparator/demo/campaigns` | Public backend demo comparator variants |
+| POST | `/api/comparator/demo/compare` | Compare backend demo comparator variants |
 | POST | `/api/impact/calculate` | Business impact calculation |
 | GET | `/api/impact/scenarios/{sentiment}` | Quick impact scenario |
 | GET | `/api/competitor/scenarios` | War room scenario list |
 | POST | `/api/competitor/simulate` | Run competitor simulation |
 | POST | `/api/export/pptx` | Export PowerPoint deck |
 | POST | `/api/export/csv` | Export CSV data |
+| POST | `/api/export/strategy-pack` | Build a client-ready Brand or Agency strategy pack payload |
+| POST | `/api/export/strategy-pack/pptx` | Render a client-ready strategy pack PPTX |
 
 ---
 
@@ -450,6 +673,7 @@ Flask Backend
   Demo API
   Status API
   Export Engine
+  Calibration Service
   OASIS Simulation Runner
         |
         v
@@ -489,7 +713,7 @@ Key decisions:
 Backend contract tests:
 
 ```bash
-./backend/.venv/bin/python -m pytest backend/tests/test_api_contract.py
+./backend/.venv/bin/python -m pytest backend/tests
 ```
 
 Frontend production build:
@@ -505,26 +729,20 @@ Locale validation:
 for f in frontend/src/locales/*.json; do python3 -m json.tool "$f" >/dev/null || exit 1; done
 ```
 
+Available frontend scripts:
+
+```bash
+cd frontend
+npm run build
+```
+
+There is no frontend unit-test or lint script configured in `frontend/package.json` yet.
+
 ---
 
 ## Product Roadmap
 
-Highest priority:
-
-- expand Thai industry templates for healthcare, restaurants, EV, FMCG, cosmetics, public policy, and agriculture
-- strengthen KPI calculation with real simulation traces rather than mock fallback where possible
-- calibrate Decision Engine rules with real campaign outcomes
-- improve PPTX export templates for agency/client deliverables
-- add broader backend tests for auth, campaign CRUD, template validation, KPI calculation, and export
-- deploy a public hosted demo
-
-Nice-to-have:
-
-- scenario comparison history
-- calibration from real post-campaign data
-- cost estimator by LLM provider and persona count
-- team collaboration and comments on reports
-- template marketplace / library
+See [docs/ROADMAP.md](docs/ROADMAP.md). The highest-priority next work is calibration against real campaign outcomes, broader QA automation, deployment hardening, and pilot-user feedback loops.
 
 ---
 

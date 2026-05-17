@@ -3,6 +3,7 @@
 from flask import Blueprint, request, jsonify, g
 
 from ..services.impact_calculator import ImpactCalculator, BusinessParams, ImpactResult, ComparisonResult
+from ..services.campaign_service import CampaignService
 from ..services.kpi_calculator import KPICalculator
 from ..utils.logger import get_logger
 
@@ -35,6 +36,10 @@ def _get_campaign_name(campaign_id: str) -> str:
     except Exception:
         pass
     return campaign_id[:12]
+
+
+def _get_owned_campaign(campaign_id: str, org_id: str):
+    return CampaignService().get_campaign(campaign_id, org_id=org_id)
 
 
 # ── API Routes ────────────────────────────────────────────
@@ -74,6 +79,9 @@ def calculate_impact():
 
     # Fetch KPIs
     org_id = _get_org_id()
+    campaign = _get_owned_campaign(campaign_id, org_id)
+    if not campaign:
+        return jsonify({"success": False, "error": "Resource not found"}), 404
     calc = _get_calculator()
     try:
         report = calc.calculate(campaign_id=campaign_id, org_id=org_id)
@@ -84,7 +92,7 @@ def calculate_impact():
             "message_resonance": report.message_resonance,
             "brand_perception_shift": report.brand_perception_shift,
         }
-        campaign_name = _get_campaign_name(campaign_id)
+        campaign_name = campaign.name
     except Exception as e:
         # Use demo KPIs if simulation not complete
         logger.warning(f"Using demo KPIs for {campaign_id}: {e}")
@@ -119,15 +127,18 @@ def quick_scenario(sentiment_value: str):
     except ValueError:
         return jsonify({"error": "sentiment must be a number"}), 400
 
-    params = BusinessParams(
-        product_name=request.args.get("product", "Product"),
-        unit_price=float(request.args.get("price", 100)),
-        market_size=int(request.args.get("market", 100000)),
-        current_market_share=float(request.args.get("share", 10)),
-        base_conversion_rate=float(request.args.get("conversion", 5)),
-        campaign_cost=float(request.args.get("cost", 500000)),
-        time_horizon_months=int(request.args.get("months", 6)),
-    )
+    try:
+        params = BusinessParams(
+            product_name=request.args.get("product", "Product"),
+            unit_price=float(request.args.get("price", 100)),
+            market_size=int(request.args.get("market", 100000)),
+            current_market_share=float(request.args.get("share", 10)),
+            base_conversion_rate=float(request.args.get("conversion", 5)),
+            campaign_cost=float(request.args.get("cost", 500000)),
+            time_horizon_months=int(request.args.get("months", 6)),
+        )
+    except ValueError:
+        return jsonify({"success": False, "error": "scenario parameters must be numeric"}), 400
 
     result = ImpactCalculator.calculate(
         campaign_id="quick",
@@ -142,4 +153,10 @@ def quick_scenario(sentiment_value: str):
         params=params,
     )
 
-    return jsonify({"success": True, "data": result.dict()})
+    data = result.dict()
+    data["source"] = {
+        "type": "local_estimate",
+        "label": "Local Estimate",
+        "warning": "Quick deterministic projection from sentiment and business inputs; not a live simulation result.",
+    }
+    return jsonify({"success": True, "data": data})

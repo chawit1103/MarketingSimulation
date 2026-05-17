@@ -23,6 +23,12 @@
         <router-link to="/impact" class="btn-impact-nav">
           {{ $t('impact.title') }}
         </router-link>
+        <router-link to="/budget-planner" class="btn-impact-nav">
+          Budget Planner
+        </router-link>
+        <router-link to="/calibration" class="btn-impact-nav">
+          Calibration
+        </router-link>
         <router-link to="/comparator" class="btn-compare-nav">
           {{ $t('comparator.navLink') }}
         </router-link>
@@ -409,6 +415,60 @@
               :disabled="submitting"
             />
           </div>
+
+          <div class="form-section trust-section">
+            <h3 class="section-label">{{ $t('campaigns.briefQualityTitle') }}</h3>
+            <p class="field-hint">{{ $t('campaigns.briefQualityDesc') }}</p>
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label>{{ $t('campaigns.campaignDuration') }}</label>
+                <input v-model="form.campaign_duration" class="form-input" :placeholder="$t('campaigns.campaignDurationPlaceholder')" :disabled="submitting" />
+              </div>
+              <div class="form-group flex-1">
+                <label>{{ $t('campaigns.budgetRange') }}</label>
+                <input v-model="form.budget_range" class="form-input" :placeholder="$t('campaigns.budgetRangePlaceholder')" :disabled="submitting" />
+              </div>
+              <div class="form-group flex-1">
+                <label>{{ $t('campaigns.primaryKpi') }}</label>
+                <input v-model="form.primary_kpi" class="form-input" :placeholder="$t('campaigns.primaryKpiPlaceholder')" :disabled="submitting" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label>{{ $t('campaigns.competitorContext') }}</label>
+                <textarea v-model="form.competitor_context" rows="2" class="form-input" :placeholder="$t('campaigns.competitorContextPlaceholder')" :disabled="submitting"></textarea>
+              </div>
+              <div class="form-group flex-1">
+                <label>{{ $t('campaigns.brandConstraints') }}</label>
+                <textarea v-model="form.brand_constraints" rows="2" class="form-input" :placeholder="$t('campaigns.brandConstraintsPlaceholder')" :disabled="submitting"></textarea>
+              </div>
+              <div class="form-group flex-1">
+                <label>{{ $t('campaigns.riskLegalNotes') }}</label>
+                <textarea v-model="form.risk_legal_notes" rows="2" class="form-input" :placeholder="$t('campaigns.riskLegalNotesPlaceholder')" :disabled="submitting"></textarea>
+              </div>
+            </div>
+
+            <div class="brief-quality-panel">
+              <div class="brief-score" :class="briefQualityScoreClass">
+                <span>{{ $t('campaigns.briefQualityScore') }}</span>
+                <strong>{{ briefQuality ? briefQuality.score : '—' }}%</strong>
+              </div>
+              <div class="brief-quality-copy">
+                <strong>{{ briefQualityLevelLabel }}</strong>
+                <p>{{ briefQualityImpactLabel }}</p>
+                <ul v-if="briefQuality?.missing_fields?.length" class="brief-missing-list">
+                  <li v-for="field in briefQuality.missing_fields.slice(0, 4)" :key="field.key">
+                    {{ field.label }}
+                  </li>
+                </ul>
+              </div>
+              <button class="btn-quality" type="button" @click="refreshBriefQuality" :disabled="briefQualityLoading || submitting">
+                {{ briefQualityLoading ? $t('campaigns.checkingBriefQuality') : $t('campaigns.checkBriefQuality') }}
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- Modal Footer -->
@@ -492,6 +552,8 @@ import {
   getPipelineStatus
 } from '@/api/campaign'
 import { listDemoCampaigns } from '@/api/demo'
+import { scoreBriefQuality } from '@/api/brief'
+import { trackEvent } from '@/services/analytics'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -510,6 +572,9 @@ const skipAvailable = ref(true)  // Allows skipping template step
 const activePipelineCampaign = ref('')
 const activePipelineStatus = ref(null)
 const activePipelineCampaignId = ref(null)
+const briefQuality = ref(null)
+const briefQualityLoading = ref(false)
+const simulationCompletedTracked = ref(false)
 let pipelinePollInterval = null
 
 // ── Form State ─────────────────────────────────────
@@ -517,6 +582,12 @@ const form = ref({
   name: '',
   description: '',
   objective: '',
+  campaign_duration: '',
+  budget_range: '',
+  primary_kpi: '',
+  competitor_context: '',
+  brand_constraints: '',
+  risk_legal_notes: '',
   platform: 'both',
   platform_mode: 'auto',
   max_rounds: 10,
@@ -588,6 +659,32 @@ const pipelineSteps = computed(() => [
 // ── Computed ───────────────────────────────────────
 const canSubmit = computed(() => {
   return form.value.name.trim() !== '' && form.value.objective !== ''
+})
+
+const briefQualityScoreClass = computed(() => {
+  const level = briefQuality.value?.level || 'unknown'
+  return `brief-${level}`
+})
+
+const briefQualityLevelLabel = computed(() => {
+  const level = briefQuality.value?.level
+  const map = {
+    strong: t('campaigns.briefQualityStrong'),
+    usable: t('campaigns.briefQualityUsable'),
+    thin: t('campaigns.briefQualityThin'),
+    weak: t('campaigns.briefQualityWeak')
+  }
+  return map[level] || t('campaigns.briefQualityUnknown')
+})
+
+const briefQualityImpactLabel = computed(() => {
+  const impact = briefQuality.value?.confidence_impact
+  const map = {
+    low_negative_impact: t('campaigns.confidenceImpactLow'),
+    moderate_negative_impact: t('campaigns.confidenceImpactModerate'),
+    high_negative_impact: t('campaigns.confidenceImpactHigh')
+  }
+  return map[impact] || t('campaigns.confidenceImpactUnknown')
 })
 
 const activePipelinePercent = computed(() => {
@@ -752,10 +849,17 @@ function openCreateModal() {
   modalError.value = ''
   modalStep.value = 0  // Start with template selector
   appliedTemplate.value = null
+  briefQuality.value = null
   form.value = {
     name: '',
     description: '',
 	    objective: '',
+    campaign_duration: '',
+    budget_range: '',
+    primary_kpi: '',
+    competitor_context: '',
+    brand_constraints: '',
+    risk_legal_notes: '',
 	    platform: 'both',
 	    platform_mode: 'auto',
 	    max_rounds: 10,
@@ -780,6 +884,12 @@ function applyRecommendedSetup() {
   form.value.name = t('campaigns.campaignNamePlaceholder')
   form.value.description = t('campaigns.quickStartDesc')
 	  form.value.objective = 'message_testing'
+  form.value.campaign_duration = ''
+  form.value.budget_range = ''
+  form.value.primary_kpi = ''
+  form.value.competitor_context = ''
+  form.value.brand_constraints = ''
+  form.value.risk_legal_notes = ''
 	  form.value.platform = 'both'
 	  form.value.platform_mode = 'auto'
 	  form.value.max_rounds = 10
@@ -798,6 +908,7 @@ function applyRecommendedSetup() {
 function onTemplateSelected({ template, selectedSeeds }) {
   appliedTemplate.value = template
   modalStep.value = 1
+  briefQuality.value = null
 
   // Pre-fill form from template
   const t = template
@@ -805,6 +916,12 @@ function onTemplateSelected({ template, selectedSeeds }) {
   form.value.platform = (t.sim_config && t.sim_config.platform) || t.default_platform || 'both'
   form.value.platform_mode = (t.sim_config && t.sim_config.platform_mode) || 'auto'
   form.value.max_rounds = (t.sim_config && t.sim_config.max_rounds) || t.default_max_rounds || 20
+  form.value.campaign_duration = t.campaign_duration || ''
+  form.value.budget_range = t.budget_range || ''
+  form.value.primary_kpi = t.primary_kpi || ''
+  form.value.competitor_context = t.competitor_context || ''
+  form.value.brand_constraints = t.brand_constraints || ''
+  form.value.risk_legal_notes = t.risk_legal_notes || ''
   const target = t.target || t.target_audience || {}
   if (target) {
     form.value.audience.age_min = (target.age_range && target.age_range[0]) || 18
@@ -903,30 +1020,11 @@ async function submitCampaign() {
   modalError.value = ''
 
   try {
+    await refreshBriefQuality()
+
     // 1. Create campaign
-    const payload = {
-      name: form.value.name.trim(),
-      description: form.value.description.trim(),
-	      objective: form.value.objective,
-	      platform: form.value.platform,
-	      platform_mode: form.value.platform_mode,
-	      max_rounds: form.value.max_rounds,
-      audience: { ...form.value.audience },
-      target: {
-        segment_name: form.value.audience.segment_name || 'General',
-        age_range: [form.value.audience.age_min, form.value.audience.age_max],
-        gender: form.value.audience.gender,
-        regions: [...form.value.audience.regions],
-        channels: [...form.value.audience.channels],
-        persona_count: form.value.audience.persona_count
-      },
-	      sim_config: {
-	        platform: form.value.platform,
-	        platform_mode: form.value.platform_mode,
-	        max_rounds: form.value.max_rounds,
-	        audience_channels: [...form.value.audience.channels]
-	      }
-    }
+    const payload = buildCampaignPayload()
+    payload.brief_quality = briefQuality.value
 
     const res = await createCampaign(payload)
     const campaignId = res.data?.id || res.id
@@ -934,6 +1032,14 @@ async function submitCampaign() {
     // 2. Start pipeline
     try {
       await startPipeline(campaignId)
+      trackEvent('simulation_started', {
+        objective: payload.objective,
+        source_mode: 'live_backend',
+        platform: payload.platform,
+        platform_mode: payload.platform_mode,
+        channel_count: payload.target.channels.length,
+        persona_count: payload.target.persona_count,
+      })
     } catch (pipeErr) {
       console.warn('Pipeline start warning:', pipeErr.message)
     }
@@ -948,12 +1054,79 @@ async function submitCampaign() {
     activePipelineCampaign.value = payload.name
     activePipelineCampaignId.value = campaignId
     activePipelineStatus.value = { current_step: 'persona_generation', status: 'running', step_progress: 0 }
+    simulationCompletedTracked.value = false
     showPipelineModal.value = true
     startPipelinePolling(campaignId)
   } catch (err) {
     modalError.value = err.response?.data?.error || err.message || 'Failed to create campaign'
   } finally {
     submitting.value = false
+  }
+}
+
+function buildCampaignPayload() {
+  return {
+    name: form.value.name.trim(),
+    description: form.value.description.trim(),
+    objective: form.value.objective,
+    platform: form.value.platform,
+    platform_mode: form.value.platform_mode,
+    max_rounds: form.value.max_rounds,
+    campaign_duration: form.value.campaign_duration,
+    budget_range: form.value.budget_range,
+    primary_kpi: form.value.primary_kpi,
+    competitor_context: form.value.competitor_context,
+    brand_constraints: form.value.brand_constraints,
+    risk_legal_notes: form.value.risk_legal_notes,
+    brief_metadata: {
+      campaign_duration: form.value.campaign_duration,
+      budget_range: form.value.budget_range,
+      primary_kpi: form.value.primary_kpi,
+      competitor_context: form.value.competitor_context,
+      brand_constraints: form.value.brand_constraints,
+      risk_legal_notes: form.value.risk_legal_notes
+    },
+    audience: { ...form.value.audience },
+    target: {
+      segment_name: form.value.audience.segment_name || 'General',
+      age_range: [form.value.audience.age_min, form.value.audience.age_max],
+      gender: form.value.audience.gender,
+      regions: [...form.value.audience.regions],
+      channels: [...form.value.audience.channels],
+      persona_count: form.value.audience.persona_count
+    },
+    sim_config: {
+      platform: form.value.platform,
+      platform_mode: form.value.platform_mode,
+      max_rounds: form.value.max_rounds,
+      audience_channels: [...form.value.audience.channels]
+    }
+  }
+}
+
+async function refreshBriefQuality() {
+  briefQualityLoading.value = true
+  try {
+    const res = await scoreBriefQuality(buildCampaignPayload())
+    briefQuality.value = res.data || res
+    trackEvent('brief_quality_scored', {
+      score: briefQuality.value?.score,
+      level: briefQuality.value?.level,
+      confidence_impact: briefQuality.value?.confidence_impact,
+      missing_fields_count: briefQuality.value?.missing_fields?.length || 0,
+    })
+  } catch (err) {
+    console.warn('Brief quality scoring failed:', err.message)
+    briefQuality.value = {
+      score: 0,
+      level: 'unknown',
+      confidence_impact: 'unknown',
+      missing_fields: [],
+      recommendations: [t('campaigns.briefQualityUnavailable')],
+      known_limitations: [t('campaigns.briefQualityUnavailable')]
+    }
+  } finally {
+    briefQualityLoading.value = false
   }
 }
 
@@ -978,6 +1151,14 @@ function startPipelinePolling(campaignId) {
         activePipelineStatus.value = res.data
       } else if (res) {
         activePipelineStatus.value = res
+      }
+      if (activePipelineStatus.value?.status === 'complete' && !simulationCompletedTracked.value) {
+        simulationCompletedTracked.value = true
+        trackEvent('simulation_completed', {
+          source_mode: 'live_backend',
+          final_step: activePipelineStatus.value.current_step || 'complete',
+          percent_complete: pipelinePercent(activePipelineStatus.value),
+        })
       }
     } catch (e) {
       console.warn('Pipeline status poll failed:', e.message)
@@ -1813,6 +1994,100 @@ select.form-input option {
   flex: 1;
 }
 
+.trust-section {
+  padding: var(--space-4);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+}
+
+.brief-quality-panel {
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+}
+
+.brief-score {
+  display: grid;
+  gap: var(--space-1);
+  text-align: center;
+}
+
+.brief-score span {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.brief-score strong {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.brief-score.brief-strong strong { color: var(--green); }
+.brief-score.brief-usable strong { color: var(--accent); }
+.brief-score.brief-thin strong { color: var(--yellow); }
+.brief-score.brief-weak strong { color: var(--red); }
+
+.brief-quality-copy strong {
+  color: var(--text-primary);
+}
+
+.brief-quality-copy p {
+  margin: var(--space-1) 0 var(--space-2);
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.brief-missing-list {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.brief-missing-list li {
+  padding: 4px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+}
+
+.btn-quality {
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 800;
+}
+
+.btn-quality:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-quality:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 /* Range Slider */
 .range-slider {
   display: flex;
@@ -2594,6 +2869,7 @@ select.form-input option {
   .campaigns-body { padding: 20px 16px 40px; }
   .campaign-grid { grid-template-columns: 1fr; }
   .form-row { flex-direction: column; }
+  .brief-quality-panel { grid-template-columns: 1fr; }
   .modal-container { max-width: 100%; margin: 0 8px; }
   .wizard-intro { flex-direction: column; align-items: stretch; }
 	  .btn-quick-start { width: 100%; }

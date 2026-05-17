@@ -27,6 +27,11 @@
             </option>
           </select>
         </label>
+        <ResultSourceBadge
+          v-if="campaignListSource.source !== 'live_backend'"
+          :source="campaignListSource.source"
+          :warning="campaignListSource.warning"
+        />
 
         <div class="scenario-grid">
           <button
@@ -71,6 +76,19 @@
         <button class="run-btn" @click="runSimulation" :disabled="loading">
           {{ loading ? $t('warRoom.simulating') : $t('warRoom.runSimulation') }}
         </button>
+        <div v-if="simulationWarning" class="backend-warning">
+          <strong>{{ $t('warRoom.backendWarningTitle') }}</strong>
+          <p>{{ simulationWarning }}</p>
+          <button
+            v-if="localFallbackAvailable"
+            class="local-fallback-btn"
+            type="button"
+            @click="runLocalEstimate"
+            :disabled="loading"
+          >
+            {{ $t('warRoom.runLocalEstimate') }}
+          </button>
+        </div>
       </div>
 
       <div class="competitor-panel">
@@ -104,6 +122,10 @@
 
     <section v-if="result" class="decision-console">
       <div>
+        <ResultSourceBadge
+          :source="result.source.type"
+          :warning="result.source.warning"
+        />
         <span class="section-label">{{ $t('warRoom.decisionConsole') }}</span>
         <h2>{{ result.decision.headline }}</h2>
         <p>{{ result.decision.rationale }}</p>
@@ -111,16 +133,48 @@
       <div class="decision-metrics">
         <div>
           <span>{{ $t('warRoom.confidence') }}</span>
-          <strong>{{ result.decision.confidence }}%</strong>
+          <strong>{{ formatPercentOrNA(result.decision.confidence) }}</strong>
         </div>
         <div>
           <span>{{ $t('warRoom.revenueUpside') }}</span>
-          <strong>{{ formatMoney(result.business.revenueUpside) }}</strong>
+          <strong>{{ formatMoneyOrNA(result.business.revenueUpside) }}</strong>
         </div>
         <div>
           <span>{{ $t('warRoom.crisisExposure') }}</span>
-          <strong>{{ formatMoney(result.business.crisisExposure) }}</strong>
+          <strong>{{ formatMoneyOrNA(result.business.crisisExposure) }}</strong>
         </div>
+      </div>
+    </section>
+
+    <section v-if="result" class="intelligence-grid">
+      <div class="intel-card">
+        <span class="section-label">{{ $t('warRoom.sentimentMovement') }}</span>
+        <div class="sentiment-list">
+          <div v-for="[brand, movement] in sentimentMovementRows" :key="brand">
+            <span>{{ brand }}</span>
+            <strong :class="movement >= 0 ? 'positive' : 'negative'">
+              {{ movement >= 0 ? '+' : '' }}{{ movement }}
+            </strong>
+          </div>
+        </div>
+      </div>
+      <div class="intel-card">
+        <span class="section-label">{{ $t('warRoom.affectedSegments') }}</span>
+        <ul>
+          <li v-for="segment in result.affected_segments" :key="segment">{{ segment }}</li>
+        </ul>
+      </div>
+      <div class="intel-card">
+        <span class="section-label">{{ $t('warRoom.amplificationChannels') }}</span>
+        <ul>
+          <li v-for="channel in result.amplification_channels" :key="channel">{{ channel }}</li>
+        </ul>
+      </div>
+      <div class="intel-card">
+        <span class="section-label">{{ $t('warRoom.keyDrivers') }}</span>
+        <ul>
+          <li v-for="driver in result.key_drivers" :key="driver">{{ driver }}</li>
+        </ul>
       </div>
     </section>
 
@@ -173,11 +227,14 @@
 
       <div class="playbook-section">
         <div class="section-label">{{ $t('warRoom.responsePlaybook') }}</div>
-        <div v-for="step in result.playbook" :key="step.round" class="playbook-item">
-          <span>R{{ step.round }}</span>
+        <div v-for="step in responsePlaybookRows" :key="step.stage || step.round" class="playbook-item">
+          <span>{{ step.stageLabel || `R${step.round}` }}</span>
           <div>
-            <strong>{{ step.move }}</strong>
+            <strong>{{ step.title || step.move }}</strong>
             <p>{{ step.reason }}</p>
+            <ul v-if="step.actions?.length" class="playbook-actions">
+              <li v-for="action in step.actions" :key="action">{{ action }}</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -203,6 +260,9 @@
         <span class="section-label">{{ $t('warRoom.immediateAction') }}</span>
         <h2>{{ result.recommendation.title }}</h2>
         <p>{{ result.recommendation.summary }}</p>
+        <p v-if="result.recommended_response" class="recommended-response">
+          {{ result.recommended_response }}
+        </p>
       </div>
       <ol>
         <li v-for="action in result.recommendation.actions" :key="action">{{ action }}</li>
@@ -215,7 +275,10 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ExportButton from '@/components/ExportButton.vue'
+import ResultSourceBadge from '@/components/ResultSourceBadge.vue'
 import { listCampaigns } from '@/api/campaign'
+import { runCompetitorSimulation } from '@/api/competitor'
+import { sourceModeFromValue, trackEvent } from '@/services/analytics'
 
 const { t } = useI18n()
 
@@ -275,9 +338,9 @@ const scenarios = [
     ],
   },
   {
-    id: 'creator_backlash',
-    nameKey: 'warRoom.creatorBacklash',
-    descriptionKey: 'warRoom.creatorBacklashDesc',
+    id: 'influencer_backlash',
+    nameKey: 'warRoom.influencerBacklash',
+    descriptionKey: 'warRoom.influencerBacklashDesc',
     baseRisk: 66,
     pressure: 1,
     ourBase: 30,
@@ -292,20 +355,88 @@ const scenarios = [
     ],
   },
   {
-    id: 'budget_war',
-    nameKey: 'warRoom.budgetWar',
-    descriptionKey: 'warRoom.budgetWarDesc',
-    baseRisk: 42,
-    pressure: 1.25,
-    ourBase: 27,
+    id: 'product_recall',
+    nameKey: 'warRoom.productRecall',
+    descriptionKey: 'warRoom.productRecallDesc',
+    baseRisk: 72,
+    pressure: 0.9,
+    ourBase: 31,
     events: [
-      { round: 2, nameKey: 'warRoom.eventMediaBlitz', impactKey: 'warRoom.eventMediaBlitzImpact', effects: { our: -3, competitor0: 4.6, risk: 3 } },
-      { round: 7, nameKey: 'warRoom.eventFatigue', impactKey: 'warRoom.eventFatigueImpact', effects: { our: 1.8, allCompetitors: -1.5, risk: 2 } },
+      { round: 2, nameKey: 'warRoom.eventRecall', impactKey: 'warRoom.eventRecallImpact', effects: { our: -7.5, competitor0: 3.8, risk: 18 } },
+      { round: 7, nameKey: 'warRoom.eventRecallRepair', impactKey: 'warRoom.eventRecallRepairImpact', effects: { our: 3.2, allCompetitors: -0.7, risk: -11 } },
     ],
     competitors: [
-      competitor('spend-cmp', 'High Spend Rival', 116, 68, 'warRoom.vulnerabilityEfficiency'),
-      competitor('retail-cmp', 'Retail Partner', 78, 54, 'warRoom.vulnerabilityMessage'),
-      competitor('niche-cmp', 'Niche Brand', 44, 50, 'warRoom.vulnerabilityDistribution'),
+      competitor('trusted', 'Trusted Incumbent', 88, 58, 'warRoom.vulnerabilityProof'),
+      competitor('value', 'Value Rival', 62, 72, 'warRoom.vulnerabilityTrust'),
+      competitor('private-label', 'Retail Private Label', 52, 48, 'warRoom.vulnerabilityDistribution'),
+    ],
+  },
+  {
+    id: 'regulatory_issue',
+    nameKey: 'warRoom.regulatoryIssue',
+    descriptionKey: 'warRoom.regulatoryIssueDesc',
+    baseRisk: 68,
+    pressure: 0.95,
+    ourBase: 32,
+    events: [
+      { round: 3, nameKey: 'warRoom.eventRegulatoryReview', impactKey: 'warRoom.eventRegulatoryReviewImpact', effects: { our: -5.4, competitor0: 2.4, risk: 14 } },
+      { round: 8, nameKey: 'warRoom.eventCompliantRelaunch', impactKey: 'warRoom.eventCompliantRelaunchImpact', effects: { our: 2.5, risk: -9 } },
+    ],
+    competitors: [
+      competitor('compliant', 'Compliant Incumbent', 86, 48, 'warRoom.vulnerabilitySpeed'),
+      competitor('fast', 'Fast Challenger', 64, 82, 'warRoom.vulnerabilityConsistency'),
+      competitor('expert', 'Niche Expert', 46, 42, 'warRoom.vulnerabilityAwareness'),
+    ],
+  },
+  {
+    id: 'esg_controversy',
+    nameKey: 'warRoom.esgControversy',
+    descriptionKey: 'warRoom.esgControversyDesc',
+    baseRisk: 70,
+    pressure: 1,
+    ourBase: 34,
+    events: [
+      { round: 3, nameKey: 'warRoom.eventEsgAllegation', impactKey: 'warRoom.eventEsgAllegationImpact', effects: { our: -6.4, competitor0: 2.9, risk: 17 } },
+      { round: 8, nameKey: 'warRoom.eventAuditCommitment', impactKey: 'warRoom.eventAuditCommitmentImpact', effects: { our: 2.9, risk: -8 } },
+    ],
+    competitors: [
+      competitor('ethical', 'Ethical Challenger', 66, 74, 'warRoom.vulnerabilityScale'),
+      competitor('mass', 'Mass Competitor', 92, 54, 'warRoom.vulnerabilityCulture'),
+      competitor('budget-sub', 'Budget Substitute', 48, 44, 'warRoom.vulnerabilityPremium'),
+    ],
+  },
+  {
+    id: 'fake_news',
+    nameKey: 'warRoom.fakeNews',
+    descriptionKey: 'warRoom.fakeNewsDesc',
+    baseRisk: 64,
+    pressure: 1.05,
+    ourBase: 30,
+    events: [
+      { round: 2, nameKey: 'warRoom.eventRumorSpike', impactKey: 'warRoom.eventRumorSpikeImpact', effects: { our: -5.8, competitor0: 2.3, risk: 15 } },
+      { round: 6, nameKey: 'warRoom.eventTrustedCorrection', impactKey: 'warRoom.eventTrustedCorrectionImpact', effects: { our: 3, risk: -10 } },
+    ],
+    competitors: [
+      competitor('opportunist', 'Opportunist Rival', 62, 78, 'warRoom.vulnerabilityReputation'),
+      competitor('trusted-leader', 'Trusted Leader', 88, 46, 'warRoom.vulnerabilityEfficiency'),
+      competitor('low-price', 'Low-price Alternative', 44, 52, 'warRoom.vulnerabilityReach'),
+    ],
+  },
+  {
+    id: 'competitor_launch',
+    nameKey: 'warRoom.competitorLaunch',
+    descriptionKey: 'warRoom.competitorLaunchDesc',
+    baseRisk: 45,
+    pressure: 1.2,
+    ourBase: 33,
+    events: [
+      { round: 2, nameKey: 'warRoom.eventCompetitorLaunch', impactKey: 'warRoom.eventCompetitorLaunchImpact', effects: { our: -3.8, competitor0: 5.4, risk: 5 } },
+      { round: 6, nameKey: 'warRoom.eventDifferentiatedResponse', impactKey: 'warRoom.eventDifferentiatedResponseImpact', effects: { our: 3.4, allCompetitors: -0.8, risk: -4 } },
+    ],
+    competitors: [
+      competitor('launch-rival', 'Launch Rival', 92, 78, 'warRoom.vulnerabilityEfficiency'),
+      competitor('category-leader', 'Category Leader', 100, 52, 'warRoom.vulnerabilityMessage'),
+      competitor('niche-challenger', 'Niche Challenger', 50, 58, 'warRoom.vulnerabilityDistribution'),
     ],
   },
 ]
@@ -326,10 +457,22 @@ const competitorIntensity = ref(70)
 const ourBudget = ref(80)
 const result = ref(null)
 const loading = ref(false)
+const campaignListSource = ref({ source: 'unknown', warning: '' })
+const simulationWarning = ref('')
+const localFallbackAvailable = ref(false)
 
 const activeScenarioData = computed(() => scenarios.find(s => s.id === activeScenario.value) || scenarios[0])
 const activeStrategyData = computed(() => strategies.find(s => s.id === selectedStrategy.value) || strategies[0])
 const selectedCampaign = computed(() => campaignOptions.value.find(c => c.id === selectedCampaignId.value) || campaignOptions.value[0])
+const sentimentMovementRows = computed(() => Object.entries(result.value?.expected_sentiment_movement || {}))
+const responsePlaybookRows = computed(() => {
+  const rows = result.value?.response_playbook?.length ? result.value.response_playbook : result.value?.playbook || []
+  return rows.map(step => ({
+    ...step,
+    stageLabel: step.stage ? t(`warRoom.${step.stage}`) : null,
+    reason: step.reason || (Array.isArray(step.actions) ? step.actions.join(' / ') : ''),
+  }))
+})
 
 const exportData = computed(() => ({
   slide_type: 'war_room',
@@ -361,9 +504,19 @@ async function loadCampaignOptions() {
         objective: item.objective || 'competitor_response',
       }))
       selectedCampaignId.value = campaignOptions.value[0].id
+      campaignListSource.value = { source: 'live_backend', warning: '' }
+      return
+    }
+    campaignListSource.value = {
+      source: 'demo_mode',
+      warning: t('warRoom.demoCampaignWarning'),
     }
   } catch (error) {
     campaignOptions.value = fallbackCampaigns()
+    campaignListSource.value = {
+      source: 'demo_mode',
+      warning: t('warRoom.demoCampaignWarning'),
+    }
   }
 }
 
@@ -379,8 +532,10 @@ function loadScenario(id) {
   activeScenario.value = id
   const scenario = scenarios.find(s => s.id === id) || scenarios[0]
   competitors.value = scenario.competitors.map(item => ({ ...item }))
-  competitorIntensity.value = id === 'budget_war' ? 82 : id === 'creator_backlash' ? 76 : 70
+  competitorIntensity.value = ['competitor_launch', 'fake_news'].includes(id) ? 82 : id === 'influencer_backlash' ? 76 : 70
   result.value = null
+  simulationWarning.value = ''
+  localFallbackAvailable.value = false
 }
 
 function scenarioName(id) {
@@ -391,10 +546,117 @@ function scenarioName(id) {
 async function runSimulation() {
   loading.value = true
   result.value = null
+  simulationWarning.value = ''
+  localFallbackAvailable.value = false
+  try {
+    const res = await runCompetitorSimulation(buildBackendPayload())
+    result.value = normalizeBackendResult(res.data || res)
+    trackEvent('war_room_scenario_run', {
+      scenario: activeScenario.value,
+      strategy: selectedStrategy.value,
+      source_mode: sourceModeFromValue(result.value?.source?.type),
+      backend_available: true,
+      competitor_count: competitors.value.length,
+    })
+  } catch (error) {
+    console.warn('Backend War Room simulation failed:', error.message)
+    simulationWarning.value = t('warRoom.backendSimulationFailed')
+    localFallbackAvailable.value = true
+    trackEvent('war_room_scenario_run', {
+      scenario: activeScenario.value,
+      strategy: selectedStrategy.value,
+      source_mode: 'unknown',
+      backend_available: false,
+      competitor_count: competitors.value.length,
+    })
+  } finally {
+    loading.value = false
+  }
+}
+
+function runLocalEstimate() {
+  loading.value = true
+  result.value = null
+  simulationWarning.value = t('warRoom.localEstimateWarning')
+  localFallbackAvailable.value = false
   setTimeout(() => {
     result.value = runWarGame()
+    trackEvent('war_room_scenario_run', {
+      scenario: activeScenario.value,
+      strategy: selectedStrategy.value,
+      source_mode: 'local_estimate',
+      backend_available: false,
+      competitor_count: competitors.value.length,
+    })
     loading.value = false
-  }, 450)
+  }, 250)
+}
+
+function buildBackendPayload() {
+  return {
+    scenario: activeScenario.value,
+    rounds,
+    response_strategy: selectedStrategy.value,
+    our_budget_index: ourBudget.value,
+    competitor_intensity: competitorIntensity.value,
+    campaign_name: selectedCampaign.value?.name || t('warRoom.ourBrand'),
+    campaign: selectedCampaign.value || null,
+  }
+}
+
+function normalizeBackendResult(data) {
+  const brands = data.brands || []
+  const ourBrand = selectedCampaign.value?.name || brands[0] || t('warRoom.ourBrand')
+  const ourShift = Number(data.share_shift?.[ourBrand] ?? data.share_shift?.[brands[0]] ?? 0)
+  const recommendation = backendRecommendation(data, ourBrand, ourShift)
+
+  return {
+    ...data,
+    source: data.source || {
+      type: 'live_backend',
+      warning: t('warRoom.backendDeterministicWarning'),
+    },
+    expected_sentiment_movement: data.expected_sentiment_movement || {},
+    affected_segments: data.affected_segments || [],
+    amplification_channels: data.amplification_channels || [],
+    key_drivers: data.key_drivers || [],
+    recommended_response: data.recommended_response || '',
+    response_playbook: data.response_playbook || [],
+    business: {
+      revenueUpside: null,
+      crisisExposure: null,
+      marketShareShift: roundToOne(ourShift),
+      projectedConversion: null,
+    },
+    decision: {
+      headline: recommendation.title,
+      rationale: recommendation.summary,
+      confidence: null,
+    },
+    recommendation,
+  }
+}
+
+function backendRecommendation(data, ourBrand, ourShift) {
+  if (data.recommended_response) {
+    return {
+      title: t('warRoom.backendRecommendedResponse'),
+      summary: data.recommended_response,
+      actions: data.response_playbook?.flatMap(step => step.actions || []).slice(0, 3) || [],
+    }
+  }
+  if (data.winner === ourBrand && ourShift > 0) {
+    return {
+      title: t('warRoom.recommendAttack'),
+      summary: t('warRoom.recommendAttackSummary'),
+      actions: [t('warRoom.actionIncreaseBudget'), t('warRoom.actionMonitorCompetitor')],
+    }
+  }
+  return {
+    title: t('warRoom.recommendPilot'),
+    summary: t('warRoom.recommendPilotSummary'),
+    actions: [t('warRoom.actionRetestMessage'), t('warRoom.actionPrepareCounter')],
+  }
 }
 
 function runWarGame() {
@@ -463,10 +725,78 @@ function runWarGame() {
     winner,
     key_events: eventRows,
     playbook,
+    response_playbook: localResponsePlaybook(strategy, scenario),
+    expected_sentiment_movement: localSentimentMovement(brands, shareShift, finalRisk),
+    affected_segments: localAffectedSegments(scenario),
+    amplification_channels: localAmplificationChannels(scenario),
+    key_drivers: localKeyDrivers(scenario, strategy),
+    recommended_response: localRecommendedResponse(winner === ourBrand, finalRisk),
     business,
+    source: {
+      type: 'local_estimate',
+      warning: t('warRoom.localEstimateWarning'),
+    },
     decision: decisionReadout(ourBrand, winner, ourShift, finalRisk, confidence, business),
     recommendation: recommendationReadout(ourBrand, winner, ourShift, finalRisk),
   }
+}
+
+function localResponsePlaybook(strategy, scenario) {
+  const middleMove = strategy.id === 'price_match' ? t('warRoom.playbookPrice') : t('warRoom.playbookProof')
+  const lateMove = scenario.id === 'influencer_backlash' ? t('warRoom.playbookCreatorRepair') : t('warRoom.playbookRetarget')
+  return [
+    { stage: 'first_2_hours', title: t('warRoom.playbookRound1'), actions: [t('warRoom.playbookRound1Reason')] },
+    { stage: 'first_24_hours', title: middleMove, actions: [t('warRoom.playbookMidReason'), lateMove] },
+    { stage: 'first_72_hours', title: t('warRoom.playbookScale'), actions: [t('warRoom.playbookScaleReason')] },
+  ]
+}
+
+function localSentimentMovement(brands, shareShift, risk) {
+  return Object.fromEntries(brands.map((brand, index) => {
+    const shift = shareShift[brand] || 0
+    const riskPenalty = index === 0 ? risk * 0.05 : 0
+    return [brand, roundToOne(shift * 1.6 - riskPenalty)]
+  }))
+}
+
+function localAffectedSegments(scenario) {
+  const map = {
+    price_war: ['Price-sensitive families', 'Retail shoppers', 'Value seekers'],
+    influencer_backlash: ['Gen Z creators', 'Trust-sensitive buyers', 'High-intent social shoppers'],
+    product_recall: ['Existing customers', 'Parents/families', 'Retail partners'],
+    regulatory_issue: ['Compliance-sensitive buyers', 'Enterprise customers', 'Trade media'],
+    esg_controversy: ['Purpose-led buyers', 'Urban professionals', 'Employees'],
+    fake_news: ['Low-trust audiences', 'Community group members', 'Older buyers'],
+    competitor_launch: ['Switchable buyers', 'Category explorers', 'Retail shoppers'],
+  }
+  return map[scenario.id] || ['Switchable buyers', 'High-intent audiences']
+}
+
+function localAmplificationChannels(scenario) {
+  const map = {
+    price_war: ['Facebook', 'TikTok', 'Retail media', 'LINE'],
+    influencer_backlash: ['TikTok', 'Instagram Reels', 'X/Twitter', 'Facebook groups'],
+    product_recall: ['Facebook groups', 'LINE communities', 'News sites', 'TikTok'],
+    regulatory_issue: ['News sites', 'LinkedIn', 'X/Twitter', 'Industry forums'],
+    esg_controversy: ['X/Twitter', 'LinkedIn', 'News sites', 'Facebook groups'],
+    fake_news: ['LINE', 'Facebook groups', 'TikTok', 'X/Twitter'],
+    competitor_launch: ['TikTok', 'YouTube', 'Retail media', 'Instagram'],
+  }
+  return map[scenario.id] || ['TikTok', 'Facebook', 'News sites']
+}
+
+function localKeyDrivers(scenario, strategy) {
+  return [
+    t(`warRoom.driver_${scenario.id}`),
+    t(`warRoom.driver_strategy_${strategy.id}`),
+    t('warRoom.driverChannelVelocity'),
+  ]
+}
+
+function localRecommendedResponse(isWinning, risk) {
+  if (risk >= 62) return t('warRoom.localRecommendedContain')
+  if (isWinning) return t('warRoom.localRecommendedScale')
+  return t('warRoom.localRecommendedPilot')
 }
 
 function initialShares(ourBrand, competitorRows, ourBase) {
@@ -572,6 +902,14 @@ function roundToOne(value) {
 
 function formatMoney(value) {
   return new Intl.NumberFormat('th-TH', { maximumFractionDigits: 0 }).format(value)
+}
+
+function formatMoneyOrNA(value) {
+  return value == null ? t('warRoom.notAvailable') : formatMoney(value)
+}
+
+function formatPercentOrNA(value) {
+  return value == null ? t('warRoom.notAvailable') : `${value}%`
 }
 
 function formatCurrency(value) {
@@ -833,6 +1171,39 @@ input[type="range"] {
   opacity: 0.55;
 }
 
+.backend-warning {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--yellow);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--yellow) 10%, transparent);
+}
+
+.backend-warning strong {
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+}
+
+.backend-warning p {
+  margin: var(--space-2) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.local-fallback-btn {
+  min-height: 38px;
+  margin-top: var(--space-3);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--yellow);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--yellow);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 900;
+}
+
 .competitor-list {
   display: grid;
   gap: var(--space-4);
@@ -927,6 +1298,53 @@ input[type="range"] {
   color: var(--text-primary);
   font-family: var(--font-mono);
   font-size: var(--text-lg);
+}
+
+.intelligence-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-6) 0;
+}
+
+.intel-card {
+  min-height: 180px;
+  padding: var(--space-5);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.intel-card ul,
+.playbook-actions {
+  margin: var(--space-3) 0 0;
+  padding-left: var(--space-5);
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+
+.sentiment-list {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.sentiment-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+}
+
+.sentiment-list strong.positive {
+  color: var(--green);
+}
+
+.sentiment-list strong.negative {
+  color: var(--red);
 }
 
 .chart-section {
@@ -1054,6 +1472,10 @@ input[type="range"] {
   line-height: 1.6;
 }
 
+.playbook-actions {
+  margin-top: var(--space-2);
+}
+
 .results-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -1123,11 +1545,17 @@ input[type="range"] {
   line-height: 1.8;
 }
 
+.recommended-response {
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
 @media (max-width: 980px) {
   .war-header,
   .command-grid,
   .decision-console,
   .war-grid,
+  .intelligence-grid,
   .recommendation {
     grid-template-columns: 1fr;
     flex-direction: column;

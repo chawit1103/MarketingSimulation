@@ -6,6 +6,9 @@ from datetime import datetime, timezone
 import uuid
 import hashlib
 import secrets
+import hmac
+
+from werkzeug.security import check_password_hash, generate_password_hash
 
 
 class UserRole(str, Enum):
@@ -35,18 +38,45 @@ class User(BaseModel):
 
     @staticmethod
     def hash_password(password: str) -> str:
-        """Hash password with SHA256 + salt."""
-        salt = secrets.token_hex(16)
-        return salt + ":" + hashlib.sha256((salt + password).encode()).hexdigest()
+        """Hash password with Werkzeug's adaptive password hasher."""
+        return generate_password_hash(password)
 
     @staticmethod
     def verify_password(password: str, password_hash: str) -> bool:
         """Verify password against stored hash."""
+        if User.is_legacy_password_hash(password_hash):
+            return User._verify_legacy_password(password, password_hash)
         try:
-            salt, h = password_hash.split(":", 1)
-            return h == hashlib.sha256((salt + password).encode()).hexdigest()
-        except (ValueError, AttributeError):
+            return check_password_hash(password_hash, password)
+        except (ValueError, AttributeError, TypeError):
             return False
+
+    @staticmethod
+    def is_legacy_password_hash(password_hash: str) -> bool:
+        """Return True for the historical salt:sha256 password format."""
+        if not isinstance(password_hash, str) or ":" not in password_hash:
+            return False
+        salt, digest = password_hash.split(":", 1)
+        return (
+            len(salt) == 32
+            and len(digest) == 64
+            and all(ch in "0123456789abcdef" for ch in salt.lower())
+            and all(ch in "0123456789abcdef" for ch in digest.lower())
+        )
+
+    @staticmethod
+    def _verify_legacy_password(password: str, password_hash: str) -> bool:
+        try:
+            salt, digest = password_hash.split(":", 1)
+            candidate = hashlib.sha256((salt + password).encode()).hexdigest()
+            return hmac.compare_digest(candidate, digest)
+        except (ValueError, AttributeError, TypeError):
+            return False
+
+    @staticmethod
+    def password_needs_rehash(password_hash: str) -> bool:
+        """Return True when a password hash should be upgraded after login."""
+        return User.is_legacy_password_hash(password_hash)
 
     @staticmethod
     def generate_api_key() -> tuple[str, str, str]:

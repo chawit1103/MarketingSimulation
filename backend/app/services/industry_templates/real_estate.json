@@ -1,0 +1,126 @@
+{
+  "id": "real_estate",
+  "name_th": "Real Estate",
+  "name_en": "Real Estate",
+  "description_th": "Deep preset for property launches, financing objections, location credibility, community concerns, and lead-quality strategy.",
+  "description_en": "Deep preset for property launches, financing objections, location credibility, community concerns, and lead-quality strategy.",
+  "icon": "P",
+  "color": "#8a6b2f",
+  "industry_depth": "deep_preset",
+  "objectives": ["message_testing", "brand_perception", "competitor_response", "crisis_simulation"],
+  "default_objective": "message_testing",
+  "default_platform": "both",
+  "default_max_rounds": 20,
+  "default_language": "th",
+  "campaign_duration": "8-16 weeks pre-sale, launch, and lead nurture window",
+  "budget_range": "THB 2M-20M test budget; replace with actual media, event, and lead-gen plan",
+  "primary_kpi": "Qualified lead intent, affordability objection rate, location trust, appointment intent",
+  "competitor_context": "Nearby developers, resale listings, price-per-square-meter comparisons, and mortgage incentive campaigns.",
+  "brand_constraints": "Avoid misleading location claims, unrealistic lifestyle promises, or unclear booking/refund terms.",
+  "risk_legal_notes": "Review advertising claims, EIA/community issues, booking contract terms, financing disclaimers, and PDPA consent for leads.",
+  "target_audience": {
+    "age_range": [24, 60],
+    "gender": "all",
+    "regions": ["bangkok", "central", "east", "north", "south"],
+    "channels": ["facebook", "instagram", "youtube", "line", "tiktok"],
+    "persona_count": 100
+  },
+  "persona_segments": [
+    {
+      "id": "home_buyers",
+      "name_th": "Home buyers",
+      "name_en": "Home buyers",
+      "count": 60,
+      "interests": ["location", "mortgage", "family lifestyle", "commute"],
+      "archetypes": [
+        {
+          "id": "first_home_couple",
+          "name_th": "First-home couple",
+          "name_en": "First-home couple",
+          "age_range": [27, 38],
+          "income": "middle",
+          "regions": ["bangkok", "central"],
+          "occupation_th": "Dual-income household",
+          "channels": ["facebook", "youtube", "line"],
+          "narrative_th": "Wants a first home but worries about mortgage approval, commute, and hidden fees.",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "family_upgrader",
+          "name_th": "Family upgrader",
+          "name_en": "Family upgrader",
+          "age_range": [35, 50],
+          "income": "upper_middle",
+          "regions": ["bangkok", "east", "central"],
+          "occupation_th": "Manager / business owner",
+          "channels": ["facebook", "line", "youtube"],
+          "narrative_th": "Evaluates space, school access, maintenance quality, and developer reputation.",
+          "purchase_style": "brand_loyal"
+        }
+      ]
+    },
+    {
+      "id": "skeptics_investors",
+      "name_th": "Skeptics and investors",
+      "name_en": "Skeptics and investors",
+      "count": 40,
+      "interests": ["resale value", "construction quality", "traffic", "community impact"],
+      "archetypes": [
+        {
+          "id": "roi_investor",
+          "name_th": "Yield-focused investor",
+          "name_en": "Yield-focused investor",
+          "age_range": [32, 58],
+          "income": "high",
+          "regions": ["bangkok", "central"],
+          "occupation_th": "Investor",
+          "channels": ["youtube", "facebook", "line"],
+          "narrative_th": "Compares price, rent potential, supply risk, and developer delivery history.",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "local_community_watch",
+          "name_th": "Local community watch",
+          "name_en": "Local community watch",
+          "age_range": [35, 60],
+          "income": "middle",
+          "regions": ["bangkok", "central", "east"],
+          "occupation_th": "Resident / local business",
+          "channels": ["facebook", "line"],
+          "narrative_th": "Worries about traffic, construction noise, flooding, and neighborhood impact.",
+          "purchase_style": "traditional"
+        }
+      ]
+    }
+  ],
+  "crisis_scenarios": [
+    {"id": "construction_delay", "name_th": "Construction delay", "name_en": "Construction delay", "trigger": "Buyers share concerns about delayed handover and unclear compensation.", "event_tag": "delay", "impact": "negative", "intensity": 8},
+    {"id": "community_traffic_backlash", "name_th": "Community traffic backlash", "name_en": "Community traffic backlash", "trigger": "Local residents post that the project will worsen traffic and flooding.", "event_tag": "community-impact", "impact": "negative", "intensity": 7},
+    {"id": "mortgage_support_launch", "name_th": "Mortgage support launch", "name_en": "Mortgage support launch", "trigger": "The developer launches a mortgage support message with careful affordability disclaimers.", "event_tag": "mortgage-support", "impact": "mixed", "intensity": 5}
+  ],
+  "document_seeds": [
+    {
+      "id": "property_launch_brief",
+      "name_th": "Property launch brief",
+      "name_en": "Property launch brief",
+      "description_th": "Starter brief for a property launch or pre-sale campaign.",
+      "description_en": "Starter brief for a property launch or pre-sale campaign.",
+      "content": "# Property Launch Brief\n\nProject: [project]\nObjective: generate qualified leads and reduce financing/location objections.\nAudience: first-home couples, family upgraders, investors, and local community stakeholders.\nProof: location facts, construction milestones, financing assumptions, legal terms.\nRisks: affordability concerns, location skepticism, delays, community backlash.\nValidation: legal review, lead consent review, objection test by segment, sales team readiness."
+    }
+  ],
+  "deep_preset": {
+    "target_segment_archetypes": ["First-home couple", "Family upgrader", "Yield-focused investor", "Local community watch"],
+    "common_objections": ["Mortgage may not be approved", "Location claim feels exaggerated", "Traffic or flooding risk", "Construction quality and delay concerns"],
+    "crisis_triggers": ["Delayed handover story", "Community impact complaint", "Misleading location distance claim", "Unclear booking/refund terms"],
+    "typical_kpis": ["Qualified lead intent", "Appointment intent", "Affordability objection rate", "Location credibility", "Community risk"],
+    "channel_behavior": ["Facebook and LINE carry buyer questions and resident concerns", "YouTube supports long-form project proof", "Instagram shows lifestyle but needs factual backing", "TikTok can surface construction concerns quickly"],
+    "competitor_archetypes": ["Nearby lower-price developer", "Premium developer with stronger brand trust", "Resale alternative", "Mortgage-incentive campaign"],
+    "legal_regulatory_sensitivities": ["Location and distance claims", "EIA/community issues", "Booking/refund terms", "PDPA lead consent", "Financing disclaimers"],
+    "proof_point_requirements": ["Verified location claims", "Construction timeline evidence", "Transparent fees", "Financing assumptions and limitations"],
+    "sample_brief": "Launch a new property project with clear affordability proof, verified location facts, and community-impact guardrails.",
+    "sample_risk_checklist": ["Are map claims accurate?", "Are fees and booking terms clear?", "Is construction evidence current?", "Are lead forms PDPA-compliant?"],
+    "sample_action_plan_hints": ["Separate buyer and community messages", "Add mortgage qualification caveats", "Use construction proof content", "Prepare traffic and flooding FAQ"],
+    "assumptions": ["This preset models communication risk and lead intent, not property valuation.", "Actual financing and legal details must be supplied by the project team."],
+    "limitations": ["Does not provide investment advice or guaranteed sales forecasts.", "Does not replace legal, EIA, or sales contract review."]
+  }
+}
