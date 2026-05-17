@@ -44,12 +44,15 @@ Outputs remain decision-support estimates, not guaranteed predictions.
 - [ ] Set `APP_ENV=production`.
 - [ ] Set `FLASK_ENV=production`.
 - [ ] Set `FLASK_DEBUG=false`.
+- [ ] Set `REQUEST_BODY_LOGGING_ENABLED=false`.
 - [ ] Disable browser/debug analytics unless explicitly approved.
 - [ ] Confirm raw exception strings and tracebacks are not returned to users.
 
 ## CORS Restricted Origins
 
 - [ ] Configure exact allowed HTTPS origins through environment variables.
+- [ ] Set `CORS_ALLOWED_ORIGINS` to the approved frontend origin.
+- [ ] Set `CONTENT_SECURITY_POLICY` and restrict `connect-src` to `'self'` plus the approved pilot API origin.
 - [ ] Do not use wildcard CORS origins for any hosted pilot.
 - [ ] Confirm preflight responses only allow the pilot frontend origin.
 - [ ] Confirm cookies/tokens are not accepted from unapproved origins.
@@ -58,7 +61,9 @@ Outputs remain decision-support estimates, not guaranteed predictions.
 
 - [ ] Add edge, API gateway, WAF, reverse proxy, or shared-store rate limiting before exposing the pilot to users.
 - [ ] Keep app-level in-memory rate limiting enabled as a secondary local safeguard.
-- [ ] Apply stricter limits to auth, settings, status, simulation, decision, export, and demo-heavy endpoints.
+- [ ] Set `RATE_LIMIT_ENABLED=true` and configure `RATE_LIMIT_WINDOW_SECONDS`.
+- [ ] Configure supported app-level limits: `RATE_LIMIT_AUTH_PER_WINDOW`, `RATE_LIMIT_DEMO_PER_WINDOW`, `RATE_LIMIT_STATUS_PER_WINDOW`, `RATE_LIMIT_DECISION_PER_WINDOW`, and `RATE_LIMIT_SIMULATION_PER_WINDOW`.
+- [ ] Apply stricter limits to auth, settings, status, simulation, decision, and demo-heavy endpoints.
 - [ ] Trust `X-Forwarded-For` only from configured trusted proxies.
 - [ ] Document the rate-limit owner and where limits are configured.
 
@@ -121,4 +126,3 @@ Invite pilot users only when all items below are true:
 - [ ] Customer data rules are accepted.
 
 If any item is incomplete, keep the pilot local or internal-only.
-
