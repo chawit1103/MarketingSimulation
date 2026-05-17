@@ -45,9 +45,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tracked_env_files="$(git ls-files '.env*' | grep -vE '^\.env(\.example|\.dev\.example)$' || true)"
+          tracked_env_files="$(git ls-files '.env*' | grep -vE '^\.env(\.example|\.dev\.example|\.production\.example)$' || true)"
           if [ -n "$tracked_env_files" ]; then
-            echo "::error::Tracked local environment file(s) detected. Keep only .env.example and .env.dev.example in Git."
+            echo "::error::Tracked local environment file(s) detected. Keep only .env.example, .env.dev.example, and .env.production.example in Git."
             echo "$tracked_env_files"
             exit 1
           fi
@@ -63,6 +63,7 @@ jobs:
           if git grep -nE "$pattern" -- \
             ':!.env.example' \
             ':!.env.dev.example' \
+            ':!.env.production.example' \
             ':!frontend/package-lock.json'
           then
             echo "::error::Potential committed secret found. Replace it with a placeholder or move it to GitHub Secrets."
