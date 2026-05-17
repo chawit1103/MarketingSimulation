@@ -70,6 +70,10 @@ def test_strategy_pack_source_audit_metadata_is_categorical_only():
         "source_mode": "backend_verified",
         "data_basis": "real_simulation",
     }) == {"source_mode": "backend_verified", "data_basis": "real_simulation"}
+    assert _safe_source_metadata({
+        "source_mode": "live_backend",
+        "data_basis": "backend_generated",
+    }) == {"source_mode": "live_backend", "data_basis": "backend_generated"}
 
 
 def test_audit_log_service_writes_org_scoped_jsonl_without_raw_content(tmp_path):
