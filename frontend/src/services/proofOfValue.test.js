@@ -51,6 +51,18 @@ function expectBlockedAndRedacted(fieldKey, payloadKey, unsafeValue, expectedRea
   expect(payloadJson).not.toContain(unsafeValue)
 }
 
+function expectReadyWith(fieldKey, safeValue) {
+  const intake = approvedIntake()
+  intake[fieldKey] = safeValue
+
+  const validation = validateProofOfValueIntake(intake)
+  const pack = buildProofOfValuePackage(intake)
+
+  expect(validation.ready).toBe(true)
+  expect(validation.unsafeSignals).toEqual([])
+  expect(pack.status).toBe('ready_for_operator_review')
+}
+
 describe('proof-of-value intake workflow', () => {
   it('builds a ready package from approved business context', () => {
     const intake = approvedIntake()
@@ -85,12 +97,25 @@ describe('proof-of-value intake workflow', () => {
   })
 
   it('flags and redacts phone-like values', () => {
-    expectBlockedAndRedacted(
-      'targetSegment',
-      'target_segment',
-      'Pilot decision maker phone +1 555 010 0199',
-      'Phone-like',
-    )
+    const phoneExamples = [
+      '+66 81 234 5678',
+      '081-234-5678',
+      '(02) 123 4567',
+      'phone: 0812345678',
+    ]
+
+    for (const phone of phoneExamples) {
+      expectBlockedAndRedacted(
+        'targetSegment',
+        'target_segment',
+        `Pilot decision maker ${phone}`,
+        'Phone-like',
+      )
+    }
+  })
+
+  it('does not flag ISO dates or normal date ranges as phone-like values', () => {
+    expectReadyWith('marketContext', 'Launch runs 2026-06-01 to 2026-08-31')
   })
 
   it('flags and redacts SSN or national-ID-like values', () => {
@@ -109,6 +134,24 @@ describe('proof-of-value intake workflow', () => {
       'Compare against customer id CUST-PLACEHOLDER-1234567890',
       'Long account',
     )
+  })
+
+  it('does not flag safe marketing prose containing contact language', () => {
+    expectReadyWith('marketContext', 'Audience prefers in-store contact during launch')
+    expectReadyWith('channelPlan', 'Contact strategy uses LINE and retail staff training')
+  })
+
+  it('flags and redacts labeled contact identifiers', () => {
+    const contactExamples = [
+      ['targetSegment', 'target_segment', 'phone: 0812345678'],
+      ['riskConcerns', 'risk_concerns', 'mobile: +66 81 234 5678'],
+      ['channelPlan', 'channel_plan', 'line id: customer_abc123'],
+      ['competitorContext', 'competitor_context', 'contact #: CUST123456789'],
+    ]
+
+    for (const [fieldKey, payloadKey, value] of contactExamples) {
+      expectBlockedAndRedacted(fieldKey, payloadKey, value, 'Personal contact')
+    }
   })
 
   it('flags and redacts sk-style placeholder tokens', () => {

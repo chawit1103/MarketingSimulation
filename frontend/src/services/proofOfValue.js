@@ -31,7 +31,7 @@ const unsafePatterns = [
   },
   {
     reason: 'Phone-like personal contact numbers must be removed.',
-    pattern: /\b(?:\+?\d{1,3}[\s.-])?(?:\(?\d{2,4}\)?[\s.-]){2,3}\d{2,4}\b/,
+    pattern: /\b(?:phone|mobile|tel)\s*:\s*\+?\d[\d\s().-]{7,}\d\b|\+\d{1,3}\s+\d{1,4}\s+\d{3}\s+\d{4}\b|\b0\d{1,2}-\d{3}-\d{4}\b|\(\d{2,4}\)\s*\d{3}\s+\d{4}\b/i,
   },
   {
     reason: 'National ID, SSN, passport, or tax identifier-like text must be removed.',
@@ -43,7 +43,7 @@ const unsafePatterns = [
   },
   {
     reason: 'Personal contact identifier patterns must be removed.',
-    pattern: /\b(?:contact|phone|mobile|tel|line id|wechat|whatsapp)\s*[:#-]?\s*[+@A-Z0-9._ -]{4,}\b/i,
+    pattern: /\b(?:contact|phone|mobile|tel|line id|wechat|whatsapp)\s*(?:#\s*:|:|#)\s*[+@A-Z0-9][+@A-Z0-9._ -]{3,}\b/i,
   },
   {
     reason: 'Raw CRM, contact, or customer-list language must be removed.',
