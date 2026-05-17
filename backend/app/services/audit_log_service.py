@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import uuid
 from datetime import datetime, timezone
 from typing import Any
@@ -32,6 +33,18 @@ AUDIT_EVENT_TYPES = {
     "settings_updated",
 }
 
+_ORG_ID_PATTERN = re.compile(r"^[A-Za-z0-9_-]+$")
+
+
+def _safe_org_id(org_id: str) -> str:
+    """Validate org IDs before using them in audit filesystem paths."""
+    value = str(org_id or "").strip()
+    if not value or ".." in value or os.sep in value or (os.altsep and os.altsep in value):
+        raise ValueError("Invalid org_id for audit path")
+    if not _ORG_ID_PATTERN.fullmatch(value):
+        raise ValueError("Invalid org_id for audit path")
+    return value
+
 
 class AuditLogService:
     """Append-only audit event writer using per-organization JSONL files."""
@@ -40,7 +53,8 @@ class AuditLogService:
         self.base_dir = upload_folder or Config.UPLOAD_FOLDER
 
     def _audit_dir(self, org_id: str) -> str:
-        path = os.path.join(self.base_dir, "organizations", str(org_id), "audit")
+        safe_org_id = _safe_org_id(org_id)
+        path = os.path.join(self.base_dir, "organizations", safe_org_id, "audit")
         os.makedirs(path, exist_ok=True)
         return path
 
@@ -59,13 +73,12 @@ class AuditLogService:
     ) -> dict[str, Any]:
         if event_type not in AUDIT_EVENT_TYPES:
             raise ValueError(f"Unsupported audit event type: {event_type}")
-        if not org_id:
-            raise ValueError("org_id is required for audit events")
+        safe_org_id = _safe_org_id(org_id)
 
         event = {
             "event_id": f"audit_{uuid.uuid4().hex[:12]}",
             "event_type": event_type,
-            "org_id": str(org_id),
+            "org_id": safe_org_id,
             "actor_user_id": str(actor_user_id or "") or None,
             "resource_type": resource_type,
             "resource_id": str(resource_id or "") or None,
@@ -74,7 +87,7 @@ class AuditLogService:
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
 
-        path = self.audit_log_path(org_id)
+        path = self.audit_log_path(safe_org_id)
         with open(path, "a", encoding="utf-8") as handle:
             handle.write(json.dumps(event, ensure_ascii=False, sort_keys=True) + "\n")
         return event
