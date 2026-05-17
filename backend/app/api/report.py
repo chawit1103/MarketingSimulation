@@ -13,6 +13,7 @@ from ..config import Config
 from ..services.report_agent import ReportAgent, ReportManager, ReportStatus
 from ..services.simulation_manager import SimulationManager
 from ..services.audit_log_service import record_audit_event
+from ..models.settings import Language
 from ..models.project import ProjectManager
 from ..models.task import TaskManager, TaskStatus
 from ..services.graph_tools import GraphToolsService
@@ -28,11 +29,28 @@ def _safe_report_campaign_id(value) -> str:
     return safe_generated_campaign_id(value)
 
 
+_SUPPORTED_REPORT_LANGUAGES = {language.value for language in Language}
+
+
+def _safe_report_language(value) -> str:
+    """Keep only supported language codes in report audit metadata."""
+    language = str(value or "").strip()
+    if not language or len(language) > 16:
+        return "unknown"
+    if any(char.isspace() for char in language) or "/" in language or "\\" in language or "@" in language:
+        return "unknown"
+
+    canonical = {item.lower(): item for item in _SUPPORTED_REPORT_LANGUAGES}
+    return canonical.get(language.lower(), "unknown")
+
+
 def _report_audit_metadata(simulation_id, campaign_id, **extra):
     metadata = {
         "simulation_id": simulation_id,
         "campaign_id": _safe_report_campaign_id(campaign_id),
     }
+    if "language" in extra:
+        extra["language"] = _safe_report_language(extra.get("language"))
     metadata.update(extra)
     return metadata
 
@@ -151,7 +169,7 @@ def generate_report():
                 simulation_id,
                 state.campaign_id,
                 force_regenerate=bool(force_regenerate),
-                language=language,
+                language=data.get("language"),
             ),
         )
 

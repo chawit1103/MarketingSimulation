@@ -12,7 +12,7 @@ if str(BACKEND_DIR) not in sys.path:
 from app import create_app  # noqa: E402
 from app.api.calibration import _safe_calibration_campaign_id  # noqa: E402
 from app.api.export import _safe_export_type, _safe_source_metadata  # noqa: E402
-from app.api.report import _report_audit_metadata, _safe_report_campaign_id  # noqa: E402
+from app.api.report import _report_audit_metadata, _safe_report_campaign_id, _safe_report_language  # noqa: E402
 from app.config import Config  # noqa: E402
 from app.models.settings import SettingsManager  # noqa: E402
 from app.models.user import UserRole  # noqa: E402
@@ -107,6 +107,46 @@ def test_safe_calibration_campaign_id_allows_only_generated_ids(campaign_id, exp
 )
 def test_safe_report_campaign_id_reuses_generated_id_rules(campaign_id, expected):
     assert _safe_report_campaign_id(campaign_id) == expected
+
+
+@pytest.mark.parametrize(
+    ("language", "expected"),
+    [
+        ("en", "en"),
+        ("th", "th"),
+        ("zh-CN", "zh-CN"),
+        ("Customer Alpha Launch", "unknown"),
+        ("client-campaign@example.com", "unknown"),
+        ("../customer-alpha/report", "unknown"),
+        ("Brief for a confidential customer launch " * 8, "unknown"),
+        (None, "unknown"),
+    ],
+)
+def test_safe_report_language_allows_only_supported_codes(language, expected):
+    assert _safe_report_language(language) == expected
+
+
+def test_report_generation_audit_metadata_normalizes_language(tmp_path):
+    service = AuditLogService(upload_folder=str(tmp_path))
+    unsafe_language = "Customer Alpha Launch"
+
+    safe = _report_audit_metadata("sim_safe", "cmp_a1b2c3d4e5f6", language="th")
+    unsafe = _report_audit_metadata("sim_safe", "cmp_a1b2c3d4e5f6", language=unsafe_language)
+    missing = _report_audit_metadata("sim_safe", "cmp_a1b2c3d4e5f6", language=None)
+
+    service.record_event(
+        org_id="org_a",
+        event_type="report_generation_started",
+        resource_type="report",
+        resource_id="report_safe_language",
+        metadata=unsafe,
+    )
+    audit_jsonl = Path(service.audit_log_path("org_a")).read_text(encoding="utf-8")
+
+    assert safe["language"] == "th"
+    assert unsafe["language"] == "unknown"
+    assert missing["language"] == "unknown"
+    assert unsafe_language not in audit_jsonl
 
 
 @pytest.mark.parametrize(
@@ -257,11 +297,12 @@ def audit_api_context(tmp_path, monkeypatch):
         "analyst": {"Authorization": f"Bearer {auth.create_token(analyst)}"},
     }
 
-    yield app.test_client(), headers, org, str(tmp_path)
-
-    SettingsManager.invalidate()
-    campaign_api._campaign_service = None
-    campaign_api._pipeline_orchestrator = None
+    try:
+        yield app.test_client(), headers, org, str(tmp_path)
+    finally:
+        SettingsManager.invalidate()
+        campaign_api._campaign_service = None
+        campaign_api._pipeline_orchestrator = None
 
 
 def test_login_campaign_and_settings_routes_create_safe_audit_events(audit_api_context):
