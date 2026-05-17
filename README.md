@@ -85,6 +85,10 @@ For demo, release validation, known limitations, and recommended next actions, s
 - [docs/SALES_FAQ.md](docs/SALES_FAQ.md)
 - [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md)
 - [docs/DEMO_DATA.md](docs/DEMO_DATA.md)
+- [docs/SALES_DEMO_WALKTHROUGH.md](docs/SALES_DEMO_WALKTHROUGH.md)
+- [docs/SAMPLE_STRATEGY_PACK_EXPORTS.md](docs/SAMPLE_STRATEGY_PACK_EXPORTS.md)
+- [docs/SAMPLE_DEMO_BRIEFS.md](docs/SAMPLE_DEMO_BRIEFS.md)
+- [docs/DEMO_ARTIFACT_CHECKLIST.md](docs/DEMO_ARTIFACT_CHECKLIST.md)
 - [docs/FAQ.md](docs/FAQ.md)
 - [docs/ANALYTICS.md](docs/ANALYTICS.md)
 - [docs/SCREENSHOT_GUIDE.md](docs/SCREENSHOT_GUIDE.md)
@@ -135,6 +139,10 @@ Recommended customer-pilot docs:
 - [Pilot Onboarding Guide](docs/PILOT_ONBOARDING_GUIDE.md)
 - [Pilot Exit Checklist](docs/PILOT_EXIT_CHECKLIST.md)
 - [Sales FAQ](docs/SALES_FAQ.md)
+- [Sales Demo Walkthrough](docs/SALES_DEMO_WALKTHROUGH.md)
+- [Sample Strategy Pack Exports](docs/SAMPLE_STRATEGY_PACK_EXPORTS.md)
+- [Sample Demo Briefs](docs/SAMPLE_DEMO_BRIEFS.md)
+- [Demo Artifact Checklist](docs/DEMO_ARTIFACT_CHECKLIST.md)
 
 ---
 
