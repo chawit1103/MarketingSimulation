@@ -14,11 +14,30 @@ logger = get_logger("mirofish.api.export")
 
 export_bp = Blueprint("export", __name__)
 
+_ALLOWED_EXPORT_TYPES = {
+    "dashboard",
+    "strategy_pack",
+    "report",
+    "generic",
+    "comparison",
+    "war_room",
+    "budget_scenario",
+    "calibration",
+}
+
 
 def _safe_pptx_filename(value: str | None, fallback: str) -> str:
     base = re.sub(r"[^A-Za-z0-9._-]+", "_", str(value or fallback)).strip("._-")
     base = base or fallback
     return base if base.lower().endswith(".pptx") else f"{base}.pptx"
+
+
+def _safe_export_type(value: object, fallback: str = "generic") -> str:
+    """Return a categorical export type safe for audit metadata."""
+    normalized = re.sub(r"[^a-z0-9_]+", "_", str(value or fallback).strip().lower()).strip("_")
+    if normalized in _ALLOWED_EXPORT_TYPES:
+        return normalized
+    return "unknown"
 
 
 def _get_org_id() -> str | None:
@@ -35,7 +54,7 @@ def _audit_export(format_name: str, export_type: str, metadata: dict | None = No
         resource_type="export",
         metadata={
             "format": format_name,
-            "export_type": export_type,
+            "export_type": _safe_export_type(export_type),
             **(metadata or {}),
         },
     )
@@ -130,7 +149,7 @@ def export_pptx():
     filename = data.get("filename", "msaas_report")
     if not filename.endswith(".pptx"):
         filename += ".pptx"
-    _audit_export("pptx", str(data.get("slide_type") or "generic"))
+    _audit_export("pptx", _safe_export_type(data.get("slide_type"), "generic"))
 
     return send_file(
         buffer,
