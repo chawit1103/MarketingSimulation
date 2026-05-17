@@ -17,9 +17,24 @@ from ..models.project import ProjectManager
 from ..models.task import TaskManager, TaskStatus
 from ..services.graph_tools import GraphToolsService
 from ..authz import ADMIN_ROLES, ANALYST_ROLES, role_required
+from ..utils.audit_ids import safe_generated_campaign_id
 from ..utils.logger import get_logger
 
 logger = get_logger('mirofish.api.report')
+
+
+def _safe_report_campaign_id(value) -> str:
+    """Keep only generated campaign IDs in report audit metadata."""
+    return safe_generated_campaign_id(value)
+
+
+def _report_audit_metadata(simulation_id, campaign_id, **extra):
+    metadata = {
+        "simulation_id": simulation_id,
+        "campaign_id": _safe_report_campaign_id(campaign_id),
+    }
+    metadata.update(extra)
+    return metadata
 
 
 def _get_org_id() -> str:
@@ -132,12 +147,12 @@ def generate_report():
             event_type="report_generation_started",
             resource_type="report",
             resource_id=report_id,
-            metadata={
-                "simulation_id": simulation_id,
-                "campaign_id": state.campaign_id,
-                "force_regenerate": bool(force_regenerate),
-                "language": language,
-            },
+            metadata=_report_audit_metadata(
+                simulation_id,
+                state.campaign_id,
+                force_regenerate=bool(force_regenerate),
+                language=language,
+            ),
         )
 
         return jsonify({"success": True, "data": {
@@ -249,11 +264,11 @@ def download_report(report_id: str):
             event_type="report_downloaded",
             resource_type="report",
             resource_id=report_id,
-            metadata={
-                "simulation_id": report.simulation_id,
-                "campaign_id": report.campaign_id,
-                "format": "markdown",
-            },
+            metadata=_report_audit_metadata(
+                report.simulation_id,
+                report.campaign_id,
+                format="markdown",
+            ),
         )
 
         md_path = ReportManager._get_report_markdown_path(report_id)

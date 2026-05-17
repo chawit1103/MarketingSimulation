@@ -2,20 +2,18 @@
 
 from __future__ import annotations
 
-import re
-
 from flask import Blueprint, g, jsonify, request
 
 from ..authz import ANALYST_ROLES, ANY_AUTHENTICATED_ROLES, role_required
 from ..services.audit_log_service import record_audit_event
 from ..services.calibration_service import CalibrationService, CalibrationValidationError
+from ..utils.audit_ids import safe_generated_campaign_id
 from ..utils.logger import get_logger
 
 
 logger = get_logger("mirofish.api.calibration")
 calibration_bp = Blueprint("calibration", __name__)
 calibration_service = CalibrationService()
-_SAFE_GENERATED_CAMPAIGN_ID = re.compile(r"^cmp_[0-9a-f]{12}$")
 
 
 def _current_org_id() -> str:
@@ -44,19 +42,7 @@ def _payload_from_request():
 
 def _safe_calibration_campaign_id(value) -> str:
     """Keep only generated campaign IDs in audit metadata."""
-    campaign_id = str(value or "").strip()
-    if not campaign_id or len(campaign_id) > 64:
-        return "unknown"
-    if (
-        any(char.isspace() for char in campaign_id)
-        or "/" in campaign_id
-        or "\\" in campaign_id
-        or "@" in campaign_id
-    ):
-        return "unknown"
-    if _SAFE_GENERATED_CAMPAIGN_ID.fullmatch(campaign_id):
-        return campaign_id
-    return "unknown"
+    return safe_generated_campaign_id(value)
 
 
 @calibration_bp.route("/actual-results", methods=["POST"])

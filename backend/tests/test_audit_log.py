@@ -12,6 +12,7 @@ if str(BACKEND_DIR) not in sys.path:
 from app import create_app  # noqa: E402
 from app.api.calibration import _safe_calibration_campaign_id  # noqa: E402
 from app.api.export import _safe_export_type, _safe_source_metadata  # noqa: E402
+from app.api.report import _report_audit_metadata, _safe_report_campaign_id  # noqa: E402
 from app.config import Config  # noqa: E402
 from app.models.settings import SettingsManager  # noqa: E402
 from app.models.user import UserRole  # noqa: E402
@@ -90,6 +91,77 @@ def test_strategy_pack_source_audit_metadata_is_categorical_only():
 )
 def test_safe_calibration_campaign_id_allows_only_generated_ids(campaign_id, expected):
     assert _safe_calibration_campaign_id(campaign_id) == expected
+
+
+@pytest.mark.parametrize(
+    ("campaign_id", "expected"),
+    [
+        ("cmp_a1b2c3d4e5f6", "cmp_a1b2c3d4e5f6"),
+        ("Customer Alpha Launch", "unknown"),
+        ("client-campaign@example.com", "unknown"),
+        ("organizations/acme/audit", "unknown"),
+        ("Brief for a confidential customer launch " * 8, "unknown"),
+        ("cmp_a1b2c3/4e5f6", "unknown"),
+        ("cmp_a1b2c3 4e5f6", "unknown"),
+    ],
+)
+def test_safe_report_campaign_id_reuses_generated_id_rules(campaign_id, expected):
+    assert _safe_report_campaign_id(campaign_id) == expected
+
+
+@pytest.mark.parametrize(
+    "unsafe_campaign_id",
+    [
+        "Customer Alpha Launch",
+        "client-campaign@example.com",
+        "organizations/acme/audit",
+        "../customer-alpha/report",
+        "Brief for a confidential customer launch " * 8,
+    ],
+)
+def test_report_audit_events_replace_unsafe_campaign_ids(tmp_path, unsafe_campaign_id):
+    service = AuditLogService(upload_folder=str(tmp_path))
+
+    for event_type in ("report_generation_started", "report_downloaded"):
+        service.record_event(
+            org_id="org_a",
+            event_type=event_type,
+            resource_type="report",
+            resource_id=f"report_{event_type}",
+            metadata=_report_audit_metadata(
+                "sim_safe",
+                unsafe_campaign_id,
+                format="markdown" if event_type == "report_downloaded" else None,
+            ),
+        )
+
+    events = service.list_events("org_a")
+    report_events = [event for event in events if event["event_type"].startswith("report_")]
+    audit_jsonl = Path(service.audit_log_path("org_a")).read_text(encoding="utf-8")
+
+    assert len(report_events) == 2
+    assert {event["metadata"]["campaign_id"] for event in report_events} == {"unknown"}
+    assert unsafe_campaign_id not in audit_jsonl
+
+
+def test_report_audit_events_preserve_safe_generated_campaign_ids(tmp_path):
+    service = AuditLogService(upload_folder=str(tmp_path))
+    safe_campaign_id = "cmp_a1b2c3d4e5f6"
+
+    for event_type in ("report_generation_started", "report_downloaded"):
+        service.record_event(
+            org_id="org_a",
+            event_type=event_type,
+            resource_type="report",
+            resource_id=f"report_{event_type}",
+            metadata=_report_audit_metadata("sim_safe", safe_campaign_id),
+        )
+
+    events = service.list_events("org_a")
+    report_events = [event for event in events if event["event_type"].startswith("report_")]
+
+    assert len(report_events) == 2
+    assert {event["metadata"]["campaign_id"] for event in report_events} == {safe_campaign_id}
 
 
 def test_audit_log_service_writes_org_scoped_jsonl_without_raw_content(tmp_path):
