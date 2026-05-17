@@ -44,6 +44,7 @@ Keep the payload and outputs within the agreed pilot storage and retention bound
 | Risk watchouts | Risk drivers, crisis watchouts, mitigation notes | In-app summary or Strategy Pack slide |
 | Revised Brief v2 | Revised objective, target segment, message, proof points, risk guardrails, validation plan | Markdown section or report excerpt |
 | Strategy Pack PPTX | Executive summary, decision gate, segment reactions, risks, action plan, limitations | PPTX export |
+| Optional Actual vs Estimate comparison | Include only when approved aggregate actuals were provided; use aggregate-only values and frame the comparison as directional/diagnostic, not guaranteed prediction or exact ROI/ROAS | Summary table or short diagnostic section |
 | Recommended validation step | What the customer should validate next through research, media, analytics, or post-campaign measurement | Final section or closing slide |
 
 ## Include In Customer Delivery
