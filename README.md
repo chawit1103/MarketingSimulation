@@ -146,6 +146,7 @@ Recommended customer-pilot docs:
 - [Proof-of-Value Deliverables](docs/PROOF_OF_VALUE_DELIVERABLES.md)
 - [Proof-of-Value Output Package](docs/PROOF_OF_VALUE_OUTPUT_PACKAGE.md)
 - [Proof-of-Value Operator Checklist](docs/PROOF_OF_VALUE_OPERATOR_CHECKLIST.md)
+- [Sample Proof-of-Value Package](docs/SAMPLE_PROOF_OF_VALUE_PACKAGE.md)
 - [Proof-of-Value Session Script](docs/PROOF_OF_VALUE_SESSION_SCRIPT.md)
 - [Pilot Discovery Questions](docs/PILOT_DISCOVERY_QUESTIONS.md)
 - [Pilot Success Criteria](docs/PILOT_SUCCESS_CRITERIA.md)
