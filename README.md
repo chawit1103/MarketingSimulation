@@ -135,6 +135,10 @@ Recommended customer-pilot docs:
 
 - [Customer Pilot Playbook](docs/CUSTOMER_PILOT_PLAYBOOK.md)
 - [Customer Data Handling](docs/CUSTOMER_DATA_HANDLING.md)
+- [Customer Proof-of-Value Flow](docs/CUSTOMER_PROOF_OF_VALUE_FLOW.md)
+- [Customer Brief Intake Template](docs/CUSTOMER_BRIEF_INTAKE_TEMPLATE.md)
+- [Proof-of-Value Deliverables](docs/PROOF_OF_VALUE_DELIVERABLES.md)
+- [Proof-of-Value Session Script](docs/PROOF_OF_VALUE_SESSION_SCRIPT.md)
 - [Pilot Discovery Questions](docs/PILOT_DISCOVERY_QUESTIONS.md)
 - [Pilot Success Criteria](docs/PILOT_SUCCESS_CRITERIA.md)
 - [Sample Pilot SOW](docs/SAMPLE_PILOT_SOW.md)
