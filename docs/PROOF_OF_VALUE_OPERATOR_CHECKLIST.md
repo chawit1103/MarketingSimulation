@@ -31,6 +31,7 @@ Use this checklist after `/proof-of-value` intake validation passes and before s
 - [ ] Review Risk and Crisis Watchouts.
 - [ ] Create Revised Brief v2.
 - [ ] Generate Strategy Pack PPTX.
+- [ ] If approved aggregate actuals are provided, run or prepare the Optional Actual vs Estimate comparison using aggregate-only values.
 - [ ] Add or preserve recommended validation step.
 
 ## Customer Package Review
@@ -42,6 +43,7 @@ Use this checklist after `/proof-of-value` intake validation passes and before s
 - [ ] Risk watchouts are included.
 - [ ] Revised Brief v2 is included.
 - [ ] Strategy Pack PPTX is included when requested.
+- [ ] Optional Actual vs Estimate comparison is included when approved aggregate actuals were provided.
 - [ ] Limitations and assumptions are visible.
 - [ ] Source/provenance labels are visible.
 

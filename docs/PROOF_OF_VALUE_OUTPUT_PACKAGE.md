@@ -28,7 +28,8 @@ If any prerequisite fails, stop and return to intake cleanup.
 5. Review Risk and Crisis Watchouts.
 6. Create Revised Brief v2 from the safe action-plan or decision-support output.
 7. Generate Strategy Pack PPTX.
-8. Run [Demo Artifact Checklist](DEMO_ARTIFACT_CHECKLIST.md) before sharing any screenshot, deck, export, recording, or written summary.
+8. If approved aggregate actuals are provided, run or prepare the Optional Actual vs Estimate comparison using aggregate-only values.
+9. Run [Demo Artifact Checklist](DEMO_ARTIFACT_CHECKLIST.md) before sharing any screenshot, deck, export, recording, or written summary.
 
 Keep the payload and outputs within the agreed pilot storage and retention boundary.
 
