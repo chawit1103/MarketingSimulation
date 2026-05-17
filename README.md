@@ -124,6 +124,7 @@ The pilot should be sold as a guided engagement, not production SaaS. Outputs ar
 Operator proof-of-value workflow:
 
 - Use `/proof-of-value` to turn one customer-approved campaign brief into an operator checklist, structured proof-of-value payload, and Strategy Pack deliverable sequence.
+- Use `/resources` to open the in-app Proof-of-Value Resource Hub for curated customer, sales, operator, and safety documentation links.
 - The workflow flags missing approvals and unsafe intake signals before any customer-facing output is assembled.
 - It does not require live LLM/API/Neo4j credentials, live integrations, PII, raw CRM records, customer lists, or secrets.
 

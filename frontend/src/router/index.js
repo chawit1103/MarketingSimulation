@@ -16,6 +16,7 @@ const WarRoom = () => import('../views/WarRoom.vue')
 const BudgetPlanner = () => import('../views/BudgetPlanner.vue')
 const CalibrationView = () => import('../views/CalibrationView.vue')
 const ProofOfValueFlow = () => import('../views/ProofOfValueFlow.vue')
+const ResourcesHub = () => import('../views/ResourcesHub.vue')
 
 const routes = [
   {
@@ -88,6 +89,11 @@ const routes = [
     path: '/proof-of-value',
     name: 'ProofOfValueFlow',
     component: ProofOfValueFlow
+  },
+  {
+    path: '/resources',
+    name: 'ResourcesHub',
+    component: ResourcesHub
   },
   {
     path: '/calibration',
