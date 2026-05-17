@@ -2,8 +2,11 @@
 
 from flask import Blueprint, request, jsonify, send_file
 import io
+import re
 
 from ..services.export_engine import PPTXGenerator
+from ..services.strategy_pack import StrategyPackService
+from ..authz import ANALYST_ROLES, role_required
 from ..utils.logger import get_logger
 
 logger = get_logger("mirofish.api.export")
@@ -11,7 +14,68 @@ logger = get_logger("mirofish.api.export")
 export_bp = Blueprint("export", __name__)
 
 
+def _safe_pptx_filename(value: str | None, fallback: str) -> str:
+    base = re.sub(r"[^A-Za-z0-9._-]+", "_", str(value or fallback)).strip("._-")
+    base = base or fallback
+    return base if base.lower().endswith(".pptx") else f"{base}.pptx"
+
+
+@export_bp.route("/strategy-pack", methods=["POST"])
+@role_required(*ANALYST_ROLES)
+def export_strategy_pack():
+    """POST /api/export/strategy-pack — build a client-ready strategy payload."""
+    data = request.get_json(silent=True) or {}
+
+    try:
+        pack = StrategyPackService().build(data)
+        return jsonify({
+            "success": True,
+            "data": pack,
+        })
+    except Exception:
+        logger.exception("Failed to build strategy pack export")
+        return jsonify({
+            "success": False,
+            "error": "Could not build strategy pack export.",
+        }), 500
+
+
+@export_bp.route("/strategy-pack/pptx", methods=["POST"])
+@role_required(*ANALYST_ROLES)
+def export_strategy_pack_pptx():
+    """POST /api/export/strategy-pack/pptx — render strategy pack payload as PPTX."""
+    data = request.get_json(silent=True) or {}
+
+    try:
+        pack = data.get("strategy_pack")
+        if not isinstance(pack, dict) or pack.get("version") != "strategy_pack_v1":
+            pack = StrategyPackService().build(data)
+
+        buffer = PPTXGenerator().generate({
+            "slide_type": "strategy_pack",
+            "strategy_pack": pack,
+        })
+        white_label = pack.get("white_label") or {}
+        filename = _safe_pptx_filename(
+            data.get("filename") or white_label.get("campaign_name"),
+            "strategy_pack",
+        )
+        return send_file(
+            buffer,
+            mimetype="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            as_attachment=True,
+            download_name=filename,
+        )
+    except Exception:
+        logger.exception("Failed to render strategy pack PPTX")
+        return jsonify({
+            "success": False,
+            "error": "Could not render strategy pack PPTX.",
+        }), 500
+
+
 @export_bp.route("/pptx", methods=["POST"])
+@role_required(*ANALYST_ROLES)
 def export_pptx():
     """POST /api/export/pptx — generate and download a PPTX deck.
 
@@ -37,6 +101,7 @@ def export_pptx():
 
 
 @export_bp.route("/csv", methods=["POST"])
+@role_required(*ANALYST_ROLES)
 def export_csv():
     """POST /api/export/csv — lightweight CSV export as fallback."""
     import csv
@@ -62,6 +127,24 @@ def export_csv():
         writer.writerow(["Round", "Sentiment", "Actions"])
         for pt in timeline:
             writer.writerow([pt.get("round_num", ""), pt.get("avg_sentiment", ""), pt.get("action_count", "")])
+
+    action_plan = data.get("action_plan") or {}
+    sections = action_plan.get("sections") or {}
+    if sections:
+        writer.writerow([])
+        writer.writerow(["Action Plan Source", (action_plan.get("source") or {}).get("type", "unknown")])
+        writer.writerow(["Action Plan Disclaimer", action_plan.get("disclaimer", "")])
+        writer.writerow([])
+        writer.writerow(["Section", "Recommendation", "Reason", "Expected Impact", "Risk"])
+        for section_key, section in sections.items():
+            for item in section.get("items", []):
+                writer.writerow([
+                    section.get("title", section_key),
+                    item.get("recommendation", ""),
+                    item.get("reason", ""),
+                    item.get("expected_impact", ""),
+                    item.get("risk", ""),
+                ])
 
     wrapper.detach()
     buffer.seek(0)

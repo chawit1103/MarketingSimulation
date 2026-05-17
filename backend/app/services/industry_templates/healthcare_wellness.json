@@ -1,0 +1,126 @@
+{
+  "id": "healthcare_wellness",
+  "name_th": "Healthcare / Wellness",
+  "name_en": "Healthcare / Wellness",
+  "description_th": "Conservative deep preset for healthcare and wellness communication, focusing on education, trust, access, privacy, and compliance.",
+  "description_en": "Conservative deep preset for healthcare and wellness communication, focusing on education, trust, access, privacy, and compliance.",
+  "icon": "H",
+  "color": "#4d7c70",
+  "industry_depth": "deep_preset",
+  "objectives": ["brand_perception", "message_testing", "crisis_simulation"],
+  "default_objective": "brand_perception",
+  "default_platform": "both",
+  "default_max_rounds": 16,
+  "default_language": "th",
+  "campaign_duration": "6-10 weeks education, awareness, or appointment-support window",
+  "budget_range": "THB 1M-10M test budget; replace with approved media and compliance plan",
+  "primary_kpi": "Trust lift, message clarity, appointment consideration, privacy concern rate",
+  "competitor_context": "Hospitals, clinics, wellness brands, pharmacy chains, telehealth platforms, and creator-led education.",
+  "brand_constraints": "Do not provide personal medical advice, diagnosis, outcome promises, or unsupported health claims.",
+  "risk_legal_notes": "Review professional advertising rules, Thai FDA/health claim rules, PDPA consent, testimonial rules, and clinical/compliance approval.",
+  "target_audience": {
+    "age_range": [20, 65],
+    "gender": "all",
+    "regions": ["bangkok", "central", "north", "northeast", "south"],
+    "channels": ["facebook", "line", "youtube", "instagram", "tiktok"],
+    "persona_count": 100
+  },
+  "persona_segments": [
+    {
+      "id": "care_seekers",
+      "name_th": "Care seekers",
+      "name_en": "Care seekers",
+      "count": 55,
+      "interests": ["trust", "access", "cost", "privacy", "professional credentials"],
+      "archetypes": [
+        {
+          "id": "family_care_coordinator",
+          "name_th": "Family care coordinator",
+          "name_en": "Family care coordinator",
+          "age_range": [30, 55],
+          "income": "middle",
+          "regions": ["bangkok", "central", "northeast"],
+          "occupation_th": "Family decision maker",
+          "channels": ["facebook", "line", "youtube"],
+          "narrative_th": "Looks for trustworthy explanations, transparent costs, and clear next steps for family healthcare decisions.",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "wellness_optimizer",
+          "name_th": "Wellness optimizer",
+          "name_en": "Wellness optimizer",
+          "age_range": [24, 42],
+          "income": "upper_middle",
+          "regions": ["bangkok", "north"],
+          "occupation_th": "Professional / creator audience",
+          "channels": ["instagram", "youtube", "tiktok"],
+          "narrative_th": "Interested in wellness routines and evidence, but skeptical of exaggerated claims.",
+          "purchase_style": "early_adopter"
+        }
+      ]
+    },
+    {
+      "id": "trust_skeptics",
+      "name_th": "Trust skeptics",
+      "name_en": "Trust skeptics",
+      "count": 45,
+      "interests": ["credentials", "privacy", "service experience", "pricing transparency"],
+      "archetypes": [
+        {
+          "id": "privacy_sensitive_patient",
+          "name_th": "Privacy-sensitive care user",
+          "name_en": "Privacy-sensitive care user",
+          "age_range": [25, 50],
+          "income": "middle",
+          "regions": ["bangkok", "south"],
+          "occupation_th": "Employee",
+          "channels": ["facebook", "line", "twitter_x"],
+          "narrative_th": "Worries about health data collection, retargeting, and sensitive information appearing in ads.",
+          "purchase_style": "traditional"
+        },
+        {
+          "id": "service_review_reader",
+          "name_th": "Service review reader",
+          "name_en": "Service review reader",
+          "age_range": [28, 58],
+          "income": "middle",
+          "regions": ["central", "north", "south"],
+          "occupation_th": "Service buyer",
+          "channels": ["facebook", "google_reviews", "line"],
+          "narrative_th": "Reads reviews about waiting time, staff attitude, billing clarity, and doctor communication before choosing a provider.",
+          "purchase_style": "social_proof"
+        }
+      ]
+    }
+  ],
+  "crisis_scenarios": [
+    {"id": "unsupported_health_claim", "name_th": "Unsupported health claim concern", "name_en": "Unsupported health claim concern", "trigger": "Users challenge a wellness claim and ask whether the message is medically approved.", "event_tag": "health-claim", "impact": "negative", "intensity": 9},
+    {"id": "privacy_concern", "name_th": "Privacy concern", "name_en": "Privacy concern", "trigger": "Users ask why sensitive care-related ads appear after visiting a landing page.", "event_tag": "privacy", "impact": "negative", "intensity": 8},
+    {"id": "education_campaign", "name_th": "Education campaign", "name_en": "Education campaign", "trigger": "The brand publishes general education content with clear professional review and next-step guidance.", "event_tag": "education", "impact": "mixed", "intensity": 5}
+  ],
+  "document_seeds": [
+    {
+      "id": "healthcare_education_brief",
+      "name_th": "Healthcare education brief",
+      "name_en": "Healthcare education brief",
+      "description_th": "Starter brief for conservative healthcare or wellness education.",
+      "description_en": "Starter brief for conservative healthcare or wellness education.",
+      "content": "# Healthcare / Wellness Education Brief\n\nOffering: [service or education topic]\nObjective: improve trust and clarity while respecting privacy and compliance.\nAudience: family care coordinators, wellness optimizers, privacy-sensitive users, service review readers.\nProof: professional review, general education sources, transparent next steps, privacy notice.\nRisks: personal medical advice, unsupported health claims, sensitive retargeting, testimonial concerns.\nValidation: clinical/compliance review, legal review, privacy review, and segment clarity test."
+    }
+  ],
+  "deep_preset": {
+    "target_segment_archetypes": ["Family care coordinator", "Wellness optimizer", "Privacy-sensitive care user", "Service review reader"],
+    "common_objections": ["Claim needs professional review", "Cost or next step is unclear", "Sensitive data may be used in ads", "Service reviews raise trust concerns"],
+    "crisis_triggers": ["Unsupported health claim challenge", "Sensitive retargeting concern", "Negative service review amplification", "Creator testimonial without proper context"],
+    "typical_kpis": ["Trust lift", "Message clarity", "Appointment consideration", "Privacy concern rate", "Service credibility"],
+    "channel_behavior": ["Facebook and LINE carry family questions", "YouTube supports careful education", "Instagram and TikTok need conservative captions and disclaimers", "Review platforms influence trust"],
+    "competitor_archetypes": ["Hospital with stronger reputation", "Low-cost clinic", "Wellness influencer brand", "Telehealth convenience competitor"],
+    "legal_regulatory_sensitivities": ["Professional advertising rules", "Health and wellness claim substantiation", "PDPA consent", "Testimonial context", "Clinical/compliance approval"],
+    "proof_point_requirements": ["Professional review statement", "General education framing", "Transparent pricing or next step", "Privacy notice", "No personal advice language"],
+    "sample_brief": "Run a conservative education campaign that improves trust and appointment consideration without giving personal medical advice.",
+    "sample_risk_checklist": ["Is every claim approved?", "Does copy avoid personal advice?", "Is privacy notice visible?", "Are testimonials contextual and compliant?"],
+    "sample_action_plan_hints": ["Use general education framing", "Add professional review label", "Make next step and cost boundaries clear", "Avoid sensitive retargeting language"],
+    "assumptions": ["This preset is for communication planning and does not provide medical, clinical, or legal advice.", "All healthcare and wellness messages require qualified professional and legal review."],
+    "limitations": ["Does not assess patient suitability, clinical outcomes, or treatment decisions.", "Does not replace professional compliance approval."]
+  }
+}

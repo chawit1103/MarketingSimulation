@@ -153,6 +153,45 @@
         </div>
       </section>
 
+      <section class="confidence-evidence panel">
+        <div class="evidence-header">
+          <div>
+            <span class="brief-kicker">{{ $t('dashboard.confidenceEvidence') }}</span>
+            <h2 class="panel-title">{{ $t('dashboard.confidenceEvidenceTitle') }}</h2>
+          </div>
+          <ResultSourceBadge :source="trustPanel.sourceType" :warning="trustPanel.sourceWarning" />
+        </div>
+        <div class="trust-grid">
+          <div class="brief-item">
+            <span>{{ $t('dashboard.trustRunId') }}</span>
+            <strong>{{ trustPanel.runId }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.trustPersonaCount') }}</span>
+            <strong>{{ trustPanel.personaCount }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.trustBriefCompleteness') }}</span>
+            <strong>{{ trustPanel.briefCompleteness }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.trustProviderModel') }}</span>
+            <strong>{{ trustPanel.providerModel }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.trustConfidenceLevel') }}</span>
+            <strong>{{ trustPanel.confidenceLevel }}</strong>
+          </div>
+          <div class="brief-item">
+            <span>{{ $t('dashboard.trustNextValidation') }}</span>
+            <strong>{{ trustPanel.nextValidationStep }}</strong>
+          </div>
+        </div>
+        <ul class="trust-limitations">
+          <li v-for="item in trustPanel.knownLimitations" :key="item">{{ item }}</li>
+        </ul>
+      </section>
+
       <!-- KPI Cards Row -->
       <section class="kpi-row">
         <div class="kpi-card sentiment-card">
@@ -326,9 +365,10 @@
         </div>
       </section>
 
-      <!-- Top Influencers -->
+      <!-- Simulated influence nodes -->
       <section class="panel">
         <h2 class="panel-title">{{ $t('dashboard.topInfluencers') }}</h2>
+        <p class="panel-note">{{ $t('dashboard.syntheticInfluencerNote') }}</p>
         <div class="influencer-grid">
           <div v-for="(inf, idx) in influencers" :key="idx" class="influencer-card">
             <div class="inf-rank">#{{ idx + 1 }}</div>
@@ -339,11 +379,11 @@
             </div>
             <div class="inf-metrics">
               <div class="inf-metric">
-                <span class="inf-metric-label">Impact</span>
+                <span class="inf-metric-label">{{ $t('dashboard.influencerImpact') }}</span>
                 <span class="inf-metric-val">{{ inf.impact_score }}/100</span>
               </div>
               <div class="inf-metric">
-                <span class="inf-metric-label">Reach</span>
+                <span class="inf-metric-label">{{ $t('dashboard.influencerReach') }}</span>
                 <span class="inf-metric-val">{{ formatNumber(inf.reach) }}</span>
               </div>
             </div>
@@ -357,8 +397,25 @@
       </section>
 
       <!-- Action Plan: Think to Finish -->
-      <section class="action-plan">
-        <h2 class="panel-title">{{ $t('dashboard.actionPlan') }}</h2>
+      <section ref="actionPlanSection" class="action-plan">
+        <div class="action-plan-head">
+          <div>
+            <h2 class="panel-title">{{ $t('dashboard.actionPlan') }}</h2>
+            <p>{{ displayActionPlan.disclaimer }}</p>
+          </div>
+          <div class="action-plan-tools">
+            <ResultSourceBadge
+              :source="displayActionPlan.source.type"
+              :warning="displayActionPlan.source.warning"
+            />
+            <button class="copy-action-plan" type="button" @click="copyActionPlan">
+              {{ actionPlanCopied ? $t('dashboard.actionPlanCopied') : $t('dashboard.copyActionPlan') }}
+            </button>
+            <button class="copy-action-plan" type="button" :disabled="revisedBriefLoading" @click="createRevisedBrief">
+              {{ revisedBriefLoading ? $t('common.loading') : $t('dashboard.createRevisedBrief') }}
+            </button>
+          </div>
+        </div>
 
         <div class="action-grid">
           <!-- Winning Strategy -->
@@ -391,6 +448,115 @@
           </div>
         </div>
 
+        <div class="structured-action-grid">
+          <div
+            v-for="section in actionPlanSections"
+            :key="section.key"
+            class="structured-action-section"
+          >
+            <div class="structured-section-head">
+              <span class="section-label">{{ section.title }}</span>
+            </div>
+            <div
+              v-for="(item, itemIdx) in section.items"
+              :key="`${section.key}-${itemIdx}`"
+              class="structured-action-item"
+            >
+              <strong>{{ item.recommendation }}</strong>
+              <dl>
+                <div>
+                  <dt>{{ $t('dashboard.actionReason') }}</dt>
+                  <dd>{{ item.reason }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.actionExpectedImpact') }}</dt>
+                  <dd>{{ item.expected_impact }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.actionRisk') }}</dt>
+                  <dd>{{ item.risk }}</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="revisedBrief" class="revised-brief-panel">
+          <div class="revised-brief-head">
+            <div>
+              <span class="brief-kicker">{{ $t('dashboard.revisedBriefKicker') }}</span>
+              <h3>{{ revisedBrief.title }}</h3>
+              <p>{{ revisedBrief.disclaimer }}</p>
+            </div>
+            <ResultSourceBadge
+              :source="revisedBrief.provenance.source_mode"
+              :warning="revisedBrief.provenance.recommended_next_validation_step"
+            />
+          </div>
+
+          <div class="brief-compare-grid">
+            <section class="brief-version-card">
+              <h4>{{ $t('dashboard.originalBrief') }}</h4>
+              <dl>
+                <div>
+                  <dt>{{ $t('dashboard.revisedObjective') }}</dt>
+                  <dd>{{ revisedBrief.original_brief.objective || campaignBrief.objective }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedTargetSegments') }}</dt>
+                  <dd>{{ listText(revisedBrief.original_brief.target_segments) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedKeyMessage') }}</dt>
+                  <dd>{{ revisedBrief.original_brief.description || campaignBrief.description }}</dd>
+                </div>
+              </dl>
+            </section>
+
+            <section class="brief-version-card revised">
+              <h4>{{ $t('dashboard.revisedBrief') }}</h4>
+              <dl>
+                <div>
+                  <dt>{{ $t('dashboard.revisedObjective') }}</dt>
+                  <dd>{{ revisedBrief.revised_brief.objective }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedTargetSegments') }}</dt>
+                  <dd>{{ listText(revisedBrief.revised_brief.target_segments) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedKeyMessage') }}</dt>
+                  <dd>{{ revisedBrief.revised_brief.key_message }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedTone') }}</dt>
+                  <dd>{{ revisedBrief.revised_brief.tone_and_voice }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedProofPoints') }}</dt>
+                  <dd>{{ listText(revisedBrief.revised_brief.proof_points) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedChannels') }}</dt>
+                  <dd>{{ listText(revisedBrief.revised_brief.channel_recommendations) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedRiskGuardrails') }}</dt>
+                  <dd>{{ listText(revisedBrief.revised_brief.risk_guardrails) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedValidationPlan') }}</dt>
+                  <dd>{{ listText(revisedBrief.revised_brief.validation_plan) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ $t('dashboard.revisedCreativeNotes') }}</dt>
+                  <dd>{{ listText(revisedBrief.revised_brief.creative_team_notes) }}</dd>
+                </div>
+              </dl>
+            </section>
+          </div>
+        </div>
+
         <!-- Action Items -->
         <div class="action-items">
           <h3 class="action-items-title">{{ $t('dashboard.priorityActionItems') }}</h3>
@@ -401,7 +567,7 @@
                 <span class="action-item-priority" :style="{ color: priorityColor(item.priority) }">
                   {{ item.priority.toUpperCase() }}
                 </span>
-                <span class="action-item-desc">{{ item.description }}</span>
+                <span class="action-item-desc">{{ item.description || item.recommendation || item.action }}</span>
                 <span class="action-item-timeline">{{ item.timeline }}</span>
               </div>
             </div>
@@ -431,14 +597,17 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getKPIs, getTimeline, getSegments, getInfluencers } from '@/api/dashboard'
 import { getCampaign, hasCampaignAuth } from '@/api/campaign'
 import { getDemoDashboard } from '@/api/demo'
 import { analyzeDecision, runWhatIf } from '@/api/decision'
+import { reviseBriefFromActionPlan } from '@/api/brief'
 import ExportButton from '@/components/ExportButton.vue'
+import ResultSourceBadge from '@/components/ResultSourceBadge.vue'
+import { sourceModeFromValue, trackEvent } from '@/services/analytics'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -452,6 +621,7 @@ const loading = ref(true)
 const showSummary = ref(false)
 const lastUpdated = ref('')
 const campaignDetails = ref(null)
+const resultSource = ref({ type: 'unknown', warning: '' })
 
 // Export data (computed from current state)
 const exportData = computed(() => ({
@@ -469,6 +639,7 @@ const exportData = computed(() => ({
     roi_pct: kpis.value.conversion_probability - 40,
   },
   timeline: timeline.value,
+  action_plan: displayActionPlan.value,
   recommendation: executiveSummaryTH.value || winningStrategy.value || 'Review action plan for next steps.',
   revenue_projection: {
     monthly: kpis.value.conversion_probability * 10000,
@@ -513,6 +684,36 @@ const campaignBrief = computed(() => {
   }
 })
 
+const trustPanel = computed(() => {
+  const campaign = campaignDetails.value || {}
+  const simConfig = campaign.sim_config || {}
+  const briefQuality = campaign.brief_quality || {}
+  const completeness = briefQuality?.brief_completeness?.percent ?? briefQuality?.score
+  const provider = simConfig.llm_provider || simConfig.provider || campaign.llm_provider
+  const model = simConfig.llm_model || simConfig.model || campaign.llm_model
+  const sourceType = resultSource.value?.type || 'unknown'
+  const sourceWarning = resultSource.value?.warning || ''
+  const limitations = [
+    ...((resultSource.value && Array.isArray(resultSource.value.limitations)) ? resultSource.value.limitations : []),
+    ...(briefQuality.known_limitations || []),
+    ...(assumptions.value || []),
+  ].filter(Boolean).slice(0, 4)
+
+  return {
+    sourceType,
+    sourceWarning,
+    runId: campaign.simulation_id || campaign.report_id || campaign.campaign_id || campaign.id || t('dashboard.trustNotAvailable'),
+    personaCount: campaignBrief.value.personas || t('dashboard.trustNotAvailable'),
+    briefCompleteness: completeness != null ? `${completeness}%` : t('dashboard.trustUnknown'),
+    providerModel: provider || model ? [provider, model].filter(Boolean).join(' / ') : t('dashboard.trustNotAvailable'),
+    confidenceLevel: confidenceScore.value ? `${confidenceScore.value}%` : t('dashboard.trustUnknown'),
+    knownLimitations: limitations.length ? limitations : [t('dashboard.trustNoLimitationsAvailable')],
+    nextValidationStep: briefQuality.score != null && briefQuality.score < 80
+      ? t('dashboard.trustValidateBrief')
+      : t('dashboard.trustValidateLiveMarket'),
+  }
+})
+
 // KPI State
 const kpis = ref({
   overall_sentiment: 42,
@@ -537,6 +738,10 @@ const winningHighlights = ref([])
 const riskSummary = ref('')
 const riskAreas = ref([])
 const actionItems = ref([])
+const structuredActionPlan = ref(null)
+const actionPlanCopied = ref(false)
+const revisedBrief = ref(null)
+const revisedBriefLoading = ref(false)
 const executiveSummaryTH = ref('')
 const confidenceScore = ref(78)
 const assumptions = ref([])
@@ -550,6 +755,9 @@ const primaryRisk = ref({})
 const whatIfResult = ref(null)
 const whatIfLoading = ref(false)
 const activeScenario = ref('')
+const actionPlanSection = ref(null)
+let actionPlanObserver = null
+let actionPlanViewedTracked = false
 
 const whatIfScenarios = [
   {
@@ -571,6 +779,23 @@ const whatIfScenarios = [
     scenario: { competitor_launch: true, budget_increase_pct: 20 },
   },
 ]
+
+const displayActionPlan = computed(() => structuredActionPlan.value || buildLocalActionPlan())
+
+const actionPlanSections = computed(() => {
+  const plan = displayActionPlan.value
+  const sections = plan.sections || {}
+  return [
+    'creative_adjustment',
+    'channel_allocation',
+    'crisis_prevention',
+    'validation_plan',
+  ].map(key => ({
+    key,
+    title: sections[key]?.title || t(`dashboard.actionSection_${key}`),
+    items: sections[key]?.items || [],
+  }))
+})
 
 // --- Computed: Grade class ---
 const gradeClass = computed(() => {
@@ -879,12 +1104,20 @@ async function loadDashboard() {
     }
 
     await loadCampaignDetails(cid)
+    resultSource.value = { type: 'unknown', warning: t('dashboard.sourceUnknownPending') }
 
     // Fetch KPIs
     try {
       const kpiRes = await getKPIs(cid)
       if (kpiRes && kpiRes.data) {
         Object.assign(kpis.value, normalizeKpis(kpiRes.data))
+        resultSource.value = normalizeResultSource(kpiRes.data.source || kpiRes.data)
+        if (kpiRes.data.confidence != null) {
+          confidenceScore.value = Math.round(kpiRes.data.confidence)
+        }
+        if (kpiRes.data.action_plan) {
+          structuredActionPlan.value = normalizeActionPlan(kpiRes.data.action_plan)
+        }
       }
       if (kpiRes && kpiRes.campaign_name) campaignName.value = kpiRes.campaign_name
       if (kpiRes && kpiRes.grade) overallGrade.value = kpiRes.grade
@@ -896,6 +1129,9 @@ async function loadDashboard() {
     try {
       const tlRes = await getTimeline(cid)
       const tlData = tlRes?.data || tlRes || {}
+      if (tlData.source && resultSource.value?.type === 'unknown') {
+        resultSource.value = normalizeResultSource(tlData.source)
+      }
       const points = tlData.timeline || tlData.rounds || []
       if (points.length) {
         timeline.value = points.map(normalizeTimelinePoint)
@@ -909,6 +1145,9 @@ async function loadDashboard() {
     try {
       const segRes = await getSegments(cid)
       const segData = segRes?.data || segRes || {}
+      if (segData.source && resultSource.value?.type === 'unknown') {
+        resultSource.value = normalizeResultSource(segData.source)
+      }
       const rows = segData.segments || segData
       if (Array.isArray(rows) && rows.length) {
         segments.value = rows.map(normalizeSegment)
@@ -970,6 +1209,7 @@ async function loadDemoDashboard(cid) {
     applyDemoDashboard(res.data || res)
   } catch (e) {
     console.warn('Demo dashboard API unavailable, using local fallback:', e.message)
+    resultSource.value = { type: 'local_estimate', warning: t('dashboard.sourceLocalFallback') }
     campaignDetails.value = demoCampaignDetails(demoId)
     if (campaignDetails.value?.name) campaignName.value = campaignDetails.value.name
     buildEvidenceFromCurrentState()
@@ -978,6 +1218,7 @@ async function loadDemoDashboard(cid) {
 
 function applyDemoDashboard(data) {
   const campaign = data.campaign || demoCampaignDetails('demo-premium-water')
+  resultSource.value = normalizeResultSource(data.source || { type: 'demo_mode', warning: t('dashboard.sourceDemoMode') })
   campaignDetails.value = campaign
   campaignName.value = campaign.name || campaignName.value
   Object.assign(kpis.value, normalizeKpis(data.kpis || {}))
@@ -992,6 +1233,7 @@ function applyDemoDashboard(data) {
   scoreExplanations.value = evidence.why_this_score || []
   riskDrivers.value = evidence.risk_drivers || []
   simulatedQuotes.value = evidence.quotes || []
+  structuredActionPlan.value = data.action_plan ? normalizeActionPlan(data.action_plan) : null
 
   if (Array.isArray(evidence.recommended_actions)) {
     actionItems.value = evidence.recommended_actions
@@ -1035,9 +1277,209 @@ function applyDecision(data) {
   if (Array.isArray(data.actions) && data.actions.length) {
     actionItems.value = data.actions
   }
+  if (data.action_plan) {
+    structuredActionPlan.value = normalizeActionPlan(data.action_plan)
+  }
   if (data.primary_risk?.driver && !riskDrivers.value.includes(data.primary_risk.driver)) {
     riskDrivers.value = [data.primary_risk.driver, ...riskDrivers.value].slice(0, 4)
   }
+}
+
+function normalizeActionPlan(plan) {
+  const source = plan.source || resultSource.value || { type: 'unknown', warning: '' }
+  const sections = plan.sections || {}
+  return {
+    version: plan.version || 'structured_action_plan_v1',
+    source: {
+      type: source.type || 'unknown',
+      warning: source.warning || '',
+    },
+    headline: plan.headline || winningStrategy.value || t('dashboard.actionPlanDefaultHeadline'),
+    disclaimer: plan.disclaimer || t('dashboard.actionPlanDisclaimer'),
+    sections: {
+      creative_adjustment: normalizeActionSection('creative_adjustment', sections.creative_adjustment),
+      channel_allocation: normalizeActionSection('channel_allocation', sections.channel_allocation),
+      crisis_prevention: normalizeActionSection('crisis_prevention', sections.crisis_prevention),
+      validation_plan: normalizeActionSection('validation_plan', sections.validation_plan),
+    },
+    summary_items: Array.isArray(plan.summary_items) ? plan.summary_items : [],
+  }
+}
+
+function normalizeActionSection(key, section) {
+  const fallback = buildLocalActionSection(key)
+  const items = Array.isArray(section?.items) && section.items.length ? section.items : fallback.items
+  return {
+    title: section?.title || t(`dashboard.actionSection_${key}`),
+    items: items.map(normalizeActionItem),
+  }
+}
+
+function normalizeActionItem(item) {
+  return {
+    recommendation: item.recommendation || item.action || item.description || t('dashboard.actionPlanMissingRecommendation'),
+    reason: item.reason || item.rationale || t('dashboard.actionPlanMissingReason'),
+    expected_impact: item.expected_impact || item.impact || t('dashboard.actionPlanMissingImpact'),
+    risk: item.risk || t('dashboard.actionPlanMissingRisk'),
+    priority: item.priority || 'medium',
+  }
+}
+
+function buildLocalActionPlan() {
+  return {
+    version: 'structured_action_plan_v1',
+    source: {
+      type: resultSource.value?.type || 'unknown',
+      warning: resultSource.value?.warning || '',
+    },
+    headline: decisionStrategy.value?.headline || winningStrategy.value || t('dashboard.actionPlanDefaultHeadline'),
+    disclaimer: t('dashboard.actionPlanDisclaimer'),
+    sections: {
+      creative_adjustment: buildLocalActionSection('creative_adjustment'),
+      channel_allocation: buildLocalActionSection('channel_allocation'),
+      crisis_prevention: buildLocalActionSection('crisis_prevention'),
+      validation_plan: buildLocalActionSection('validation_plan'),
+    },
+  }
+}
+
+function buildLocalActionSection(key) {
+  const topPositive = topPositiveSegmentLabel()
+  const topRisk = topNegativeSegmentLabel()
+  const source = resultSource.value?.type || 'unknown'
+  const mapping = {
+    creative_adjustment: {
+      title: t('dashboard.actionSection_creative_adjustment'),
+      items: [{
+        recommendation: kpis.value.message_resonance >= 70
+          ? t('dashboard.actionCreativeKeep')
+          : t('dashboard.actionCreativeRewrite'),
+        reason: t('dashboard.actionCreativeReason', { resonance: kpis.value.message_resonance, segment: topPositive }),
+        expected_impact: t('dashboard.actionCreativeImpact'),
+        risk: t('dashboard.actionCreativeRisk'),
+        priority: kpis.value.message_resonance >= 70 ? 'medium' : 'high',
+      }],
+    },
+    channel_allocation: {
+      title: t('dashboard.actionSection_channel_allocation'),
+      items: [{
+        recommendation: t('dashboard.actionChannelRecommendation', { channels: campaignBrief.value.channels }),
+        reason: t('dashboard.actionChannelReason', { conversion: kpis.value.conversion_probability, influence: kpis.value.social_influence }),
+        expected_impact: t('dashboard.actionChannelImpact'),
+        risk: t('dashboard.actionChannelRisk'),
+        priority: 'high',
+      }],
+    },
+    crisis_prevention: {
+      title: t('dashboard.actionSection_crisis_prevention'),
+      items: [{
+        recommendation: crisisLevel.value >= 3 ? t('dashboard.actionCrisisContain') : t('dashboard.actionCrisisPrepare'),
+        reason: t('dashboard.actionCrisisReason', { risk: crisisLabel.value, driver: riskDrivers.value[0] || topRisk }),
+        expected_impact: t('dashboard.actionCrisisImpact'),
+        risk: t('dashboard.actionCrisisRisk'),
+        priority: crisisLevel.value >= 3 ? 'critical' : 'medium',
+      }],
+    },
+    validation_plan: {
+      title: t('dashboard.actionSection_validation_plan'),
+      items: [{
+        recommendation: ['demo_mode', 'local_estimate', 'unknown'].includes(source)
+          ? t('dashboard.actionValidationBackend')
+          : t('dashboard.actionValidationLive'),
+        reason: t('dashboard.actionValidationReason', { source, confidence: confidenceScore.value }),
+        expected_impact: t('dashboard.actionValidationImpact'),
+        risk: t('dashboard.actionValidationRisk'),
+        priority: ['demo_mode', 'local_estimate', 'unknown'].includes(source) ? 'high' : 'medium',
+      }],
+    },
+  }
+  return mapping[key]
+}
+
+async function copyActionPlan() {
+  const lines = actionPlanToLines(displayActionPlan.value)
+  try {
+    await navigator.clipboard.writeText(lines.join('\n'))
+    actionPlanCopied.value = true
+    setTimeout(() => { actionPlanCopied.value = false }, 1800)
+  } catch (e) {
+    console.warn('Copy action plan failed:', e.message)
+  }
+}
+
+function actionPlanToLines(plan) {
+  const lines = [
+    `${t('dashboard.actionPlan')}: ${plan.headline}`,
+    `${t('resultSource.unknownSource')}: ${plan.source.type}`,
+    plan.disclaimer,
+  ]
+  for (const section of actionPlanSections.value) {
+    lines.push('', section.title)
+    section.items.forEach((item, idx) => {
+      lines.push(`${idx + 1}. ${item.recommendation}`)
+      lines.push(`   ${t('dashboard.actionReason')}: ${item.reason}`)
+      lines.push(`   ${t('dashboard.actionExpectedImpact')}: ${item.expected_impact}`)
+      lines.push(`   ${t('dashboard.actionRisk')}: ${item.risk}`)
+    })
+  }
+  return lines
+}
+
+function revisedBriefPayload() {
+  const campaign = campaignDetails.value || {
+    id: campaignId.value,
+    name: campaignName.value,
+    description: campaignBrief.value.description,
+    objective: campaignBrief.value.objective,
+  }
+  return {
+    campaign,
+    original_brief: {
+      ...campaign,
+      description: campaignBrief.value.description,
+      objective: campaignBrief.value.objective,
+      target: {
+        segment_name: campaignBrief.value.audience,
+        channels: campaignBrief.value.channels
+          ? campaignBrief.value.channels.split(',').map(item => item.trim()).filter(Boolean)
+          : [],
+      },
+    },
+    action_plan: displayActionPlan.value,
+    evidence: {
+      assumptions: assumptions.value,
+      risk_drivers: riskDrivers.value,
+      quotes: simulatedQuotes.value,
+      segments: segments.value,
+      recommended_next_validation_step: trustPanel.value.nextValidationStep,
+    },
+    source: {
+      ...resultSource.value,
+      campaign_id: campaign.campaign_id || campaign.id || campaignId.value,
+    },
+  }
+}
+
+async function createRevisedBrief() {
+  if (revisedBriefLoading.value) return
+  revisedBriefLoading.value = true
+  try {
+    const res = await reviseBriefFromActionPlan(revisedBriefPayload())
+    revisedBrief.value = res.data || res
+    trackEvent('revised_brief_created', {
+      source_mode: sourceModeFromValue(revisedBrief.value?.provenance?.source_mode),
+      has_campaign_id: Boolean(revisedBrief.value?.campaign_id),
+    })
+  } catch (e) {
+    console.warn('Revised brief generation failed:', e.message)
+  } finally {
+    revisedBriefLoading.value = false
+  }
+}
+
+function listText(value) {
+  if (Array.isArray(value)) return value.filter(Boolean).join(' / ') || '—'
+  return value || '—'
 }
 
 function localDecisionFallback() {
@@ -1088,6 +1530,29 @@ function normalizeKpis(data) {
     next.crisis_risk = Math.round(next.crisis_risk)
   }
   return next
+}
+
+function normalizeResultSource(source) {
+  const rawType = source?.type || source?.source_mode || 'unknown'
+  const allowed = ['demo_mode', 'local_estimate', 'live_backend', 'backend_verified', 'unknown']
+  const type = allowed.includes(rawType) ? rawType : 'unknown'
+  const fallbackWarnings = {
+    demo_mode: t('dashboard.sourceDemoMode'),
+    local_estimate: t('dashboard.sourceLocalEstimate'),
+    backend_verified: t('dashboard.sourceBackendVerified'),
+    live_backend: t('dashboard.sourceLiveBackend'),
+    unknown: t('dashboard.sourceUnknownPending'),
+  }
+  return {
+    type,
+    warning: source?.warning || fallbackWarnings[type],
+    data_basis: source?.data_basis || 'unknown',
+    run_id: source?.run_id,
+    simulation_id: source?.simulation_id,
+    campaign_id: source?.campaign_id,
+    confidence: source?.confidence,
+    limitations: Array.isArray(source?.limitations) ? source.limitations : [],
+  }
 }
 
 function normalizeTimelinePoint(point) {
@@ -1167,10 +1632,10 @@ function seedDemoData() {
 
   if (influencers.value.length === 0) {
     influencers.value = [
-      { name: '@TechReviewTH', platform: 'Twitter', impact_score: 92, sentiment: 68, reach: 245000 },
-      { name: 'SomsakD', platform: 'Reddit', impact_score: 85, sentiment: 45, reach: 180000 },
-      { name: '@DigitalNomadBKK', platform: 'Twitter', impact_score: 78, sentiment: 55, reach: 120000 },
-      { name: 'PraewMedia', platform: 'Facebook', impact_score: 71, sentiment: 30, reach: 310000 },
+      { name: 'Synthetic Tech Reviewer A', platform: 'X', impact_score: 92, sentiment: 68, reach: 245000 },
+      { name: 'Synthetic Forum Voice B', platform: 'Reddit', impact_score: 85, sentiment: 45, reach: 180000 },
+      { name: 'Synthetic Urban Creator C', platform: 'X', impact_score: 78, sentiment: 55, reach: 120000 },
+      { name: 'Synthetic Family Page D', platform: 'Facebook', impact_score: 71, sentiment: 30, reach: 310000 },
     ]
   }
 
@@ -1201,9 +1666,34 @@ function seedDemoData() {
   }
 }
 
+function observeActionPlan() {
+  if (!actionPlanSection.value || actionPlanViewedTracked || typeof IntersectionObserver === 'undefined') return
+  actionPlanObserver = new IntersectionObserver((entries) => {
+    if (entries.some(entry => entry.isIntersecting)) {
+      actionPlanViewedTracked = true
+      trackEvent('action_plan_viewed', {
+        source_mode: sourceModeFromValue(displayActionPlan.value?.source?.type),
+        section_count: actionPlanSections.value.length,
+        has_structured_plan: Boolean(structuredActionPlan.value),
+      })
+      actionPlanObserver?.disconnect()
+      actionPlanObserver = null
+    }
+  }, { threshold: 0.35 })
+  actionPlanObserver.observe(actionPlanSection.value)
+}
+
 onMounted(async () => {
   await loadDashboard()
   seedDemoData()
+  observeActionPlan()
+})
+
+onUnmounted(() => {
+  if (actionPlanObserver) {
+    actionPlanObserver.disconnect()
+    actionPlanObserver = null
+  }
 })
 </script>
 
@@ -1618,6 +2108,28 @@ font-size: var(--text-sm);
   overflow-wrap: anywhere;
 }
 
+.confidence-evidence {
+  margin-bottom: 28px;
+}
+
+.trust-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--border-subtle);
+}
+
+.trust-limitations {
+  margin: var(--space-4) 0 0;
+  padding-left: var(--space-5);
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+
 /* ====================== DECISION EVIDENCE ====================== */
 .decision-evidence {
   margin: 28px 0;
@@ -1913,6 +2425,14 @@ font-size: var(--text-sm);
   letter-spacing: 0.5px;
 }
 
+.panel-note {
+  margin: -8px 0 16px 0;
+  max-width: 760px;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
 /* ====================== CHART ====================== */
 .chart-container {
   display: flex;
@@ -2164,6 +2684,53 @@ font-size: var(--text-sm);
   margin-bottom: 28px;
 }
 
+.action-plan-head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-5);
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.action-plan-head p {
+  max-width: 760px;
+  margin: 6px 0 0;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.action-plan-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.copy-action-plan {
+  min-height: 36px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 800;
+}
+
+.copy-action-plan:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.copy-action-plan:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
 .action-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2258,6 +2825,132 @@ font-size: var(--text-sm);
   font-weight: 700;
   flex-shrink: 0;
   min-width: 32px;
+}
+
+.structured-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.structured-action-section {
+  padding: 18px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-surface);
+}
+
+.structured-section-head {
+  margin-bottom: 12px;
+}
+
+.structured-action-item strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.structured-action-item dl {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 0;
+}
+
+.structured-action-item dl div {
+  display: grid;
+  gap: 3px;
+}
+
+.structured-action-item dt {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.structured-action-item dd {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.revised-brief-panel {
+  margin-bottom: 24px;
+  padding: 22px;
+  border: 1px solid var(--border-accent);
+  border-radius: 8px;
+  background: var(--bg-surface);
+}
+
+.revised-brief-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin-bottom: 18px;
+}
+
+.revised-brief-head h3 {
+  margin: 4px 0 6px;
+  color: var(--text-primary);
+  font-size: var(--text-xl);
+}
+
+.revised-brief-head p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.brief-compare-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 16px;
+}
+
+.brief-version-card {
+  padding: 18px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-panel);
+}
+
+.brief-version-card.revised {
+  border-color: var(--border-accent);
+  background: var(--accent-subtle);
+}
+
+.brief-version-card h4 {
+  margin: 0 0 14px;
+  color: var(--text-primary);
+  font-size: var(--text-base);
+}
+
+.brief-version-card dl {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.brief-version-card dt {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.brief-version-card dd {
+  margin: 3px 0 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.55;
 }
 
 /* Action Items */
@@ -2784,7 +3477,14 @@ font-size: var(--text-sm);
   .mid-row {
     grid-template-columns: 1fr;
   }
-  .action-grid {
+  .action-plan-head {
+    flex-direction: column;
+  }
+  .action-plan-tools {
+    justify-content: flex-start;
+  }
+  .action-grid,
+  .structured-action-grid {
     grid-template-columns: 1fr;
   }
   .influencer-grid {

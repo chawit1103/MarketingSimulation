@@ -194,6 +194,7 @@
 import { ref, computed, onMounted, onUnmounted, onActivated, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getSimulationHistory } from '../api/simulation'
+import { hasBrowserAuth } from '../api/authStorage'
 
 const router = useRouter()
 const route = useRoute()
@@ -456,7 +457,7 @@ const loadHistory = async () => {
 
 function shouldUseEmptyHistory() {
   if (!import.meta.env.DEV) return false
-  return !localStorage.getItem('3c-auth-token') && !localStorage.getItem('3c-api-key')
+  return !hasBrowserAuth()
 }
 
 // Initialize IntersectionObserver

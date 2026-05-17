@@ -46,6 +46,8 @@ class SimulationState:
     simulation_id: str
     project_id: str
     graph_id: str
+    org_id: str = ""
+    campaign_id: Optional[str] = None
     
     # Platform enabled state
     enable_twitter: bool = True
@@ -89,6 +91,8 @@ class SimulationState:
             "simulation_id": self.simulation_id,
             "project_id": self.project_id,
             "graph_id": self.graph_id,
+            "org_id": self.org_id,
+            "campaign_id": self.campaign_id,
             "enable_twitter": self.enable_twitter,
             "enable_reddit": self.enable_reddit,
             "status": self.status.value,
@@ -115,6 +119,8 @@ class SimulationState:
             "simulation_id": self.simulation_id,
             "project_id": self.project_id,
             "graph_id": self.graph_id,
+            "org_id": self.org_id,
+            "campaign_id": self.campaign_id,
             "status": self.status.value,
             "entities_count": self.entities_count,
             "profiles_count": self.profiles_count,
@@ -152,10 +158,11 @@ class SimulationManager:
         # In-memory simulation state cache
         self._simulations: Dict[str, SimulationState] = {}
     
-    def _get_simulation_dir(self, simulation_id: str) -> str:
+    def _get_simulation_dir(self, simulation_id: str, *, create: bool = True) -> str:
         """Get simulation data directory"""
         sim_dir = os.path.join(self.SIMULATION_DATA_DIR, simulation_id)
-        os.makedirs(sim_dir, exist_ok=True)
+        if create:
+            os.makedirs(sim_dir, exist_ok=True)
         return sim_dir
     
     def _save_simulation_state(self, state: SimulationState):
@@ -175,7 +182,7 @@ class SimulationManager:
         if simulation_id in self._simulations:
             return self._simulations[simulation_id]
         
-        sim_dir = self._get_simulation_dir(simulation_id)
+        sim_dir = self._get_simulation_dir(simulation_id, create=False)
         state_file = os.path.join(sim_dir, "state.json")
         
         if not os.path.exists(state_file):
@@ -188,6 +195,8 @@ class SimulationManager:
             simulation_id=simulation_id,
             project_id=data.get("project_id", ""),
             graph_id=data.get("graph_id", ""),
+            org_id=data.get("org_id", ""),
+            campaign_id=data.get("campaign_id"),
             enable_twitter=data.get("enable_twitter", True),
             enable_reddit=data.get("enable_reddit", True),
             status=SimulationStatus(data.get("status", "created")),
@@ -221,6 +230,8 @@ class SimulationManager:
         platform_mode: str = "auto",
         audience_channels: Optional[List[str]] = None,
         oasis_preset: Optional[Dict[str, Any]] = None,
+        org_id: str = "",
+        campaign_id: Optional[str] = None,
     ) -> SimulationState:
         """
         Create new simulation
@@ -247,6 +258,8 @@ class SimulationManager:
             simulation_id=simulation_id,
             project_id=project_id,
             graph_id=graph_id,
+            org_id=org_id,
+            campaign_id=campaign_id,
             enable_twitter=enable_twitter,
             enable_reddit=enable_reddit,
             status=SimulationStatus.CREATED,
@@ -504,11 +517,18 @@ class SimulationManager:
             self._save_simulation_state(state)
             raise
     
-    def get_simulation(self, simulation_id: str) -> Optional[SimulationState]:
+    def get_simulation(self, simulation_id: str, org_id: Optional[str] = None) -> Optional[SimulationState]:
         """Get simulation state"""
-        return self._load_simulation_state(simulation_id)
+        state = self._load_simulation_state(simulation_id)
+        if state and org_id is not None and state.org_id != org_id:
+            return None
+        return state
     
-    def list_simulations(self, project_id: Optional[str] = None) -> List[SimulationState]:
+    def list_simulations(
+        self,
+        project_id: Optional[str] = None,
+        org_id: Optional[str] = None,
+    ) -> List[SimulationState]:
         """List all simulations"""
         simulations = []
         
@@ -521,14 +541,21 @@ class SimulationManager:
                 
                 state = self._load_simulation_state(sim_id)
                 if state:
+                    if org_id is not None and state.org_id != org_id:
+                        continue
                     if project_id is None or state.project_id == project_id:
                         simulations.append(state)
         
         return simulations
     
-    def get_profiles(self, simulation_id: str, platform: str = "reddit") -> List[Dict[str, Any]]:
+    def get_profiles(
+        self,
+        simulation_id: str,
+        platform: str = "reddit",
+        org_id: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
         """Get Agent Profiles for simulation"""
-        state = self._load_simulation_state(simulation_id)
+        state = self.get_simulation(simulation_id, org_id=org_id)
         if not state:
             raise ValueError(f"Simulation does not exist: {simulation_id}")
         
@@ -541,9 +568,15 @@ class SimulationManager:
         with open(profile_path, 'r', encoding='utf-8') as f:
             return json.load(f)
     
-    def get_simulation_config(self, simulation_id: str) -> Optional[Dict[str, Any]]:
+    def get_simulation_config(
+        self,
+        simulation_id: str,
+        org_id: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
         """Get simulation config"""
-        sim_dir = self._get_simulation_dir(simulation_id)
+        if org_id is not None and not self.get_simulation(simulation_id, org_id=org_id):
+            return None
+        sim_dir = self._get_simulation_dir(simulation_id, create=False)
         config_path = os.path.join(sim_dir, "simulation_config.json")
         
         if not os.path.exists(config_path):

@@ -1,0 +1,126 @@
+{
+  "id": "insurance_insurtech",
+  "name_th": "Insurance / InsurTech",
+  "name_en": "Insurance / InsurTech",
+  "description_th": "Deep preset for insurance product education, trust rebuilding, claims concerns, agent/channel conflict, and regulated communication.",
+  "description_en": "Deep preset for insurance product education, trust rebuilding, claims concerns, agent/channel conflict, and regulated communication.",
+  "icon": "I",
+  "color": "#3456a4",
+  "industry_depth": "deep_preset",
+  "objectives": ["brand_perception", "message_testing", "competitor_response", "crisis_simulation"],
+  "default_objective": "brand_perception",
+  "default_platform": "both",
+  "default_max_rounds": 20,
+  "default_language": "th",
+  "campaign_duration": "8-12 weeks education and lead generation window",
+  "budget_range": "THB 2M-12M test budget; replace with approved media and agent plan",
+  "primary_kpi": "Trust lift, quote intent, objection reduction, claim concern rate",
+  "competitor_context": "Traditional insurers, bank assurance, price-comparison platforms, digital-first challengers, and agent-led local competitors.",
+  "brand_constraints": "Avoid guaranteed payout language, hidden exclusions, fear-based pressure, or confusing financial/medical claims.",
+  "risk_legal_notes": "Review OIC, PDPA, policy wording, claims examples, testimonial disclosures, and agent compliance rules.",
+  "target_audience": {
+    "age_range": [22, 65],
+    "gender": "all",
+    "regions": ["bangkok", "central", "northeast", "north", "south"],
+    "channels": ["facebook", "line", "youtube", "tiktok"],
+    "persona_count": 110
+  },
+  "persona_segments": [
+    {
+      "id": "protection_buyers",
+      "name_th": "Protection buyers",
+      "name_en": "Protection buyers",
+      "count": 55,
+      "interests": ["family security", "claims", "monthly premium", "advisor trust"],
+      "archetypes": [
+        {
+          "id": "young_family_planner",
+          "name_th": "Young family planner",
+          "name_en": "Young family planner",
+          "age_range": [28, 42],
+          "income": "middle",
+          "regions": ["bangkok", "central"],
+          "occupation_th": "Employee / parent",
+          "channels": ["facebook", "line", "youtube"],
+          "narrative_th": "Wants protection for family but worries about exclusions, premium burden, and whether claims will really be paid.",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "price_compare_buyer",
+          "name_th": "Price comparison buyer",
+          "name_en": "Price comparison buyer",
+          "age_range": [24, 38],
+          "income": "lower_middle",
+          "regions": ["bangkok", "east"],
+          "occupation_th": "Office worker",
+          "channels": ["tiktok", "facebook", "line"],
+          "narrative_th": "Compares premiums online and suspects insurers hide exclusions in small print.",
+          "purchase_style": "price_sensitive"
+        }
+      ]
+    },
+    {
+      "id": "trust_gatekeepers",
+      "name_th": "Trust gatekeepers",
+      "name_en": "Trust gatekeepers",
+      "count": 45,
+      "interests": ["brand reputation", "claim stories", "financial stability", "agent advice"],
+      "archetypes": [
+        {
+          "id": "experienced_claimant",
+          "name_th": "Experienced claimant",
+          "name_en": "Experienced claimant",
+          "age_range": [35, 58],
+          "income": "middle",
+          "regions": ["central", "north", "south"],
+          "occupation_th": "Small business / employee",
+          "channels": ["facebook", "line", "youtube"],
+          "narrative_th": "Has filed a claim before and evaluates brands by claims service, not slogans.",
+          "purchase_style": "brand_loyal"
+        },
+        {
+          "id": "local_agent_influenced",
+          "name_th": "Local agent influenced buyer",
+          "name_en": "Local agent influenced buyer",
+          "age_range": [40, 65],
+          "income": "middle",
+          "regions": ["northeast", "north", "south"],
+          "occupation_th": "Family decision maker",
+          "channels": ["line", "facebook", "tv"],
+          "narrative_th": "Trusts known local agents and community referrals more than digital ads.",
+          "purchase_style": "social_proof"
+        }
+      ]
+    }
+  ],
+  "crisis_scenarios": [
+    {"id": "claim_denial_story", "name_th": "Claim denial story", "name_en": "Claim denial story", "trigger": "A customer posts a viral story claiming the insurer denied a claim unfairly.", "event_tag": "claim-denial", "impact": "negative", "intensity": 9},
+    {"id": "fine_print_backlash", "name_th": "Fine print backlash", "name_en": "Fine print backlash", "trigger": "Users accuse a campaign of hiding exclusions behind simple benefit language.", "event_tag": "fine-print", "impact": "negative", "intensity": 8},
+    {"id": "transparent_claims_education", "name_th": "Transparent claims education", "name_en": "Transparent claims education", "trigger": "The brand publishes simple claims examples and decision criteria with careful disclaimers.", "event_tag": "claims-education", "impact": "mixed", "intensity": 5}
+  ],
+  "document_seeds": [
+    {
+      "id": "insurance_education_brief",
+      "name_th": "Insurance education brief",
+      "name_en": "Insurance education brief",
+      "description_th": "Starter brief for transparent insurance education.",
+      "description_en": "Starter brief for transparent insurance education.",
+      "content": "# Insurance Education Brief\n\nProduct: [product]\nObjective: improve trust and qualified quote intent.\nAudience: family planners, price comparison buyers, claim-experience skeptics.\nProof: clear policy examples, eligibility, exclusion summary, claims process.\nRisks: overpromising, hidden exclusions, personal data collection, agent/channel conflict.\nValidation: legal review, advisor review, claims team review, and segment objection test."
+    }
+  ],
+  "deep_preset": {
+    "target_segment_archetypes": ["Young family planner", "Price comparison buyer", "Experienced claimant", "Local agent influenced buyer"],
+    "common_objections": ["Will claims really be paid?", "Premium is too high", "Exclusions are unclear", "Online quote feels risky"],
+    "crisis_triggers": ["Viral claim denial story", "Misleading benefit language", "Agent misconduct allegation", "Personal data handling concern"],
+    "typical_kpis": ["Trust lift", "Qualified quote intent", "Claim concern rate", "Exclusion comprehension", "Advisor handoff completion"],
+    "channel_behavior": ["Facebook and LINE carry claim stories quickly", "YouTube works for education", "TikTok can simplify but can also overpromise", "Agent networks need compliant scripts"],
+    "competitor_archetypes": ["Low-premium digital challenger", "Bank assurance bundle", "Trusted legacy insurer", "Local agent-led competitor"],
+    "legal_regulatory_sensitivities": ["OIC rules", "PDPA consent", "Policy wording", "Testimonials and claims examples", "Agent compliance"],
+    "proof_point_requirements": ["Plain-language exclusions", "Claims process evidence", "Eligibility boundaries", "Approved disclaimer language"],
+    "sample_brief": "Introduce a protection product by making claims eligibility and exclusions easier to understand without promising outcomes.",
+    "sample_risk_checklist": ["Are exclusions visible?", "Is quote collection consent clear?", "Are testimonials compliant?", "Did legal approve all examples?"],
+    "sample_action_plan_hints": ["Lead with transparent claims process", "Add side-by-side exclusion explainer", "Train agents on approved messages", "Prepare response for claim-denial comments"],
+    "assumptions": ["This preset is a deterministic planning aid, not actuarial advice.", "Regulatory and policy wording review is mandatory before launch."],
+    "limitations": ["Does not assess individual insurance suitability.", "Does not estimate actual claims or portfolio risk."]
+  }
+}

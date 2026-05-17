@@ -11,6 +11,120 @@
     <div class="settings-content">
       <h1 class="page-title">{{ $t('settings.title') }}</h1>
 
+      <!-- Setup Wizard -->
+      <section class="config-section setup-wizard">
+        <div class="section-heading-row">
+          <div>
+            <h2 class="section-title">{{ $t('settings.wizardTitle') }}</h2>
+            <p class="section-desc">{{ $t('settings.wizardDesc') }}</p>
+          </div>
+          <button class="btn-secondary compact" @click="runReadinessCheck" :disabled="wizardLoading">
+            {{ wizardLoading ? $t('common.loading') : $t('settings.checkReadiness') }}
+          </button>
+        </div>
+
+        <div class="wizard-modes">
+          <button
+            v-for="mode in wizardModes"
+            :key="mode.id"
+            :class="['wizard-mode', { active: wizardMode === mode.id }]"
+            type="button"
+            @click="selectWizardMode(mode.id)"
+          >
+            <strong>{{ $t(mode.labelKey) }}</strong>
+            <span>{{ $t(mode.descKey) }}</span>
+          </button>
+        </div>
+
+        <div class="wizard-steps">
+          <button
+            v-for="(step, idx) in wizardSteps"
+            :key="step.key"
+            :class="['wizard-step', { active: wizardStep === idx, done: readinessStatus(step.key) === 'ready' || readinessStatus(step.key) === 'skipped' }]"
+            type="button"
+            @click="wizardStep = idx"
+          >
+            <span>{{ idx + 1 }}</span>
+            <strong>{{ $t(step.labelKey) }}</strong>
+          </button>
+        </div>
+
+        <div class="wizard-panel">
+          <div>
+            <span class="wizard-kicker">{{ $t(activeWizardStep.kickerKey) }}</span>
+            <h3>{{ $t(activeWizardStep.labelKey) }}</h3>
+            <p>{{ $t(activeWizardStep.helpKey) }}</p>
+          </div>
+
+          <div v-if="activeWizardStep.key === 'mode'" class="wizard-readiness">
+            <article>
+              <strong>{{ $t('settings.currentSetupMode') }}</strong>
+              <p>{{ setupModeLabel }}</p>
+            </article>
+            <article>
+              <strong>{{ $t('settings.costEstimate') }}</strong>
+              <p>{{ costEstimateText }}</p>
+              <small>{{ readiness.cost_estimate?.disclaimer || $t('settings.costEstimateDisclaimer') }}</small>
+            </article>
+          </div>
+
+          <div v-else-if="activeWizardStep.key === 'llm'" class="wizard-test-row">
+            <article class="readiness-card">
+              <strong>{{ $t('settings.llm') }}</strong>
+              <span :class="['status-dot-label', statusClass(readiness.checks.llm.status)]">{{ readinessLabel(readiness.checks.llm.status) }}</span>
+              <p>{{ readiness.checks.llm.safe_detail }}</p>
+              <ul v-if="readiness.checks.llm.issues?.length">
+                <li v-for="issue in readiness.checks.llm.issues" :key="issue">{{ issue }}</li>
+              </ul>
+            </article>
+            <button class="btn-secondary" type="button" @click="testLLMProvider" :disabled="testingProvider || wizardMode === 'demo'">
+              {{ testingProvider ? $t('common.loading') : $t('settings.testLlmProvider') }}
+            </button>
+          </div>
+
+          <div v-else-if="activeWizardStep.key === 'embedding'" class="wizard-test-row">
+            <article class="readiness-card">
+              <strong>{{ $t('settings.embedding') }}</strong>
+              <span :class="['status-dot-label', statusClass(readiness.checks.embedding.status)]">{{ readinessLabel(readiness.checks.embedding.status) }}</span>
+              <p>{{ readiness.checks.embedding.safe_detail }}</p>
+              <ul v-if="readiness.checks.embedding.issues?.length">
+                <li v-for="issue in readiness.checks.embedding.issues" :key="issue">{{ issue }}</li>
+              </ul>
+            </article>
+            <p class="wizard-note">{{ $t('settings.embeddingReadinessNote') }}</p>
+          </div>
+
+          <div v-else-if="activeWizardStep.key === 'neo4j'" class="wizard-test-row">
+            <article class="readiness-card">
+              <strong>{{ $t('settings.graphdb') }}</strong>
+              <span :class="['status-dot-label', statusClass(readiness.checks.neo4j.status)]">{{ readinessLabel(readiness.checks.neo4j.status) }}</span>
+              <p>{{ readiness.checks.neo4j.safe_detail }}</p>
+              <ul v-if="readiness.checks.neo4j.issues?.length">
+                <li v-for="issue in readiness.checks.neo4j.issues" :key="issue">{{ issue }}</li>
+              </ul>
+            </article>
+            <button class="btn-secondary" type="button" @click="loadSystemStatus" :disabled="statusLoading || wizardMode === 'demo'">
+              {{ statusLoading ? $t('common.loading') : $t('settings.testNeo4jStatus') }}
+            </button>
+          </div>
+
+          <div v-else class="wizard-readiness">
+            <article>
+              <strong>{{ readiness.sample_simulation?.label || $t('settings.sampleSimulation') }}</strong>
+              <p>{{ readiness.sample_simulation?.detail || $t('settings.sampleSimulationDesc') }}</p>
+            </article>
+            <article>
+              <strong>{{ $t('settings.readinessResult') }}</strong>
+              <p :class="readiness.ready ? 'is-ok-text' : 'is-warning-text'">
+                {{ readiness.ready ? $t('settings.readyToSimulate') : $t('settings.needsAttentionBeforeSimulation') }}
+              </p>
+            </article>
+          </div>
+
+          <div v-if="wizardMessage" :class="['message inline-message', wizardMessageType]">{{ wizardMessage }}</div>
+        </div>
+      </section>
+
       <!-- System Health -->
       <section class="config-section system-health">
         <div class="section-heading-row">
@@ -69,7 +183,15 @@
           </div>
           <div class="form-group">
             <label>{{ $t('settings.apiKey') }}</label>
-            <input v-model="config.llm.apiKey" type="password" placeholder="sk-..." />
+            <input
+              v-model="config.llm.apiKey"
+              type="password"
+              :placeholder="secretPresence.llmApiKey ? $t('settings.secretPlaceholderStored') : 'sk-...'"
+              autocomplete="new-password"
+            />
+            <p class="secret-hint" :class="{ 'is-present': secretPresence.llmApiKey }">
+              {{ secretPresence.llmApiKey ? $t('settings.secretStored') : $t('settings.secretNotStored') }}
+            </p>
           </div>
           <div class="form-group">
             <label>{{ $t('settings.baseUrl') }}</label>
@@ -107,7 +229,15 @@
           </div>
           <div class="form-group">
             <label>{{ $t('settings.apiKey') }}</label>
-            <input v-model="config.embedding.apiKey" type="password" placeholder="sk-..." />
+            <input
+              v-model="config.embedding.apiKey"
+              type="password"
+              :placeholder="secretPresence.embeddingApiKey ? $t('settings.secretPlaceholderStored') : 'sk-...'"
+              autocomplete="new-password"
+            />
+            <p class="secret-hint" :class="{ 'is-present': secretPresence.embeddingApiKey }">
+              {{ secretPresence.embeddingApiKey ? $t('settings.secretStored') : $t('settings.secretNotStored') }}
+            </p>
           </div>
           <div class="form-group">
             <label>{{ $t('settings.baseUrl') }}</label>
@@ -146,8 +276,8 @@
           <div class="form-group">
             <label>{{ $t('settings.graphMode') }}</label>
             <select v-model="config.graphdb.mode">
-              <option value="neo4j">Neo4j</option>
-              <option value="bolt">Bolt</option>
+              <option value="local">Local Neo4j</option>
+              <option value="cloud">Neo4j AuraDB</option>
             </select>
           </div>
           <div class="form-group">
@@ -160,7 +290,15 @@
           </div>
           <div class="form-group">
             <label>{{ $t('settings.graphPassword') }}</label>
-            <input v-model="config.graphdb.password" type="password" placeholder="password" />
+            <input
+              v-model="config.graphdb.password"
+              type="password"
+              :placeholder="secretPresence.graphPassword ? $t('settings.secretPlaceholderStored') : 'password'"
+              autocomplete="new-password"
+            />
+            <p class="secret-hint" :class="{ 'is-present': secretPresence.graphPassword }">
+              {{ secretPresence.graphPassword ? $t('settings.secretStored') : $t('settings.secretNotStored') }}
+            </p>
           </div>
         </div>
       </section>
@@ -206,10 +344,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { computed, ref, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import TemplateImportDropZone from '@/components/TemplateImportDropZone.vue'
 import { getSystemStatus } from '@/api/status'
+import { checkSettingsReadiness, getProviders, getSettings, testLLMConnection, updateSettings } from '@/api/settings'
+import { trackEvent } from '@/services/analytics'
 
 const { locale, t } = useI18n()
 
@@ -236,11 +376,17 @@ const config = reactive({
     ontology: ''
   },
   graphdb: {
-    mode: 'neo4j',
+    mode: 'local',
     uri: 'bolt://localhost:7687',
     user: 'neo4j',
     password: ''
   }
+})
+
+const secretPresence = reactive({
+  llmApiKey: false,
+  embeddingApiKey: false,
+  graphPassword: false,
 })
 
 const selectedLanguage = ref(locale.value)
@@ -249,10 +395,40 @@ const testing = ref(false)
 const message = ref('')
 const messageType = ref('success')
 const statusLoading = ref(false)
+const wizardMode = ref('demo')
+const wizardStep = ref(0)
+const wizardLoading = ref(false)
+const testingProvider = ref(false)
+const wizardMessage = ref('')
+const wizardMessageType = ref('success')
+const providerCatalog = ref({ llm_providers: [], embedding_providers: [], graph_db_modes: [] })
 const systemStatus = reactive({
   status: 'degraded',
   services: [],
   estimate: {}
+})
+const readiness = reactive(defaultReadiness())
+
+const wizardModes = [
+  { id: 'demo', labelKey: 'settings.modeDemoOnly', descKey: 'settings.modeDemoOnlyDesc' },
+  { id: 'local', labelKey: 'settings.modeLocalModel', descKey: 'settings.modeLocalModelDesc' },
+  { id: 'cloud', labelKey: 'settings.modeCloudApi', descKey: 'settings.modeCloudApiDesc' },
+]
+
+const wizardSteps = [
+  { key: 'mode', labelKey: 'settings.wizardStepMode', kickerKey: 'settings.wizardKickerStart', helpKey: 'settings.wizardStepModeHelp' },
+  { key: 'llm', labelKey: 'settings.wizardStepLlm', kickerKey: 'settings.wizardKickerProvider', helpKey: 'settings.wizardStepLlmHelp' },
+  { key: 'embedding', labelKey: 'settings.wizardStepEmbedding', kickerKey: 'settings.wizardKickerProvider', helpKey: 'settings.wizardStepEmbeddingHelp' },
+  { key: 'neo4j', labelKey: 'settings.wizardStepNeo4j', kickerKey: 'settings.wizardKickerStorage', helpKey: 'settings.wizardStepNeo4jHelp' },
+  { key: 'sample', labelKey: 'settings.wizardStepSample', kickerKey: 'settings.wizardKickerReady', helpKey: 'settings.wizardStepSampleHelp' },
+]
+
+const activeWizardStep = computed(() => wizardSteps[wizardStep.value] || wizardSteps[0])
+const setupModeLabel = computed(() => t(wizardModes.find(mode => mode.id === wizardMode.value)?.labelKey || 'settings.modeDemoOnly'))
+const costEstimateText = computed(() => {
+  const value = readiness.cost_estimate?.per_100_personas
+  if (value == null) return t('settings.costEstimateUnknown')
+  return `$${value} / 100 personas (${readiness.cost_estimate?.label || t('settings.estimateOnly')})`
 })
 
 function changeLanguage() {
@@ -260,7 +436,7 @@ function changeLanguage() {
   localStorage.setItem('3c-lang', selectedLanguage.value)
 }
 
-function saveSettings() {
+async function saveSettings() {
   saving.value = true
   message.value = ''
   try {
@@ -271,11 +447,23 @@ function saveSettings() {
       graphdb: { ...config.graphdb },
       language: selectedLanguage.value
     }
-    localStorage.setItem('3c-settings', JSON.stringify(settings))
+    localStorage.setItem('3c-settings', JSON.stringify(safeLocalSettings(settings)))
     message.value = t('settings.saveSuccess')
     messageType.value = 'success'
+    if (wizardMode.value !== 'demo' && readiness.ready) {
+      const backendPayload = toBackendSettings(settings)
+      await updateSettings(backendPayload)
+      if (backendPayload.llm.api_key) secretPresence.llmApiKey = true
+      if (backendPayload.embedding.api_key) secretPresence.embeddingApiKey = true
+      if (backendPayload.graph_db.password) secretPresence.graphPassword = true
+      clearSecretInputs()
+      localStorage.setItem('3c-settings', JSON.stringify(safeLocalSettings(settings)))
+    } else if (wizardMode.value !== 'demo' && !readiness.ready) {
+      message.value = t('settings.localSaveNeedsReadiness')
+    }
   } catch (e) {
-    message.value = t('settings.saveFailed')
+    console.warn('Settings save failed:', e.message)
+    message.value = wizardMode.value === 'demo' ? t('settings.saveFailed') : t('settings.localSaveBackendFailed')
     messageType.value = 'error'
   } finally {
     saving.value = false
@@ -286,13 +474,16 @@ async function testConnection() {
   testing.value = true
   message.value = ''
   try {
-    // Placeholder for actual connection test
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    message.value = t('settings.connectionSuccess')
-    messageType.value = 'success'
+    await runReadinessCheck()
+    message.value = readiness.ready ? t('settings.connectionSuccess') : t('settings.connectionNeedsAttention')
+    messageType.value = readiness.ready ? 'success' : 'error'
   } catch (e) {
     message.value = t('settings.connectionFailed')
     messageType.value = 'error'
+    trackEvent('settings_provider_test_failed', {
+      provider_type: 'readiness',
+      mode: wizardMode.value,
+    })
   } finally {
     testing.value = false
   }
@@ -327,8 +518,236 @@ function statusLabel(status) {
 }
 
 function statusClass(status) {
-  if (status === 'ok' || status === 'configured') return 'is-ok'
+  if (status === 'ok' || status === 'configured' || status === 'ready' || status === 'skipped') return 'is-ok'
   return 'is-warning'
+}
+
+function defaultReadiness() {
+  return {
+    mode: 'demo',
+    ready: true,
+    checks: {
+      llm: { status: 'skipped', safe_detail: 'Demo mode does not require an LLM provider.', issues: [] },
+      embedding: { status: 'skipped', safe_detail: 'Demo mode does not require an embedding provider.', issues: [] },
+      neo4j: { status: 'skipped', safe_detail: 'Demo mode does not require Neo4j.', issues: [] },
+    },
+    sample_simulation: { status: 'available', label: 'Try Sample Campaign', detail: 'Use a deterministic demo campaign.' },
+    cost_estimate: { per_100_personas: 0, label: 'Directional estimate only', disclaimer: '' },
+  }
+}
+
+function selectWizardMode(mode) {
+  wizardMode.value = mode
+  if (mode === 'demo') {
+    wizardStep.value = 0
+  } else if (mode === 'local') {
+    config.llm.provider = 'ollama'
+    config.embedding.provider = 'ollama'
+    config.graphdb.mode = 'local'
+    config.llm.baseUrl = config.llm.baseUrl || 'http://localhost:11434/v1'
+    config.embedding.baseUrl = config.embedding.baseUrl || 'http://localhost:11434'
+  } else if (mode === 'cloud') {
+    if (config.llm.provider === 'ollama') config.llm.provider = 'openai'
+    if (config.embedding.provider === 'ollama') config.embedding.provider = 'openai'
+    config.graphdb.mode = 'cloud'
+  }
+  runReadinessCheck()
+}
+
+async function loadProviderCatalog() {
+  try {
+    const res = await getProviders()
+    providerCatalog.value = res.data || res
+  } catch (e) {
+    console.warn('Provider catalog unavailable:', e.message)
+  }
+}
+
+function readinessStatus(key) {
+  if (key === 'mode' || key === 'sample') return readiness.ready ? 'ready' : 'needs_attention'
+  return readiness.checks[key]?.status || 'needs_attention'
+}
+
+function readinessLabel(status) {
+  const labels = {
+    ready: t('settings.statusReady'),
+    skipped: t('settings.statusSkipped'),
+    needs_attention: t('settings.statusNeedsAttention'),
+    ok: t('settings.statusOk'),
+    configured: t('settings.statusConfigured'),
+    warning: t('settings.statusWarning'),
+  }
+  return labels[status] || status || t('settings.statusWarning')
+}
+
+async function runReadinessCheck() {
+  wizardLoading.value = true
+  wizardMessage.value = ''
+  try {
+    const res = await checkSettingsReadiness(toReadinessPayload())
+    Object.assign(readiness, res.data || res)
+    wizardMessage.value = readiness.ready ? t('settings.readinessReady') : t('settings.readinessNeedsAttention')
+    wizardMessageType.value = readiness.ready ? 'success' : 'error'
+  } catch (e) {
+    wizardMessage.value = safeClientError(e)
+    wizardMessageType.value = 'error'
+    trackEvent('settings_provider_test_failed', {
+      provider_type: 'readiness',
+      mode: wizardMode.value,
+    })
+  } finally {
+    wizardLoading.value = false
+  }
+}
+
+async function testLLMProvider() {
+  testingProvider.value = true
+  wizardMessage.value = ''
+  try {
+    const res = await testLLMConnection(toBackendSettings({ llm: config.llm }).llm)
+    wizardMessage.value = res.message || t('settings.connectionSuccess')
+    wizardMessageType.value = 'success'
+  } catch (e) {
+    wizardMessage.value = safeClientError(e)
+    wizardMessageType.value = 'error'
+    trackEvent('settings_provider_test_failed', {
+      provider_type: 'llm',
+      provider: config.llm.provider,
+      mode: wizardMode.value,
+    })
+  } finally {
+    testingProvider.value = false
+  }
+}
+
+function toReadinessPayload() {
+  const backend = toBackendSettings({
+    llm: config.llm,
+    embedding: config.embedding,
+    graphdb: config.graphdb,
+  })
+  return {
+    mode: wizardMode.value,
+    llm: {
+      provider: backend.llm.provider,
+      model: backend.llm.model,
+      base_url: backend.llm.base_url,
+      api_key_present: Boolean(backend.llm.api_key || secretPresence.llmApiKey),
+    },
+    embedding: {
+      provider: backend.embedding.provider,
+      model: backend.embedding.model,
+      base_url: backend.embedding.base_url,
+      api_key_present: Boolean(backend.embedding.api_key || secretPresence.embeddingApiKey),
+    },
+    graph_db: {
+      mode: backend.graph_db.mode,
+      uri: backend.graph_db.uri,
+      user: backend.graph_db.user,
+      password_present: Boolean(backend.graph_db.password || secretPresence.graphPassword),
+    },
+  }
+}
+
+function toBackendSettings(settings) {
+  return {
+    language: selectedLanguage.value,
+    llm: {
+      provider: settings.llm?.provider || 'ollama',
+      model: settings.llm?.model || 'qwen2.5:7b',
+      api_key: unmaskedSecret(settings.llm?.apiKey),
+      api_key_present: Boolean(secretPresence.llmApiKey || unmaskedSecret(settings.llm?.apiKey)),
+      base_url: settings.llm?.baseUrl || null,
+      temperature: settings.llm?.temperature ?? 0.7,
+      max_tokens: settings.llm?.maxTokens ?? 4096,
+      timeout: settings.llm?.timeout ?? 600,
+    },
+    embedding: {
+      provider: settings.embedding?.provider || 'ollama',
+      model: settings.embedding?.model || 'nomic-embed-text',
+      api_key: unmaskedSecret(settings.embedding?.apiKey),
+      api_key_present: Boolean(secretPresence.embeddingApiKey || unmaskedSecret(settings.embedding?.apiKey)),
+      base_url: settings.embedding?.baseUrl || null,
+    },
+    graph_db: {
+      mode: normalizeGraphMode(settings.graphdb?.mode),
+      uri: settings.graphdb?.uri || 'bolt://localhost:7687',
+      user: settings.graphdb?.user || 'neo4j',
+      password: unmaskedSecret(settings.graphdb?.password),
+      password_present: Boolean(secretPresence.graphPassword || unmaskedSecret(settings.graphdb?.password)),
+    },
+    task_llm: {},
+  }
+}
+
+function normalizeGraphMode(mode) {
+  if (mode === 'neo4j' || mode === 'bolt') return 'local'
+  return mode || 'local'
+}
+
+function unmaskedSecret(value) {
+  if (!value || String(value).includes('••••') || String(value).includes('****')) return ''
+  return value
+}
+
+function safeClientError(error) {
+  const raw = error?.message || String(error || '')
+  return raw.replace(/sk-[A-Za-z0-9_-]{8,}/g, 'sk-***').slice(0, 180) || t('settings.connectionFailed')
+}
+
+function clearSecretInputs() {
+  config.llm.apiKey = ''
+  config.embedding.apiKey = ''
+  config.graphdb.password = ''
+}
+
+function safeLocalSettings(settings) {
+  return {
+    ...settings,
+    llm: { ...(settings.llm || {}), apiKey: '' },
+    embedding: { ...(settings.embedding || {}), apiKey: '' },
+    graphdb: { ...(settings.graphdb || {}), password: '' },
+    secretPresence: { ...secretPresence },
+  }
+}
+
+function applyBackendSettings(settings) {
+  if (!settings) return
+  if (settings.language) {
+    selectedLanguage.value = settings.language
+    locale.value = settings.language
+  }
+  if (settings.llm) {
+    config.llm.provider = settings.llm.provider || config.llm.provider
+    config.llm.model = settings.llm.model || config.llm.model
+    config.llm.baseUrl = settings.llm.base_url || config.llm.baseUrl
+    config.llm.temperature = settings.llm.temperature ?? config.llm.temperature
+    config.llm.maxTokens = settings.llm.max_tokens ?? config.llm.maxTokens
+    config.llm.timeout = settings.llm.timeout ?? config.llm.timeout
+    secretPresence.llmApiKey = Boolean(settings.llm.api_key_present)
+  }
+  if (settings.embedding) {
+    config.embedding.provider = settings.embedding.provider || config.embedding.provider
+    config.embedding.model = settings.embedding.model || config.embedding.model
+    config.embedding.baseUrl = settings.embedding.base_url || config.embedding.baseUrl
+    secretPresence.embeddingApiKey = Boolean(settings.embedding.api_key_present)
+  }
+  if (settings.graph_db) {
+    config.graphdb.mode = normalizeGraphMode(settings.graph_db.mode)
+    config.graphdb.uri = settings.graph_db.uri || config.graphdb.uri
+    config.graphdb.user = settings.graph_db.user || config.graphdb.user
+    secretPresence.graphPassword = Boolean(settings.graph_db.password_present)
+  }
+  clearSecretInputs()
+}
+
+async function loadBackendSettings() {
+  try {
+    const res = await getSettings()
+    applyBackendSettings(res.settings || res.data?.settings)
+  } catch (e) {
+    // Settings reads require auth; unauthenticated demo users keep local defaults.
+  }
 }
 
 // Load saved settings on mount
@@ -340,6 +759,16 @@ try {
     Object.assign(config.embedding, parsed.embedding || {})
     Object.assign(config.tasks, parsed.tasks || {})
     Object.assign(config.graphdb, parsed.graphdb || {})
+    Object.assign(secretPresence, parsed.secretPresence || {})
+    clearSecretInputs()
+    localStorage.setItem('3c-settings', JSON.stringify(safeLocalSettings({
+      llm: { ...config.llm },
+      embedding: { ...config.embedding },
+      tasks: { ...config.tasks },
+      graphdb: { ...config.graphdb },
+      language: parsed.language || selectedLanguage.value,
+    })))
+    config.graphdb.mode = normalizeGraphMode(config.graphdb.mode)
     if (parsed.language) {
       selectedLanguage.value = parsed.language
       locale.value = parsed.language
@@ -349,8 +778,11 @@ try {
   // ignore parse errors
 }
 
-onMounted(() => {
+onMounted(async () => {
+  loadProviderCatalog()
+  await loadBackendSettings()
   loadSystemStatus()
+  runReadinessCheck()
 })
 </script>
 
@@ -428,6 +860,176 @@ onMounted(() => {
   border-radius: var(--radius-lg);
   background: var(--bg-surface);
   box-shadow: var(--shadow-card);
+}
+
+.setup-wizard {
+  border-color: var(--border-accent);
+}
+
+.wizard-modes,
+.wizard-steps,
+.wizard-readiness {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.wizard-modes {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: var(--space-5);
+}
+
+.wizard-mode {
+  min-height: 112px;
+  padding: var(--space-4);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+  color: var(--text-secondary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.wizard-mode.active {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.wizard-mode strong,
+.readiness-card strong,
+.wizard-readiness strong {
+  display: block;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: 900;
+}
+
+.wizard-mode span {
+  display: block;
+  margin-top: var(--space-2);
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.wizard-steps {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-bottom: var(--space-5);
+}
+
+.wizard-step {
+  min-height: 64px;
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+}
+
+.wizard-step span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 900;
+}
+
+.wizard-step strong {
+  color: var(--text-primary);
+  font-size: var(--text-xs);
+}
+
+.wizard-step.active {
+  border-color: var(--accent);
+}
+
+.wizard-step.done span {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.wizard-panel {
+  padding: var(--space-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+}
+
+.wizard-kicker {
+  display: block;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.wizard-panel h3 {
+  margin: var(--space-2) 0;
+  color: var(--text-primary);
+  font-size: var(--text-lg);
+}
+
+.wizard-panel p,
+.wizard-note {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.wizard-readiness {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: var(--space-4);
+}
+
+.wizard-readiness article,
+.readiness-card {
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+}
+
+.readiness-card {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.readiness-card ul {
+  margin: 0;
+  padding-left: var(--space-5);
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.wizard-test-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-4);
+  align-items: start;
+  margin-top: var(--space-4);
+}
+
+.inline-message {
+  margin-top: var(--space-4);
+}
+
+.is-ok-text {
+  color: var(--green) !important;
+}
+
+.is-warning-text {
+  color: var(--yellow) !important;
 }
 
 .section-title {
@@ -591,6 +1193,17 @@ onMounted(() => {
   box-shadow: 0 0 0 3px var(--accent-subtle);
 }
 
+.secret-hint {
+  margin: 0;
+  font-size: var(--text-xs);
+  line-height: 1.35;
+  color: var(--text-tertiary);
+}
+
+.secret-hint.is-present {
+  color: var(--success);
+}
+
 .action-row {
   display: flex;
   gap: var(--space-3);
@@ -670,7 +1283,11 @@ onMounted(() => {
 }
 
 @media (max-width: 600px) {
-  .form-grid {
+  .form-grid,
+  .wizard-modes,
+  .wizard-steps,
+  .wizard-readiness,
+  .wizard-test-row {
     grid-template-columns: 1fr;
   }
   .section-heading-row {

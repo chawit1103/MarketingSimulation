@@ -20,5 +20,17 @@ export default defineConfig({
         secure: false
       }
     }
+  },
+  test: {
+    environment: 'jsdom',
+    environmentOptions: {
+      jsdom: {
+        url: 'http://localhost/',
+      },
+    },
+    globals: true,
+    setupFiles: ['./src/test/setup.js'],
+    include: ['src/**/*.test.js'],
+    exclude: ['src/services/analytics.test.js', 'e2e/**', 'node_modules/**', 'dist/**'],
   }
 })

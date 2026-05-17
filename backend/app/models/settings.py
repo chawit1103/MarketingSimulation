@@ -1,7 +1,67 @@
-"""Runtime settings model — persisted to settings.json, with .env fallback."""
+"""Runtime settings model with production-safe secret handling.
+
+Non-secret runtime preferences are persisted to settings.json. Provider secrets
+may be persisted only for local/demo use. Production resolves secrets from the
+environment and writes blank secret fields to local JSON.
+"""
 from typing import Optional, Dict, Any
 from pydantic import BaseModel, Field
 from enum import Enum
+import os
+
+
+def _is_masked_secret(value: Any) -> bool:
+    return isinstance(value, str) and ("••••" in value or "****" in value)
+
+
+class SecretProvider:
+    """Provider-neutral interface for runtime secrets."""
+
+    def llm_api_key(self) -> str:
+        return ""
+
+    def embedding_api_key(self) -> str:
+        return ""
+
+    def graph_db_password(self) -> str:
+        return ""
+
+
+class EnvironmentSecretProvider(SecretProvider):
+    """Read production secrets from environment/config only."""
+
+    def llm_api_key(self) -> str:
+        from ..config import Config
+
+        return os.environ.get("LLM_API_KEY") or getattr(Config, "LLM_API_KEY", "") or ""
+
+    def embedding_api_key(self) -> str:
+        from ..config import Config
+
+        return os.environ.get("EMBEDDING_API_KEY") or getattr(Config, "EMBEDDING_API_KEY", "") or ""
+
+    def graph_db_password(self) -> str:
+        from ..config import Config
+
+        if Config.is_production():
+            return os.environ.get("NEO4J_PASSWORD", "")
+        return os.environ.get("NEO4J_PASSWORD") or getattr(Config, "NEO4J_PASSWORD", "") or ""
+
+
+class LocalDemoFileSecretProvider(SecretProvider):
+    """Read secrets from local settings for non-production demo workflows."""
+
+    def __init__(self, settings: "AppSettings"):
+        self._settings = settings
+
+    def llm_api_key(self) -> str:
+        return self._settings.llm.api_key or ""
+
+    def embedding_api_key(self) -> str:
+        return self._settings.embedding.api_key or ""
+
+    def graph_db_password(self) -> str:
+        return self._settings.graph_db.password or ""
 
 
 class ProviderType(str, Enum):
@@ -115,7 +175,6 @@ class SettingsManager:
     def _load(self):
         """Load from settings.json, with .env fallback for missing values."""
         import json
-        import os
         from ..config import Config
 
         settings_path = os.path.join(Config.UPLOAD_FOLDER, 'settings.json')
@@ -124,6 +183,7 @@ class SettingsManager:
             with open(settings_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             self._settings = AppSettings(**data)
+            self._apply_secret_policy()
         else:
             # First run — initialize from .env / defaults
             self._settings = AppSettings(
@@ -136,6 +196,7 @@ class SettingsManager:
                 embedding=EmbeddingSettings(
                     provider=EmbeddingProviderType.OLLAMA,
                     model=Config.EMBEDDING_MODEL,
+                    api_key=Config.EMBEDDING_API_KEY or "",
                     base_url=Config.EMBEDDING_BASE_URL,
                 ),
                 graph_db=GraphDBSettings(
@@ -144,25 +205,74 @@ class SettingsManager:
                     password=Config.NEO4J_PASSWORD,
                 ),
             )
+            self._apply_secret_policy()
             self.save()
+
+    def _apply_secret_policy(self):
+        """Apply local-vs-production secret rules to in-memory settings."""
+        from ..config import Config
+
+        env_provider = EnvironmentSecretProvider()
+        if Config.is_production():
+            self._settings.llm.api_key = env_provider.llm_api_key()
+            self._settings.embedding.api_key = env_provider.embedding_api_key()
+            self._settings.graph_db.password = env_provider.graph_db_password()
+            return
+
+        local_provider = LocalDemoFileSecretProvider(self._settings)
+        if not local_provider.llm_api_key() and env_provider.llm_api_key():
+            self._settings.llm.api_key = env_provider.llm_api_key()
+        if not local_provider.embedding_api_key() and env_provider.embedding_api_key():
+            self._settings.embedding.api_key = env_provider.embedding_api_key()
+        if not local_provider.graph_db_password() and env_provider.graph_db_password():
+            self._settings.graph_db.password = env_provider.graph_db_password()
+
+    @staticmethod
+    def _may_persist_secrets() -> bool:
+        """Return True only when local/demo file secret storage is allowed."""
+        from ..config import Config
+
+        return bool(Config.SETTINGS_PERSIST_SECRETS) and not Config.is_production()
 
     def save(self):
         """Persist current settings to settings.json."""
         import json
-        import os
         from ..config import Config
 
         settings_path = os.path.join(Config.UPLOAD_FOLDER, 'settings.json')
         os.makedirs(os.path.dirname(settings_path), exist_ok=True)
+        try:
+            os.chmod(os.path.dirname(settings_path), 0o700)
+        except OSError:
+            pass
+        data = self._settings.model_dump()
+        if not self._may_persist_secrets():
+            data["llm"]["api_key"] = ""
+            data["embedding"]["api_key"] = ""
+            data["graph_db"]["password"] = ""
+
         with open(settings_path, 'w', encoding='utf-8') as f:
-            json.dump(self._settings.model_dump(), f, indent=2, ensure_ascii=False)
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        try:
+            os.chmod(settings_path, 0o600)
+        except OSError:
+            pass
 
     def get(self) -> AppSettings:
         return self._settings
 
     def update(self, data: Dict[str, Any]):
         """Update settings from dict — validates, saves, invalidates caches."""
+        existing = self._settings.model_dump()
+        for section, field in (("llm", "api_key"), ("embedding", "api_key"), ("graph_db", "password")):
+            incoming_section = data.get(section)
+            if not isinstance(incoming_section, dict):
+                continue
+            if _is_masked_secret(incoming_section.get(field)):
+                incoming_section[field] = (existing.get(section) or {}).get(field, "")
+
         self._settings = AppSettings(**data)
+        self._apply_secret_policy()
         self.save()
         # Signal provider reinitialization (lazy import to avoid circular)
         try:

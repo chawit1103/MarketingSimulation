@@ -296,6 +296,7 @@ import {
   getRunStatusDetail
 } from '../api/simulation'
 import { generateReport } from '../api/report'
+import { trackEvent } from '@/services/analytics'
 
 const props = defineProps({
   simulationId: String,
@@ -324,6 +325,7 @@ const runStatus = ref({})
 const allActions = ref([]) // All actions (incremental accumulation)
 const actionIds = ref(new Set()) // Action IDs set for deduplication
 const scrollContainer = ref(null)
+const completionTracked = ref(false)
 
 // Computed
 // Display actions in chronological order (newest at the bottom)
@@ -375,6 +377,7 @@ const resetAllState = () => {
   startError.value = null
   isStarting.value = false
   isStopping.value = false
+  completionTracked.value = false
   stopPolling()  // Stop any existing polling
 }
 
@@ -419,6 +422,11 @@ const doStartSimulation = async () => {
 
       phase.value = 1
       runStatus.value = res.data
+      trackEvent('simulation_started', {
+        source_mode: 'live_backend',
+        platform: params.platform,
+        max_rounds: props.maxRounds || null,
+      })
 
       startStatusPolling()
       startDetailPolling()
@@ -451,6 +459,7 @@ const handleStopSimulation = async () => {
       phase.value = 2
       stopPolling()
       emit('update-status', 'completed')
+      trackSimulationCompleted('stopped')
     } else {
       addLog(`Stop failed: ${res.error || 'Unknown error'}`)
     }
@@ -525,11 +534,24 @@ const fetchRunStatus = async () => {
         phase.value = 2
         stopPolling()
         emit('update-status', 'completed')
+        trackSimulationCompleted(data.runner_status || 'completed')
       }
     }
   } catch (err) {
     console.warn('Failed to fetch run status:', err)
   }
+}
+
+function trackSimulationCompleted(status) {
+  if (completionTracked.value) return
+  completionTracked.value = true
+  trackEvent('simulation_completed', {
+    source_mode: 'live_backend',
+    runner_status: status,
+    twitter_actions_count: runStatus.value.twitter_actions_count || 0,
+    reddit_actions_count: runStatus.value.reddit_actions_count || 0,
+    total_rounds: runStatus.value.total_rounds || props.maxRounds || null,
+  })
 }
 
 // Check if all enabled platforms have completed

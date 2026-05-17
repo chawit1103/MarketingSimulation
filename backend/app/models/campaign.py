@@ -71,6 +71,8 @@ class Campaign(BaseModel):
     
     # Results (populated after simulation)
     results_summary: Optional[Dict[str, Any]] = None
+    brief_quality: Optional[Dict[str, Any]] = None
+    brief_metadata: Dict[str, Any] = Field(default_factory=dict)
 
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())

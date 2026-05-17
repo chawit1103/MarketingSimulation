@@ -36,12 +36,14 @@
         <component :is="Component" />
       </transition>
     </router-view>
+    <FeedbackWidget />
   </div>
 </template>
 
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import FeedbackWidget from '@/components/FeedbackWidget.vue'
 
 const { locale } = useI18n()
 

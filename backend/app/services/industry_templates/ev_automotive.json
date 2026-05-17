@@ -1,0 +1,126 @@
+{
+  "id": "ev_automotive",
+  "name_th": "EV / Automotive",
+  "name_en": "EV / Automotive",
+  "description_th": "Deep preset for EV and automotive launches, ownership anxiety, safety trust, dealer/service readiness, and competitor price wars.",
+  "description_en": "Deep preset for EV and automotive launches, ownership anxiety, safety trust, dealer/service readiness, and competitor price wars.",
+  "icon": "E",
+  "color": "#187c9a",
+  "industry_depth": "deep_preset",
+  "objectives": ["competitor_response", "message_testing", "brand_perception", "crisis_simulation"],
+  "default_objective": "competitor_response",
+  "default_platform": "both",
+  "default_max_rounds": 20,
+  "default_language": "th",
+  "campaign_duration": "6-12 weeks launch, test-drive, or price-response window",
+  "budget_range": "THB 3M-25M test budget; replace with actual media, dealer, and test-drive plan",
+  "primary_kpi": "Test-drive intent, ownership anxiety reduction, safety trust, price-war resilience",
+  "competitor_context": "Chinese EV entrants, Japanese incumbent brands, used-car alternatives, dealer promotions, and financing offers.",
+  "brand_constraints": "Avoid unsupported range claims, unclear warranty language, or overstated charging network availability.",
+  "risk_legal_notes": "Review warranty terms, financing disclosures, safety claims, battery claims, comparative advertising, and dealer scripts.",
+  "target_audience": {
+    "age_range": [22, 60],
+    "gender": "all",
+    "regions": ["bangkok", "central", "east", "north", "south"],
+    "channels": ["youtube", "facebook", "tiktok", "instagram", "line"],
+    "persona_count": 115
+  },
+  "persona_segments": [
+    {
+      "id": "ev_considerers",
+      "name_th": "EV considerers",
+      "name_en": "EV considerers",
+      "count": 65,
+      "interests": ["range", "charging", "battery warranty", "monthly payment"],
+      "archetypes": [
+        {
+          "id": "urban_ev_switcher",
+          "name_th": "Urban EV switcher",
+          "name_en": "Urban EV switcher",
+          "age_range": [28, 45],
+          "income": "upper_middle",
+          "regions": ["bangkok", "central"],
+          "occupation_th": "Professional",
+          "channels": ["youtube", "facebook", "instagram"],
+          "narrative_th": "Interested in EV savings and tech, but worries about charging access and resale value.",
+          "purchase_style": "researcher"
+        },
+        {
+          "id": "monthly_payment_buyer",
+          "name_th": "Monthly payment buyer",
+          "name_en": "Monthly payment buyer",
+          "age_range": [24, 42],
+          "income": "middle",
+          "regions": ["central", "east", "northeast"],
+          "occupation_th": "Employee / small business",
+          "channels": ["tiktok", "facebook", "line"],
+          "narrative_th": "Compares monthly payment, down payment, charging cost, and maintenance savings.",
+          "purchase_style": "price_sensitive"
+        }
+      ]
+    },
+    {
+      "id": "trust_and_service",
+      "name_th": "Trust and service evaluators",
+      "name_en": "Trust and service evaluators",
+      "count": 45,
+      "interests": ["service network", "safety", "resale", "brand reliability"],
+      "archetypes": [
+        {
+          "id": "safety_first_parent",
+          "name_th": "Safety-first parent",
+          "name_en": "Safety-first parent",
+          "age_range": [32, 52],
+          "income": "middle",
+          "regions": ["bangkok", "central"],
+          "occupation_th": "Family buyer",
+          "channels": ["facebook", "youtube", "line"],
+          "narrative_th": "Prioritizes safety ratings, service access, and long-term reliability for family use.",
+          "purchase_style": "brand_loyal"
+        },
+        {
+          "id": "auto_community_reviewer",
+          "name_th": "Auto community reviewer",
+          "name_en": "Auto community reviewer",
+          "age_range": [25, 45],
+          "income": "middle",
+          "regions": ["bangkok", "north", "south"],
+          "occupation_th": "Car enthusiast / reviewer audience",
+          "channels": ["youtube", "facebook", "tiktok"],
+          "narrative_th": "Follows reviewers and owner groups, quickly amplifies service, range, or safety concerns.",
+          "purchase_style": "social_proof"
+        }
+      ]
+    }
+  ],
+  "crisis_scenarios": [
+    {"id": "price_war_drop", "name_th": "Price war drop", "name_en": "Price war drop", "trigger": "A competitor cuts EV prices and current prospects ask whether they should wait.", "event_tag": "price-war", "impact": "negative", "intensity": 8},
+    {"id": "battery_safety_concern", "name_th": "Battery safety concern", "name_en": "Battery safety concern", "trigger": "A safety incident clip spreads and users question battery risk and warranty coverage.", "event_tag": "battery-safety", "impact": "negative", "intensity": 9},
+    {"id": "charging_network_proof", "name_th": "Charging network proof", "name_en": "Charging network proof", "trigger": "The brand publishes verified charging and service coverage for key routes.", "event_tag": "charging-proof", "impact": "mixed", "intensity": 5}
+  ],
+  "document_seeds": [
+    {
+      "id": "ev_launch_brief",
+      "name_th": "EV launch brief",
+      "name_en": "EV launch brief",
+      "description_th": "Starter brief for EV launch or competitor price-response messaging.",
+      "description_en": "Starter brief for EV launch or competitor price-response messaging.",
+      "content": "# EV Launch Brief\n\nVehicle: [model]\nObjective: increase test-drive intent while reducing ownership anxiety.\nAudience: EV considerers, payment-sensitive buyers, safety-first families, auto communities.\nProof: range assumptions, charging map, service network, warranty terms, financing caveats.\nRisks: price war, safety incident, warranty confusion, charging availability gap.\nValidation: legal review, dealer script review, owner-group objection test, service readiness check."
+    }
+  ],
+  "deep_preset": {
+    "target_segment_archetypes": ["Urban EV switcher", "Monthly payment buyer", "Safety-first parent", "Auto community reviewer"],
+    "common_objections": ["Range may be lower than claimed", "Charging is inconvenient", "Battery warranty is unclear", "Competitor price may drop again"],
+    "crisis_triggers": ["Competitor price cut", "Battery or fire safety clip", "Charging station complaint", "Dealer service failure story"],
+    "typical_kpis": ["Test-drive intent", "Ownership anxiety reduction", "Range trust", "Service trust", "Price-war resilience"],
+    "channel_behavior": ["YouTube supports technical proof and reviews", "Facebook owner groups amplify trust issues", "TikTok spreads short incident clips", "LINE helps dealer follow-up"],
+    "competitor_archetypes": ["Aggressive EV price cutter", "Trusted ICE incumbent", "Premium technology brand", "Used-car value alternative"],
+    "legal_regulatory_sensitivities": ["Range and performance claims", "Warranty wording", "Financing disclosures", "Safety claims", "Comparative advertising"],
+    "proof_point_requirements": ["Range test assumptions", "Charging coverage evidence", "Warranty terms", "Service network readiness", "Dealer script approval"],
+    "sample_brief": "Launch an EV model with proof-led ownership messaging and a response plan for competitor price cuts.",
+    "sample_risk_checklist": ["Are range assumptions visible?", "Is charging coverage verified?", "Is warranty wording clear?", "Are dealers using approved scripts?"],
+    "sample_action_plan_hints": ["Lead with route-based charging proof", "Offer transparent cost-of-ownership assumptions", "Prepare price-war FAQ", "Use owner/service evidence"],
+    "assumptions": ["This preset supports campaign planning, not vehicle safety certification or financial advice.", "Actual dealer and service readiness must be validated by the brand."],
+    "limitations": ["Does not forecast vehicle sales, resale value, or safety outcomes.", "Does not replace legal review of warranty, financing, or safety claims."]
+  }
+}
