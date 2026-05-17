@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from flask import Blueprint, g, jsonify, request
 
 from ..authz import ANALYST_ROLES, ANY_AUTHENTICATED_ROLES, role_required
@@ -13,6 +15,7 @@ from ..utils.logger import get_logger
 logger = get_logger("mirofish.api.calibration")
 calibration_bp = Blueprint("calibration", __name__)
 calibration_service = CalibrationService()
+_SAFE_GENERATED_CAMPAIGN_ID = re.compile(r"^cmp_[0-9a-f]{12}$")
 
 
 def _current_org_id() -> str:
@@ -39,6 +42,23 @@ def _payload_from_request():
     return data
 
 
+def _safe_calibration_campaign_id(value) -> str:
+    """Keep only generated campaign IDs in audit metadata."""
+    campaign_id = str(value or "").strip()
+    if not campaign_id or len(campaign_id) > 64:
+        return "unknown"
+    if (
+        any(char.isspace() for char in campaign_id)
+        or "/" in campaign_id
+        or "\\" in campaign_id
+        or "@" in campaign_id
+    ):
+        return "unknown"
+    if _SAFE_GENERATED_CAMPAIGN_ID.fullmatch(campaign_id):
+        return campaign_id
+    return "unknown"
+
+
 @calibration_bp.route("/actual-results", methods=["POST"])
 @role_required(*ANALYST_ROLES)
 def import_actual_results():
@@ -55,7 +75,7 @@ def import_actual_results():
             resource_type="calibration_record",
             resource_id=result.get("record_id"),
             metadata={
-                "campaign_id": result.get("campaign_id"),
+                "campaign_id": _safe_calibration_campaign_id(result.get("campaign_id")),
                 "calibration_status": result.get("calibration_status"),
                 "source_mode": (result.get("source") or {}).get("source_mode"),
                 "data_basis": (result.get("source") or {}).get("data_basis"),

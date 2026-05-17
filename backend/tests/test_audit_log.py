@@ -10,6 +10,7 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
 from app import create_app  # noqa: E402
+from app.api.calibration import _safe_calibration_campaign_id  # noqa: E402
 from app.api.export import _safe_export_type, _safe_source_metadata  # noqa: E402
 from app.config import Config  # noqa: E402
 from app.models.settings import SettingsManager  # noqa: E402
@@ -74,6 +75,21 @@ def test_strategy_pack_source_audit_metadata_is_categorical_only():
         "source_mode": "live_backend",
         "data_basis": "backend_generated",
     }) == {"source_mode": "live_backend", "data_basis": "backend_generated"}
+
+
+@pytest.mark.parametrize(
+    ("campaign_id", "expected"),
+    [
+        ("cmp_a1b2c3d4e5f6", "cmp_a1b2c3d4e5f6"),
+        ("Customer Alpha Launch", "unknown"),
+        ("client-campaign@example.com", "unknown"),
+        ("Brief for a confidential customer launch " * 8, "unknown"),
+        ("cmp_a1b2c3/4e5f6", "unknown"),
+        ("cmp_a1b2c3 4e5f6", "unknown"),
+    ],
+)
+def test_safe_calibration_campaign_id_allows_only_generated_ids(campaign_id, expected):
+    assert _safe_calibration_campaign_id(campaign_id) == expected
 
 
 def test_audit_log_service_writes_org_scoped_jsonl_without_raw_content(tmp_path):
@@ -253,7 +269,7 @@ def test_calibration_import_creates_audit_event_without_raw_actuals(audit_api_co
         "/api/calibration/actual-results",
         headers=headers["analyst"],
         json={
-            "campaign_id": "cmp_calibration",
+            "campaign_id": "cmp_a1b2c3d4e5f6",
             "impressions": 1200,
             "estimated_impressions": 1000,
             "qualitative_notes": "Aggregate only; no raw customer records.",
@@ -268,6 +284,39 @@ def test_calibration_import_creates_audit_event_without_raw_actuals(audit_api_co
 
     assert len(calibration_events) == 1
     assert calibration_events[0]["resource_id"].startswith("cal_")
-    assert calibration_events[0]["metadata"]["campaign_id"] == "cmp_calibration"
+    assert calibration_events[0]["metadata"]["campaign_id"] == "cmp_a1b2c3d4e5f6"
     assert "Aggregate only" not in rendered
     assert "impressions" not in rendered
+
+
+@pytest.mark.parametrize(
+    "unsafe_campaign_id",
+    [
+        "Customer Alpha Launch",
+        "client-campaign@example.com",
+        "Brief for a confidential customer launch " * 8,
+    ],
+)
+def test_calibration_import_audit_event_replaces_unsafe_campaign_id(audit_api_context, unsafe_campaign_id):
+    client, headers, org, upload_folder = audit_api_context
+
+    response = client.post(
+        "/api/calibration/actual-results",
+        headers=headers["analyst"],
+        json={
+            "campaign_id": unsafe_campaign_id,
+            "impressions": 1200,
+            "estimated_impressions": 1000,
+        },
+    )
+
+    assert response.status_code == 201
+
+    audit_service = AuditLogService(upload_folder=upload_folder)
+    events = audit_service.list_events(org.org_id)
+    calibration_events = [event for event in events if event["event_type"] == "calibration_imported"]
+    audit_jsonl = Path(audit_service.audit_log_path(org.org_id)).read_text(encoding="utf-8")
+
+    assert len(calibration_events) == 1
+    assert calibration_events[0]["metadata"]["campaign_id"] == "unknown"
+    assert unsafe_campaign_id not in audit_jsonl

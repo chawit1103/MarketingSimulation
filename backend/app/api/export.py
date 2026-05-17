@@ -57,7 +57,9 @@ def _safe_category(value: object, allowed: set[str], fallback: str = "unknown") 
 
 def _safe_export_type(value: object, fallback: str = "generic") -> str:
     """Return a categorical export type safe for audit metadata."""
-    return _safe_category(value, _ALLOWED_EXPORT_TYPES, fallback=fallback)
+    if value is None or str(value).strip() == "":
+        return fallback
+    return _safe_category(value, _ALLOWED_EXPORT_TYPES)
 
 
 def _safe_source_metadata(source: dict | None) -> dict:
