@@ -11,6 +11,7 @@ This review covers the controlled paid pilot sales/demo documentation package af
 | Sales demo | Ready with synthetic/demo data only | Sales demo docs support prospect conversations when source labels, limitations, and artifact safety checks remain visible. |
 | Controlled paid pilot | Conditional candidate | Pilot docs require trusted operators, approved/anonymized data, environment-provided secrets, deployment controls, audit review, and retention/deletion ownership. |
 | Public pilot | Blocked | Reviewed docs keep public pilot outside the current release boundary. |
+| Public internet exposure | Blocked | Reviewed docs keep public internet exposure outside the current release boundary. |
 | Production SaaS | Blocked | Reviewed docs do not position the product as a self-serve or production customer deployment. |
 
 Canonical readiness wording remains:
