@@ -32,6 +32,7 @@ _ALLOWED_SOURCE_MODES = {
     "unknown",
 }
 _ALLOWED_DATA_BASIS = {
+    "backend_generated",
     "demo_fixture",
     "local_estimate",
     "real_simulation",
