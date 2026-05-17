@@ -119,6 +119,8 @@ Customer data rules for the first pilot:
 - No PII.
 - No raw CRM records.
 - No live social-listening, CRM, ad-platform, or marketing automation integration.
+- No API keys, provider tokens, OAuth credentials, passwords, graph credentials, or customer-owned provider secrets may be entered into browser fields.
+- If customer-owned credentials are ever needed in a later approved phase, configure them only through an approved deployment secret path, environment variable, or secret manager.
 - Use anonymized or explicitly approved campaign briefs only.
 - Keep Demo Mode, Local Estimate, Live Backend, Backend Verified, and Unknown Source labels visible in the UI, screenshots, exports, and decks.
 

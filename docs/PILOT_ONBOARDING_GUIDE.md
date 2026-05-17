@@ -42,7 +42,8 @@ State clearly:
 
 - No PII.
 - No raw CRM records.
-- No API keys or provider secrets in browser fields unless explicitly approved and safe.
+- No API keys, provider tokens, OAuth credentials, passwords, graph credentials, or customer-owned provider secrets may be entered into browser fields.
+- If customer-owned credentials are ever needed in a later approved phase, configure them only through an approved deployment secret path, environment variable, or secret manager. Never capture them in browser forms, screenshots, docs, exports, recordings, chat logs, or pilot artifacts.
 - Use anonymized or approved campaign briefs.
 - No live social-listening or CRM integration.
 
@@ -77,4 +78,3 @@ Send:
 - Open questions.
 - Data deletion or retention decision.
 - Next meeting agenda.
-

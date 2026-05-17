@@ -18,7 +18,7 @@ Use this checklist at the end of every controlled paid pilot.
 
 Record:
 
-- Sponsor name or role.
+- Decision sponsor role/title or anonymized stakeholder reference.
 - Use case.
 - Number of scenarios reviewed.
 - Most useful section.
@@ -54,4 +54,3 @@ Confirm in the exit note:
 - Local demo remains ready.
 - Controlled private pilot remains conditional.
 - Public pilot, public internet exposure, and production customer deployment remain blocked until documented readiness gates are completed.
-

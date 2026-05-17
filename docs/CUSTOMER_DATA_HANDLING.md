@@ -35,6 +35,8 @@ Do not collect:
 - Customer support transcripts tied to identifiable people.
 - Raw CRM exports, transaction logs, or lead lists.
 - API keys, provider tokens, OAuth credentials, or passwords.
+- Graph credentials or customer-owned provider secrets.
+- Any credentials entered through browser forms, screenshots, docs, exports, recordings, chat logs, or pilot artifacts.
 - Confidential board materials unless explicitly approved and sanitized.
 - Regulated personal data, health data, financial account data, or children's data.
 
@@ -55,6 +57,7 @@ For the first paid pilot:
 - Prefer local or private controlled environment.
 - Keep secrets in environment variables or approved secret storage.
 - Do not store provider API keys in browser local storage.
+- If customer-owned credentials are ever needed in a later approved phase, configure them only through an approved deployment secret path, environment variable, or secret manager.
 - Do not commit `.env`, `.env.*`, generated reports with customer data, or uploads.
 - Delete pilot artifacts at exit unless the customer approves retention.
 
@@ -63,4 +66,3 @@ For the first paid pilot:
 Use this plain-language disclosure in onboarding:
 
 > 3C Simulator uses approved campaign context to generate decision-support estimates. The pilot does not require PII, raw CRM data, or live integrations. Outputs should guide discussion and validation planning; they are not guaranteed predictions.
-

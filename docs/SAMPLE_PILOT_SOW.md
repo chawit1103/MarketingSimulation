@@ -34,6 +34,7 @@ Excluded:
 - Public internet exposure.
 - Live CRM, ad-platform, or social-listening integration.
 - Raw PII, raw CRM records, or customer lists.
+- API keys, provider tokens, OAuth credentials, passwords, graph credentials, or customer-owned provider secrets entered through browser fields.
 - Guaranteed ROI, revenue, conversion, crisis, or market-share prediction.
 - Custom model training.
 
@@ -78,7 +79,7 @@ Example 3-week pilot:
 
 ## Data Handling
 
-The first pilot will not use PII, raw CRM data, live integrations, provider credentials supplied through the browser, or customer secrets. Data-handling rules are defined in [CUSTOMER_DATA_HANDLING.md](CUSTOMER_DATA_HANDLING.md).
+The first pilot will not use PII, raw CRM data, live integrations, provider credentials supplied through the browser, or customer secrets. If customer-owned credentials are ever needed in a later approved phase, they must be configured only through an approved deployment secret path, environment variable, or secret manager. Data-handling rules are defined in [CUSTOMER_DATA_HANDLING.md](CUSTOMER_DATA_HANDLING.md).
 
 ## Commercial Terms Placeholder
 
@@ -96,4 +97,3 @@ Current status:
 - Public pilot: blocked.
 - Public internet exposure: blocked.
 - Production customer deployment: blocked.
-
