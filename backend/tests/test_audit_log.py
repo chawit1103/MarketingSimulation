@@ -14,7 +14,8 @@ from app.api.calibration import _safe_calibration_campaign_id  # noqa: E402
 from app.api.export import _safe_export_type, _safe_source_metadata  # noqa: E402
 from app.api.report import _report_audit_metadata, _safe_report_campaign_id, _safe_report_language  # noqa: E402
 from app.config import Config  # noqa: E402
-from app.models.settings import SettingsManager  # noqa: E402
+from app.api.settings import _settings_audit_sections, _settings_sections_changed  # noqa: E402
+from app.models.settings import AppSettings, SettingsManager  # noqa: E402
 from app.models.user import UserRole  # noqa: E402
 from app.services.audit_log_service import AuditLogService  # noqa: E402
 from app.services.auth_service import AuthService  # noqa: E402
@@ -124,6 +125,31 @@ def test_safe_report_campaign_id_reuses_generated_id_rules(campaign_id, expected
 )
 def test_safe_report_language_allows_only_supported_codes(language, expected):
     assert _safe_report_language(language) == expected
+
+
+def test_settings_audit_sections_follow_app_settings_top_level_fields():
+    assert _settings_audit_sections() == set(AppSettings.model_fields.keys())
+
+
+def test_settings_sections_changed_preserves_only_known_sections():
+    payload = {
+        "language": "en",
+        "llm": {"provider": "openai"},
+        "embedding": {"provider": "ollama"},
+        "graph_db": {"mode": "local"},
+        "task_llm": {"report": {"provider": "openai"}},
+        "customer_jane@example.com": "x",
+        "Customer Alpha Launch": "x",
+        "Brief for a confidential customer launch " * 8: "x",
+    }
+
+    assert _settings_sections_changed(payload) == [
+        "embedding",
+        "graph_db",
+        "language",
+        "llm",
+        "task_llm",
+    ]
 
 
 def test_report_generation_audit_metadata_normalizes_language(tmp_path):
@@ -373,6 +399,38 @@ def test_login_campaign_and_settings_routes_create_safe_audit_events(audit_api_c
     assert "Do not log this segment" not in rendered
     assert "unit-api-key-should-not-be-logged" not in rendered
     assert "graph-password-should-not-be-logged" not in rendered
+
+
+def test_settings_update_audit_event_omits_unknown_top_level_keys(audit_api_context):
+    client, headers, org, upload_folder = audit_api_context
+    unknown_keys = [
+        "customer_jane@example.com",
+        "Customer Alpha Launch",
+        "Brief for a confidential customer launch " * 8,
+    ]
+    payload = {
+        "language": "th",
+        "llm": {"provider": "ollama", "model": "qwen2.5:7b"},
+        unknown_keys[0]: "email-like key must not be audited",
+        unknown_keys[1]: "customer name key must not be audited",
+        unknown_keys[2]: "long free-text key must not be audited",
+    }
+
+    response = client.put("/api/settings", headers=headers["admin"], json=payload)
+
+    assert response.status_code == 200
+    audit_service = AuditLogService(upload_folder=upload_folder)
+    events = audit_service.list_events(org.org_id)
+    settings_events = [event for event in events if event["event_type"] == "settings_updated"]
+    audit_jsonl = Path(audit_service.audit_log_path(org.org_id)).read_text(encoding="utf-8")
+
+    assert len(settings_events) == 1
+    assert settings_events[0]["metadata"]["sections_changed"] == ["language", "llm"]
+    for unknown_key in unknown_keys:
+        assert unknown_key not in audit_jsonl
+    assert "email-like key must not be audited" not in audit_jsonl
+    assert "customer name key must not be audited" not in audit_jsonl
+    assert "long free-text key must not be audited" not in audit_jsonl
 
 
 def test_calibration_import_creates_audit_event_without_raw_actuals(audit_api_context):

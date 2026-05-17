@@ -4,7 +4,7 @@ from copy import deepcopy
 from typing import Any
 
 from flask import Blueprint, request, jsonify, g
-from ..models.settings import SettingsManager, ProviderType, EmbeddingProviderType, GraphDBMode
+from ..models.settings import AppSettings, SettingsManager, ProviderType, EmbeddingProviderType, GraphDBMode
 from ..authz import ADMIN_ROLES, role_required
 from ..services.audit_log_service import record_audit_event
 from ..utils.audit_redaction import audit_changed_fields
@@ -29,6 +29,16 @@ SECRET_PRESENCE_FIELDS = {
     "password_present",
     "has_password",
 }
+
+
+def _settings_audit_sections() -> set[str]:
+    """Return the AppSettings top-level sections allowed in audit metadata."""
+    return set(AppSettings.model_fields.keys())
+
+
+def _settings_sections_changed(payload: dict) -> list[str]:
+    """Return changed known settings sections without persisting arbitrary keys."""
+    return audit_changed_fields(payload, _settings_audit_sections())
 
 
 def _sanitize_error(error: Exception | str) -> str:
@@ -268,7 +278,7 @@ def update_settings():
                 org_id=str(org_id),
                 event_type="settings_updated",
                 resource_type="settings",
-                metadata={"sections_changed": audit_changed_fields(data)},
+                metadata={"sections_changed": _settings_sections_changed(data)},
             )
         return jsonify({'success': True, 'message': 'Settings updated and providers reinitialized'})
     except Exception as e:
