@@ -38,6 +38,8 @@ If any input includes disallowed data, stop intake and ask the customer to provi
 7. Discuss what the customer would validate next through their normal research, media, analytics, or post-campaign measurement process.
 8. Agree whether the next step is a controlled paid pilot with documented scope, data handling, deployment controls, and retention/deletion ownership.
 
+Use [Proof-of-Value Output Package](PROOF_OF_VALUE_OUTPUT_PACKAGE.md) and [Proof-of-Value Operator Checklist](PROOF_OF_VALUE_OPERATOR_CHECKLIST.md) after intake validation passes and before any customer-facing package is shared.
+
 ## Decision-Support Outputs
 
 The proof-of-value flow can produce:
@@ -73,6 +75,8 @@ Strategy Pack exports should include a provenance footer with source mode, data 
 - [ ] Unsafe intake signals are resolved before any generated payload, screenshot, export, or deck is shared.
 - [ ] Source/provenance labels are visible before sharing outputs.
 - [ ] [Proof-of-Value Deliverables](PROOF_OF_VALUE_DELIVERABLES.md) are reviewed before the session.
+- [ ] [Proof-of-Value Output Package](PROOF_OF_VALUE_OUTPUT_PACKAGE.md) is used to assemble customer-facing outputs.
+- [ ] [Proof-of-Value Operator Checklist](PROOF_OF_VALUE_OPERATOR_CHECKLIST.md) is complete.
 - [ ] [Proof-of-Value Session Script](PROOF_OF_VALUE_SESSION_SCRIPT.md) is used for the live walkthrough.
 - [ ] [Demo Artifact Checklist](DEMO_ARTIFACT_CHECKLIST.md) is completed before sending screenshots, decks, exports, or recordings externally.
 - [ ] Retention/deletion ownership is agreed before retaining any customer-approved brief or generated artifact.
