@@ -121,6 +121,12 @@ Pilot positioning:
 
 The pilot should be sold as a guided engagement, not production SaaS. Outputs are decision-support estimates, not guaranteed predictions of sentiment, conversion, revenue, ROI, crisis probability, or market share.
 
+Operator proof-of-value workflow:
+
+- Use `/proof-of-value` to turn one customer-approved campaign brief into an operator checklist, structured proof-of-value payload, and Strategy Pack deliverable sequence.
+- The workflow flags missing approvals and unsafe intake signals before any customer-facing output is assembled.
+- It does not require live LLM/API/Neo4j credentials, live integrations, PII, raw CRM records, customer lists, or secrets.
+
 Customer data rules for the first pilot:
 
 - No PII.

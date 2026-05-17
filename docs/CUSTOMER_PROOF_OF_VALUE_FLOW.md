@@ -31,10 +31,12 @@ If any input includes disallowed data, stop intake and ask the customer to provi
 
 1. Confirm the campaign brief is approved for pilot use.
 2. Confirm no PII, raw CRM records, customer lists, live integration credentials, or secrets are included.
-3. Run the brief through the local/demo or controlled pilot workflow with visible source/provenance labels.
-4. Review decision-support outputs with the customer.
-5. Discuss what the customer would validate next through their normal research, media, analytics, or post-campaign measurement process.
-6. Agree whether the next step is a controlled paid pilot with documented scope, data handling, deployment controls, and retention/deletion ownership.
+3. Open `/proof-of-value` and enter the approved intake fields.
+4. Resolve any missing approvals or unsafe intake signals before assembling customer-facing outputs.
+5. Run the brief through the local/demo or controlled pilot workflow with visible source/provenance labels.
+6. Review decision-support outputs with the customer.
+7. Discuss what the customer would validate next through their normal research, media, analytics, or post-campaign measurement process.
+8. Agree whether the next step is a controlled paid pilot with documented scope, data handling, deployment controls, and retention/deletion ownership.
 
 ## Decision-Support Outputs
 
@@ -64,9 +66,11 @@ Strategy Pack exports should include a provenance footer with source mode, data 
 
 ## Operator Checklist
 
+- [ ] `/proof-of-value` is used to assemble the operator checklist and structured proof-of-value payload.
 - [ ] Intake uses [Customer Brief Intake Template](CUSTOMER_BRIEF_INTAKE_TEMPLATE.md).
 - [ ] Customer approval checkbox is complete.
 - [ ] No PII/raw CRM/customer records checkbox is complete.
+- [ ] Unsafe intake signals are resolved before any generated payload, screenshot, export, or deck is shared.
 - [ ] Source/provenance labels are visible before sharing outputs.
 - [ ] [Proof-of-Value Deliverables](PROOF_OF_VALUE_DELIVERABLES.md) are reviewed before the session.
 - [ ] [Proof-of-Value Session Script](PROOF_OF_VALUE_SESSION_SCRIPT.md) is used for the live walkthrough.
