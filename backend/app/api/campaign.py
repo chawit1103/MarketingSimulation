@@ -9,8 +9,10 @@ from flask import Blueprint, request, jsonify, g
 from ..services.campaign_service import CampaignService
 from ..services.pipeline_orchestrator import PipelineOrchestrator
 from ..services.oasis_platform_presets import resolve_preset
+from ..services.audit_log_service import record_audit_event
 from ..models.campaign import CampaignStatus
 from ..authz import ADMIN_ROLES, ANALYST_ROLES, role_required
+from ..utils.audit_redaction import audit_changed_fields
 from ..utils.logger import get_logger
 
 logger = get_logger('mirofish.api.campaign')
@@ -91,6 +93,17 @@ def create_campaign():
             brief_quality=data.get('brief_quality') if isinstance(data.get('brief_quality'), dict) else None,
             brief_metadata=data.get('brief_metadata') if isinstance(data.get('brief_metadata'), dict) else None,
             created_by=_get_user_id(),
+        )
+        record_audit_event(
+            org_id=org_id,
+            event_type="campaign_created",
+            actor_user_id=_get_user_id(),
+            resource_type="campaign",
+            resource_id=campaign.campaign_id,
+            metadata={
+                "objective": campaign.objective.value,
+                "status": campaign.status.value,
+            },
         )
 
         return jsonify({
@@ -236,6 +249,21 @@ def update_campaign(campaign_id: str):
 
         if campaign is None:
             return jsonify({'success': False, 'error': 'Resource not found'}), 404
+        allowed_fields = {
+            "name", "description", "objective", "status",
+            "tags", "results_summary",
+        }
+        record_audit_event(
+            org_id=org_id,
+            event_type="campaign_updated",
+            actor_user_id=_get_user_id(),
+            resource_type="campaign",
+            resource_id=campaign.campaign_id,
+            metadata={
+                "changed_fields": audit_changed_fields(data, allowed_fields),
+                "status": campaign.status.value,
+            },
+        )
 
         return jsonify({
             'success': True,
@@ -263,6 +291,13 @@ def delete_campaign(campaign_id: str):
         deleted = svc.delete_campaign(campaign_id, org_id)
         if not deleted:
             return jsonify({'success': False, 'error': 'Resource not found'}), 404
+        record_audit_event(
+            org_id=org_id,
+            event_type="campaign_deleted",
+            actor_user_id=_get_user_id(),
+            resource_type="campaign",
+            resource_id=campaign_id,
+        )
 
         return jsonify({
             'success': True,

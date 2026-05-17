@@ -95,9 +95,18 @@ Outputs remain decision-support estimates, not guaranteed predictions.
 - [ ] Confirm logs do not include screenshots, generated decks, or uploaded customer files unless explicitly approved.
 - [ ] Define log retention and deletion policy.
 
-## Data Deletion Process
+## Audit Log
+
+- [ ] Confirm org-scoped audit logging is enabled for login, campaign mutation, simulation lifecycle, report/export, calibration import, and settings update events.
+- [ ] Confirm audit metadata contains IDs, event names, changed field names, formats, source labels, and timestamps only.
+- [ ] Confirm audit logs do not contain raw briefs, PII, API keys, tokens, passwords, provider secrets, graph credentials, raw CRM records, customer records, uploaded file contents, or generated report body text.
+- [ ] Record the audit log retention period and deletion owner.
+
+## Data Retention and Deletion Process
 
 - [ ] Agree on pilot data retention before kickoff.
+- [ ] Review and approve [DATA_RETENTION_AND_DELETION.md](DATA_RETENTION_AND_DELETION.md).
+- [ ] Review customer data rules in [CUSTOMER_DATA_HANDLING.md](CUSTOMER_DATA_HANDLING.md).
 - [ ] Provide a deletion process for campaign briefs, simulation outputs, exports, uploads, logs, screenshots, and generated reports.
 - [ ] Confirm deletion owner and timeline.
 - [ ] Verify deletion after the pilot exit checklist is completed.

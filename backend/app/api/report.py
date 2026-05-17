@@ -12,6 +12,7 @@ from . import report_bp
 from ..config import Config
 from ..services.report_agent import ReportAgent, ReportManager, ReportStatus
 from ..services.simulation_manager import SimulationManager
+from ..services.audit_log_service import record_audit_event
 from ..models.project import ProjectManager
 from ..models.task import TaskManager, TaskStatus
 from ..services.graph_tools import GraphToolsService
@@ -126,6 +127,18 @@ def generate_report():
 
         thread = threading.Thread(target=run_generate, daemon=True)
         thread.start()
+        record_audit_event(
+            org_id=org_id,
+            event_type="report_generation_started",
+            resource_type="report",
+            resource_id=report_id,
+            metadata={
+                "simulation_id": simulation_id,
+                "campaign_id": state.campaign_id,
+                "force_regenerate": bool(force_regenerate),
+                "language": language,
+            },
+        )
 
         return jsonify({"success": True, "data": {
             "simulation_id": simulation_id,
@@ -231,6 +244,17 @@ def download_report(report_id: str):
         report = _get_owned_report(report_id)
         if not report:
             return _resource_not_found()
+        record_audit_event(
+            org_id=_get_org_id(),
+            event_type="report_downloaded",
+            resource_type="report",
+            resource_id=report_id,
+            metadata={
+                "simulation_id": report.simulation_id,
+                "campaign_id": report.campaign_id,
+                "format": "markdown",
+            },
+        )
 
         md_path = ReportManager._get_report_markdown_path(report_id)
         if not os.path.exists(md_path):

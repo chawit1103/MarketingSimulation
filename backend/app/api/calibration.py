@@ -5,6 +5,7 @@ from __future__ import annotations
 from flask import Blueprint, g, jsonify, request
 
 from ..authz import ANALYST_ROLES, ANY_AUTHENTICATED_ROLES, role_required
+from ..services.audit_log_service import record_audit_event
 from ..services.calibration_service import CalibrationService, CalibrationValidationError
 from ..utils.logger import get_logger
 
@@ -47,6 +48,18 @@ def import_actual_results():
         result = calibration_service.import_actual_results(
             org_id=_current_org_id(),
             payload=payload,
+        )
+        record_audit_event(
+            org_id=_current_org_id(),
+            event_type="calibration_imported",
+            resource_type="calibration_record",
+            resource_id=result.get("record_id"),
+            metadata={
+                "campaign_id": result.get("campaign_id"),
+                "calibration_status": result.get("calibration_status"),
+                "source_mode": (result.get("source") or {}).get("source_mode"),
+                "data_basis": (result.get("source") or {}).get("data_basis"),
+            },
         )
         return jsonify({"success": True, "data": result}), 201
     except CalibrationValidationError as exc:

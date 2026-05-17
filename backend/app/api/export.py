@@ -1,11 +1,12 @@
 """Export API — generate PPTX/PDF slides from simulation data."""
 
-from flask import Blueprint, request, jsonify, send_file
+from flask import Blueprint, request, jsonify, send_file, g
 import io
 import re
 
 from ..services.export_engine import PPTXGenerator
 from ..services.strategy_pack import StrategyPackService
+from ..services.audit_log_service import record_audit_event
 from ..authz import ANALYST_ROLES, role_required
 from ..utils.logger import get_logger
 
@@ -20,6 +21,26 @@ def _safe_pptx_filename(value: str | None, fallback: str) -> str:
     return base if base.lower().endswith(".pptx") else f"{base}.pptx"
 
 
+def _get_org_id() -> str | None:
+    return str(g.current_org_id) if g.get("current_org_id") else None
+
+
+def _audit_export(format_name: str, export_type: str, metadata: dict | None = None) -> None:
+    org_id = _get_org_id()
+    if not org_id:
+        return
+    record_audit_event(
+        org_id=org_id,
+        event_type="export_generated",
+        resource_type="export",
+        metadata={
+            "format": format_name,
+            "export_type": export_type,
+            **(metadata or {}),
+        },
+    )
+
+
 @export_bp.route("/strategy-pack", methods=["POST"])
 @role_required(*ANALYST_ROLES)
 def export_strategy_pack():
@@ -28,6 +49,15 @@ def export_strategy_pack():
 
     try:
         pack = StrategyPackService().build(data)
+        source = pack.get("source") or {}
+        _audit_export(
+            "json",
+            "strategy_pack",
+            {
+                "source_mode": source.get("source_mode"),
+                "data_basis": source.get("data_basis"),
+            },
+        )
         return jsonify({
             "success": True,
             "data": pack,
@@ -60,6 +90,15 @@ def export_strategy_pack_pptx():
             data.get("filename") or white_label.get("campaign_name"),
             "strategy_pack",
         )
+        source = pack.get("source") or {}
+        _audit_export(
+            "pptx",
+            "strategy_pack",
+            {
+                "source_mode": source.get("source_mode"),
+                "data_basis": source.get("data_basis"),
+            },
+        )
         return send_file(
             buffer,
             mimetype="application/vnd.openxmlformats-officedocument.presentationml.presentation",
@@ -91,6 +130,7 @@ def export_pptx():
     filename = data.get("filename", "msaas_report")
     if not filename.endswith(".pptx"):
         filename += ".pptx"
+    _audit_export("pptx", str(data.get("slide_type") or "generic"))
 
     return send_file(
         buffer,
@@ -148,6 +188,7 @@ def export_csv():
 
     wrapper.detach()
     buffer.seek(0)
+    _audit_export("csv", "report")
 
     return send_file(
         buffer,
