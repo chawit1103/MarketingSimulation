@@ -144,6 +144,7 @@ Recommended customer-pilot docs:
 - [Customer Proof-of-Value Flow](docs/CUSTOMER_PROOF_OF_VALUE_FLOW.md)
 - [Customer Brief Intake Template](docs/CUSTOMER_BRIEF_INTAKE_TEMPLATE.md)
 - [Proof-of-Value Sales Offer](docs/PROOF_OF_VALUE_SALES_OFFER.md)
+- [Proof-of-Value One-Page Copy](docs/PROOF_OF_VALUE_ONE_PAGE_COPY.md)
 - [Proof-of-Value Pricing Options](docs/PROOF_OF_VALUE_PRICING_OPTIONS.md)
 - [Proof-of-Value Deliverables](docs/PROOF_OF_VALUE_DELIVERABLES.md)
 - [Proof-of-Value Output Package](docs/PROOF_OF_VALUE_OUTPUT_PACKAGE.md)
