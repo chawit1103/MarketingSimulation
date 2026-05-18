@@ -107,6 +107,11 @@ const resourceSections = [
         description: 'Founder-led outreach, follow-up, brief request, and objection-response copy.',
       },
       {
+        title: 'Founder First Customer Close Pack',
+        path: 'docs/FOUNDER_FIRST_CUSTOMER_CLOSE_PACK.md',
+        description: 'Founder-led qualification, default offer, close sequence, and paid-pilot proposal skeleton for the first customer.',
+      },
+      {
         title: 'Proof-of-Value One-Page Copy',
         path: 'docs/PROOF_OF_VALUE_ONE_PAGE_COPY.md',
         description: 'Customer-facing one-page overview for landing page, PDF, email, or sales message use.',

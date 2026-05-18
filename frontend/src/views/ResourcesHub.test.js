@@ -58,6 +58,7 @@ describe('ResourcesHub', () => {
 
     const hrefs = wrapper.findAll('a').map((link) => link.attributes('href'))
     expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/PROOF_OF_VALUE_OUTREACH_PACK.md')
+    expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/FOUNDER_FIRST_CUSTOMER_CLOSE_PACK.md')
     expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/PROOF_OF_VALUE_ONE_PAGE_COPY.md')
     expect(hrefs).toContain('/proof-of-value')
     expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/PROOF_OF_VALUE_CUSTOMER_OUTPUT_TEMPLATE.md')
