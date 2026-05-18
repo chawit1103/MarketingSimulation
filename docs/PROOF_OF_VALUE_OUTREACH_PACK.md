@@ -20,7 +20,7 @@ Hi {{first_name}}, I am helping teams use 3C Simulator to pressure-test one appr
 
 The offer is a Proof-of-Value Workshop: 30-60 minutes, one approved brief, no PII/raw CRM/customer lists/secrets/live integrations, and a decision-support package with brief quality, creative comparison, risks, revised brief, and next validation step.
 
-Would it be useful to test this on one upcoming campaign or historical scenario?
+If useful, send one approved brief or two 30-minute slots. I can run one founder-led PoV session next week; Tue/Wed work?
 
 ## Warm Intro Message
 
@@ -30,7 +30,7 @@ We are offering a 3C Simulator Proof-of-Value Workshop for teams that want a pra
 
 We do not need PII, raw CRM records, customer lists, secrets, or live integrations. The output is not a production deployment or a guaranteed forecast; it is a structured package to help decide what to test, revise, or validate next.
 
-Would you be open to a short fit check?
+If this is useful, send one approved brief or two 30-minute slots. I can run one founder-led PoV session next week; Tue/Wed work?
 
 ## Email Version
 
@@ -54,7 +54,7 @@ The data boundary is intentionally simple: no PII, no raw CRM records, no custom
 
 This is a controlled private pilot candidate and decision-support estimate. It is not production deployment, guaranteed prediction, exact ROI/ROAS forecasting, or a replacement for your research process.
 
-If useful, I can send the one-page overview and a sample proof-of-value package, then we can decide whether one approved brief is a good fit.
+If useful, send one approved brief or two 30-minute slots. I can run one founder-led PoV session next week; Tue/Wed work?
 
 Best,
 {{sender_name}}
@@ -65,7 +65,7 @@ Hi {{first_name}}, quick idea: if your team has one approved campaign brief, 3C 
 
 No PII, raw CRM records, customer lists, secrets, or live integrations are needed.
 
-It is a decision-support estimate, not production deployment or guaranteed forecasting. Open to a quick fit check?
+It is a decision-support estimate, not production deployment or guaranteed forecasting. If useful, send one approved brief or two 30-minute slots.
 
 ## LINE / Chat Version
 
@@ -75,7 +75,7 @@ We use one approved campaign brief and create a decision-support package: brief 
 
 No PII, raw CRM, customer lists, secrets, or live integrations needed.
 
-Would you like to try it with one approved campaign?
+I can run one founder-led PoV session next week. Tue/Wed work?
 
 ## Follow-Up After No Response
 
@@ -85,7 +85,7 @@ The Proof-of-Value Workshop is meant to be lightweight: one approved brief, one 
 
 It does not require customer records, credentials, or live integrations. The goal is simply to see whether 3C Simulator helps clarify a real campaign decision before scoping any controlled paid pilot.
 
-Should I send the one-page summary, or close the loop for now?
+If useful, send one approved brief or two 30-minute slots. Otherwise, I will close the loop for now.
 
 ## Brief Request Message
 
@@ -187,7 +187,7 @@ The Proof-of-Value Workshop can sit before or alongside research by helping the 
 
 ไม่ต้องใช้ PII, raw CRM, customer lists, secrets หรือ live integrations และผลลัพธ์เป็น decision-support estimate เท่านั้น
 
-สนใจลองกับหนึ่งแคมเปญที่อนุมัติแล้วไหมครับ/คะ?
+ถ้าสนใจ ส่งบรีฟที่อนุมัติแล้วหนึ่งชุด หรือส่งเวลา 30 นาทีมา 2 ตัวเลือกได้เลยครับ/ค่ะ ผม/ฉันสามารถรัน founder-led PoV session ได้สัปดาห์หน้า วันอังคาร/พุธสะดวกไหมครับ/คะ?
 
 ### Warm Intro Message
 
@@ -197,7 +197,7 @@ The Proof-of-Value Workshop can sit before or alongside research by helping the 
 
 ไม่ต้องส่ง PII, raw CRM records, customer lists, secrets หรือ live integrations ถ้าแคมเปญอ่อนไหว ใช้ anonymized campaign code ได้ครับ/ค่ะ
 
-สะดวกคุยสั้น ๆ เพื่อดูว่าเหมาะไหมครับ/คะ?
+ถ้าสนใจ ส่งบรีฟที่อนุมัติแล้วหนึ่งชุด หรือส่งเวลา 30 นาทีมา 2 ตัวเลือกได้เลยครับ/ค่ะ สัปดาห์หน้า วันอังคาร/พุธสะดวกไหมครับ/คะ?
 
 ### LINE / Chat Version
 
@@ -207,7 +207,7 @@ The Proof-of-Value Workshop can sit before or alongside research by helping the 
 
 ไม่ต้องใช้ PII, raw CRM, customer lists, secrets หรือ live integrations
 
-สนใจลองกับหนึ่งแคมเปญไหมครับ/คะ?
+ผม/ฉันสามารถรัน founder-led PoV session ได้สัปดาห์หน้า วันอังคาร/พุธสะดวกไหมครับ/คะ?
 
 ### Brief Request Message
 
