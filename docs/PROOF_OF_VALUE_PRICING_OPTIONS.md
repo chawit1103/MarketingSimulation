@@ -18,6 +18,29 @@ The proof-of-value package is a guided workshop/session and decision-support pac
 | Standard Proof-of-Value Package | Placeholder range: USD 3,000-7,500 | Intake review, 60-minute workshop, output package, Strategy Pack outline or export, follow-up summary | Best for a team comparing creative routes. |
 | Paid Pilot Scoping Add-On | Placeholder range: USD 2,500-5,000 | Pilot scope, data boundary, success criteria, retention/deletion plan, operator checklist | Applies when customer wants to move toward a controlled paid pilot. |
 
+## Recommended First-Customer Default Offer
+
+Use one default offer for founder-led first-customer conversations unless scope clearly requires a custom proposal.
+
+Offer: **Founder Proof-of-Value Workshop**
+
+Example placeholder range: **USD 2,500-5,000** or **THB 90,000-180,000 equivalent**.
+
+This is example guidance for sales planning only and is not a binding quote.
+
+Includes:
+
+- 60-minute guided session,
+- 1 approved campaign brief or approved historical scenario,
+- `/proof-of-value` intake and safety confirmation,
+- customer-facing output package within the next business day,
+- one follow-up call,
+- optional credit toward a controlled paid pilot if the customer proceeds within an agreed decision window.
+
+Recommended CTA:
+
+> Send one approved brief or two 30-minute slots. I can run one founder-led PoV session next week; Tue/Wed work?
+
 ## Pricing Assumptions
 
 - One approved campaign brief or historical scenario.

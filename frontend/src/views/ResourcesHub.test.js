@@ -21,6 +21,7 @@ describe('ResourcesHub', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('Proof-of-Value Resource Hub')
+    expect(wrapper.text()).toContain('Start Here: First Customer')
     expect(wrapper.text()).toContain('Customer Proof-of-Value')
   })
 
@@ -48,6 +49,7 @@ describe('ResourcesHub', () => {
     const wrapper = mountView()
     const text = wrapper.text()
 
+    expect(text).toContain('Start Here: First Customer')
     expect(text).toContain('Customer Proof-of-Value')
     expect(text).toContain('Sales Materials')
     expect(text).toContain('Operator Checklist')
@@ -55,7 +57,10 @@ describe('ResourcesHub', () => {
     expect(text).toContain('Sample Packages')
 
     const hrefs = wrapper.findAll('a').map((link) => link.attributes('href'))
+    expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/PROOF_OF_VALUE_OUTREACH_PACK.md')
     expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/PROOF_OF_VALUE_ONE_PAGE_COPY.md')
+    expect(hrefs).toContain('/proof-of-value')
+    expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/PROOF_OF_VALUE_CUSTOMER_OUTPUT_TEMPLATE.md')
     expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/PROOF_OF_VALUE_SALES_OFFER.md')
     expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/CUSTOMER_BRIEF_INTAKE_TEMPLATE.md')
     expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/PROOF_OF_VALUE_OPERATOR_CHECKLIST.md')

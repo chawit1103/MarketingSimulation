@@ -57,9 +57,9 @@
               v-for="doc in section.docs"
               :key="doc.path"
               class="doc-card"
-              :href="docUrl(doc.path)"
-              target="_blank"
-              rel="noreferrer"
+              :href="doc.route || docUrl(doc.path)"
+              :target="doc.route ? undefined : '_blank'"
+              :rel="doc.route ? undefined : 'noreferrer'"
             >
               <span class="doc-path">{{ doc.path }}</span>
               <strong>{{ doc.title }}</strong>
@@ -96,6 +96,54 @@ const guardrails = [
 ]
 
 const resourceSections = [
+  {
+    eyebrow: 'Start Here',
+    title: 'Start Here: First Customer',
+    description: 'Recommended founder-led execution order for selling, running, and closing the first customer proof-of-value session.',
+    docs: [
+      {
+        title: 'Proof-of-Value Outreach Message Pack',
+        path: 'docs/PROOF_OF_VALUE_OUTREACH_PACK.md',
+        description: 'Founder-led outreach, follow-up, brief request, and objection-response copy.',
+      },
+      {
+        title: 'Proof-of-Value One-Page Copy',
+        path: 'docs/PROOF_OF_VALUE_ONE_PAGE_COPY.md',
+        description: 'Customer-facing one-page overview for landing page, PDF, email, or sales message use.',
+      },
+      {
+        title: 'Customer Brief Intake Template',
+        path: 'docs/CUSTOMER_BRIEF_INTAKE_TEMPLATE.md',
+        description: 'Approved brief fields, A/B/C route requirement, and safety confirmations before intake.',
+      },
+      {
+        title: '/proof-of-value route',
+        path: 'proof-of-value',
+        route: '/proof-of-value',
+        description: 'Operator intake workflow for validating the approved brief before output assembly.',
+      },
+      {
+        title: 'Proof-of-Value Customer Output Template',
+        path: 'docs/PROOF_OF_VALUE_CUSTOMER_OUTPUT_TEMPLATE.md',
+        description: 'Customer-facing package template with provenance footer placeholders.',
+      },
+      {
+        title: 'Proof-of-Value Output Package',
+        path: 'docs/PROOF_OF_VALUE_OUTPUT_PACKAGE.md',
+        description: 'Operator sequence for assembling and reviewing customer-facing outputs.',
+      },
+      {
+        title: 'Proof-of-Value Sales Offer',
+        path: 'docs/PROOF_OF_VALUE_SALES_OFFER.md',
+        description: 'Offer framing, buyer fit, deliverables, exclusions, and next-step language.',
+      },
+      {
+        title: 'Proof-of-Value Pricing Options',
+        path: 'docs/PROOF_OF_VALUE_PRICING_OPTIONS.md',
+        description: 'Placeholder pricing and the recommended first-customer default offer.',
+      },
+    ],
+  },
   {
     eyebrow: 'Customer Proof-of-Value',
     title: 'Customer Proof-of-Value',
