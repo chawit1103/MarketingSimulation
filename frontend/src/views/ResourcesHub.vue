@@ -177,6 +177,34 @@ const resourceSections = [
     ],
   },
   {
+    eyebrow: 'AI Preparation',
+    title: 'Prepare Brief with AI',
+    description: 'Thai-first prompt packs for turning a loose customer question into safe intake fields before operator review.',
+    docs: [
+      {
+        title: 'AI Research Prompt Pack',
+        path: 'docs/AI_RESEARCH_PROMPT_PACK.md',
+        description: 'Thai-first prompts for brief structuring, market context, A/B/C routes, risk watchouts, KPIs, and final formatting.',
+      },
+      {
+        title: 'PoV Intake Import Template',
+        path: 'docs/POV_INTAKE_IMPORT_TEMPLATE.md',
+        description: 'Markdown and JSON templates for preparing reviewed intake data before pasting into /proof-of-value.',
+      },
+      {
+        title: 'Raw Brief to PoV Example',
+        path: 'docs/RAW_BRIEF_TO_POV_EXAMPLE.md',
+        description: 'Synthetic Thai example showing a raw business question converted into structured proof-of-value intake.',
+      },
+      {
+        title: '/proof-of-value route',
+        path: 'proof-of-value',
+        route: '/proof-of-value',
+        description: 'Operator intake workflow for validating approved, reviewed, and safety-checked brief data.',
+      },
+    ],
+  },
+  {
     eyebrow: 'Sales Materials',
     title: 'Sales Materials',
     description: 'Use these when preparing a sales conversation or showing a synthetic example package.',

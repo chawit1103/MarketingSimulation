@@ -32,6 +32,23 @@
         <span v-for="guardrail in proofPackage.guardrails" :key="guardrail">{{ guardrail }}</span>
       </section>
 
+      <section class="ai-helper-panel" aria-label="Prepare brief with AI prompt pack">
+        <div>
+          <span class="page-kicker">มีแค่โจทย์ดิบ?</span>
+          <h2>ใช้ Prompt Pack เพื่อเตรียม Brief</h2>
+          <p>
+            ให้ ChatGPT/Claude/Gemini ช่วยแปลงโจทย์ภาษาไทยเป็น brief ที่พร้อมให้ operator ตรวจ ก่อนนำมากรอกแบบปลอดภัย.
+            แอปนี้ไม่ส่งข้อมูลไป external AI provider และยังต้องห้าม PII, raw CRM, customer lists, secrets, และ live integrations.
+          </p>
+        </div>
+        <div class="helper-links">
+          <a v-for="link in aiHelperLinks" :key="link.href" :href="link.href" target="_blank" rel="noreferrer">
+            {{ link.label }}
+          </a>
+          <router-link to="/resources">Resources Hub</router-link>
+        </div>
+      </section>
+
       <section class="pov-layout">
         <form class="intake-panel" @submit.prevent>
           <div class="panel-heading">
@@ -133,6 +150,13 @@ import {
 } from '@/services/proofOfValue'
 
 const intake = reactive(defaultProofOfValueIntake())
+
+const githubBlobRoot = 'https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/'
+
+const aiHelperLinks = [
+  { label: 'AI Research Prompt Pack', href: `${githubBlobRoot}docs/AI_RESEARCH_PROMPT_PACK.md` },
+  { label: 'Intake Import Template', href: `${githubBlobRoot}docs/POV_INTAKE_IMPORT_TEMPLATE.md` },
+]
 
 const primaryFields = [
   { key: 'campaignNameOrCode', label: 'Campaign name or anonymized code', rows: 1, placeholder: 'POV-WATER-001 or approved campaign name' },
@@ -250,6 +274,55 @@ const structuredPayload = computed(() => JSON.stringify(proofPackage.value, null
   flex-wrap: wrap;
   gap: var(--space-2);
   margin-bottom: var(--space-6);
+}
+
+.ai-helper-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, auto);
+  gap: var(--space-5);
+  align-items: center;
+  margin-bottom: var(--space-6);
+  padding: var(--space-5);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+  box-shadow: var(--shadow-card);
+}
+
+.ai-helper-panel h2 {
+  margin: 0 0 var(--space-2);
+}
+
+.ai-helper-panel p {
+  margin: 0;
+  max-width: 900px;
+  color: var(--text-secondary);
+}
+
+.helper-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.helper-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.helper-links a:hover {
+  border-color: var(--border-accent);
+  background: var(--bg-muted);
 }
 
 .guardrail-strip span,
@@ -409,9 +482,14 @@ const structuredPayload = computed(() => JSON.stringify(proofPackage.value, null
 
 @media (max-width: 980px) {
   .pov-header,
+  .ai-helper-panel,
   .pov-layout,
   .field-grid {
     grid-template-columns: 1fr;
+  }
+
+  .helper-links {
+    justify-content: flex-start;
   }
 
   .navbar {
