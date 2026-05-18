@@ -47,8 +47,9 @@ Updated: 2026-05-18
 - risk concerns
 - success KPIs
 - optional aggregate actuals
-- validation goal
 - assumptions to review
+- questions to ask customer
+- recommended validation notes for output package
 - safety notes
 ```
 
@@ -161,9 +162,9 @@ Campaign context:
 5. Assumptions and validation needed
 ```
 
-## 6. Success KPI And Validation Plan Prompt
+## 6. Success KPI And Validation Notes Prompt
 
-ใช้เพื่อแปลง objective เป็น KPI และ validation goal ที่วัดได้แบบไม่อ้างผลแน่นอน
+ใช้เพื่อแปลง objective เป็น KPI และ recommended validation notes ที่ operator จะใช้ภายหลังใน output package. หมายเหตุ validation ไม่ใช่ field โดยตรงของ `/proof-of-value`.
 
 ```text
 คุณคือผู้ช่วยวาง KPI และ validation plan สำหรับ Proof-of-Value
@@ -171,19 +172,20 @@ Campaign context:
 Brief:
 <วาง brief ที่ได้รับอนุมัติ>
 
-ช่วยเสนอ success KPIs และ validation goal สำหรับ campaign นี้
+ช่วยเสนอ success KPIs และ recommended validation notes สำหรับ campaign นี้
 
 ข้อกำหนด:
 - KPI ต้องเป็น decision-support metric ไม่ใช่คำสัญญาผลลัพธ์
 - ห้าม claim exact ROI/ROAS หรือ guaranteed prediction
 - ถ้าใช้ historical actuals ต้องเป็น aggregate-only และได้รับอนุมัติ
 - ห้ามใช้ PII, raw CRM, customer list, secrets หรือ live integrations
+- Recommended validation notes เป็น operator notes สำหรับ downstream output package ไม่ใช่ direct /proof-of-value input field
 
 รูปแบบคำตอบ:
 - Primary KPI:
 - Secondary KPIs:
-- Validation goal:
-- Suggested validation method:
+- Questions to ask customer:
+- Recommended validation notes for output package:
 - Minimum evidence needed:
 - Assumptions to review:
 ```
@@ -222,8 +224,9 @@ Field ที่ต้องตอบ:
 - risk concerns
 - success KPIs
 - optional aggregate actuals
-- validation goal
 - assumptions to review
+- questions to ask customer
+- recommended validation notes for output package
 - safety checklist
 ```
 
@@ -249,7 +252,8 @@ Input:
 JSON keys:
 campaignNameOrCode, productService, objective, targetSegment, marketContext,
 channelPlan, budgetBand, competitorContext, creativeA, creativeB, creativeC,
-riskConcerns, successKpis, aggregateActuals, validationGoal, assumptionsToReview
+riskConcerns, successKpis, aggregateActuals, assumptionsToReview,
+questionsToAskCustomer, recommendedValidationNotes
 ```
 
 ## Human Review Before Pasting
@@ -262,4 +266,5 @@ riskConcerns, successKpis, aggregateActuals, validationGoal, assumptionsToReview
 - ไม่มี requirement ให้เชื่อมต่อ live CRM, social listening, ad platform, analytics หรือ marketing automation
 - มี creative direction A/B/C ครบ หรือมีการอนุมัติให้ operator สร้าง safe working routes
 - assumption ถูกแยกชัดเจน
+- recommended validation notes ถูกเก็บเป็น operator notes สำหรับ output package ไม่ใช่ field ที่กรอกใน `/proof-of-value`
 - output ไม่อ้าง production readiness, guaranteed prediction, exact ROI/ROAS หรือการแทน market research

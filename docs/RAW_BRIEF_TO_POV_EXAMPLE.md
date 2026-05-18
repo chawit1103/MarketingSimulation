@@ -34,7 +34,8 @@ Field ที่ต้องตอบ:
 campaign name or anonymized campaign code, product/service, objective, target segment,
 market context, channel plan, budget band, competitor context, creative direction A,
 creative direction B, creative direction C, risk concerns, success KPIs,
-optional aggregate actuals, validation goal
+optional aggregate actuals, assumptions to review, questions to ask customer,
+recommended validation notes for output package
 
 โจทย์ดิบ:
 <วางโจทย์ synthetic ด้านบน>
@@ -58,7 +59,6 @@ optional aggregate actuals, validation goal
 | Risk concerns | ราคาดูแพงเกินไป, claim สุขภาพต้องไม่เกินหลักฐาน, lifestyle tone อาจดูไกลตัว |
 | Success KPIs | Consideration, message clarity, perceived value, purchase intent proxy, risk sentiment |
 | Optional aggregate actuals | Not provided |
-| Validation goal | เลือก creative route ที่น่าใช้ต่อ และออกแบบ user test หรือ A/B real ad test แบบจำกัดวง |
 
 ## Assumptions To Review
 
@@ -66,6 +66,12 @@ optional aggregate actuals, validation goal
 - Competitor set เป็น hypothesis จากโจทย์ ไม่ใช่ competitive research ที่ยืนยันแล้ว.
 - KPI เป็น directional planning input ไม่ใช่ guaranteed outcome.
 - Creative routes เป็น working routes และต้องให้ลูกค้าตรวจภาษาก่อนใช้จริง.
+
+## Operator Notes For Output Package
+
+- Questions to ask customer: ยืนยัน target segment, competitor set, budget band และ risk sensitivity ก่อนใช้ใน customer-facing output.
+- Recommended validation notes: ใช้ user test หรือ A/B real ad test แบบจำกัดวงเพื่อ validate creative route ที่เลือก.
+- These notes are not direct `/proof-of-value` input fields. Use them later when assembling the output package.
 
 ## Human Operator Review Before Pasting
 

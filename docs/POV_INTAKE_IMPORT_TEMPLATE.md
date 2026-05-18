@@ -45,11 +45,16 @@ Updated: 2026-05-18
 | Risk concerns |  |
 | Success KPIs |  |
 | Optional aggregate actuals | Not provided / aggregate-only approved values |
-| Validation goal |  |
 
 ## Assumptions To Review
 
 - <assumption to verify>
+
+## Operator Notes For Output Package
+
+- Questions to ask customer: <questions to confirm before output packaging>
+- Recommended validation notes: <validation method or next evidence to recommend>
+- These notes are not direct `/proof-of-value` input fields. Use them later when assembling the customer-facing output package.
 
 ## Safety Notes
 
@@ -79,8 +84,9 @@ Updated: 2026-05-18
   "riskConcerns": "",
   "successKpis": "",
   "aggregateActuals": "",
-  "validationGoal": "",
   "assumptionsToReview": [],
+  "questionsToAskCustomer": [],
+  "recommendedValidationNotes": "",
   "safetyNotes": {
     "approvedForPovUse": false,
     "noPii": false,
@@ -110,6 +116,8 @@ Updated: 2026-05-18
 | riskConcerns | Risk concerns |
 | successKpis | Success KPIs |
 | aggregateActuals | Optional aggregate actuals |
+
+Validation recommendations, customer questions, and validation-method ideas are operator notes for downstream output packaging. They are not direct `/proof-of-value` input fields and should not be treated as silently imported form data.
 
 ## Operator Warning
 
