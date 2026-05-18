@@ -18,6 +18,10 @@ describe('ProofOfValueFlow', () => {
     const text = wrapper.text()
 
     expect(text).toContain('Approved Brief to Strategy Pack')
+    expect(text).toContain('มีแค่โจทย์ดิบ?')
+    expect(text).toContain('AI Research Prompt Pack')
+    expect(text).toContain('Intake Import Template')
+    expect(text).toContain('Resources Hub')
     expect(text).toContain('Local Estimate')
     expect(text).toContain('No PII')
     expect(text).toContain('No raw CRM records')

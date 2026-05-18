@@ -51,6 +51,7 @@ describe('ResourcesHub', () => {
 
     expect(text).toContain('Start Here: First Customer')
     expect(text).toContain('Customer Proof-of-Value')
+    expect(text).toContain('Prepare Brief with AI')
     expect(text).toContain('Sales Materials')
     expect(text).toContain('Operator Checklist')
     expect(text).toContain('Data Safety and Guardrails')
@@ -64,6 +65,9 @@ describe('ResourcesHub', () => {
     expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/PROOF_OF_VALUE_CUSTOMER_OUTPUT_TEMPLATE.md')
     expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/PROOF_OF_VALUE_SALES_OFFER.md')
     expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/CUSTOMER_BRIEF_INTAKE_TEMPLATE.md')
+    expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/AI_RESEARCH_PROMPT_PACK.md')
+    expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/POV_INTAKE_IMPORT_TEMPLATE.md')
+    expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/RAW_BRIEF_TO_POV_EXAMPLE.md')
     expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/PROOF_OF_VALUE_OPERATOR_CHECKLIST.md')
     expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/CUSTOMER_DATA_HANDLING.md')
     expect(hrefs).toContain('https://github.com/chawit1103/MarketingSimulation/blob/multilang-v0.3/docs/SAMPLE_PROOF_OF_VALUE_PACKAGE.md')
