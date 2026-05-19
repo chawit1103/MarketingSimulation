@@ -181,6 +181,26 @@ const resourceSections = [
         path: 'docs/STRATEGIC_COMMAND_SAFETY_BOUNDARIES_TH.md',
         description: 'Allowed use, disallowed use, data boundary, output boundary, and political-risk exclusions.',
       },
+      {
+        title: 'PM2.5 Demo Package Input',
+        path: 'docs/strategic-command/PM25_DUST_FREE_ROOM_INPUT_TH.md',
+        description: 'User-provided PM2.5 dust-free room scenario, synthetic personas, watchouts, and response inputs.',
+      },
+      {
+        title: 'PM2.5 Executive Strategy Pack',
+        path: 'docs/strategic-command/PM25_EXECUTIVE_STRATEGY_PACK_TH.md',
+        description: 'Ready-to-present PM2.5 Health Resilience Strategy Pack with provenance and validation notes.',
+      },
+      {
+        title: 'PM2.5 Demo Script',
+        path: 'docs/strategic-command/PM25_DEMO_SCRIPT_TH.md',
+        description: '5-minute and 15-minute presenter script for political/government strategy team demos.',
+      },
+      {
+        title: 'PM2.5 Screenshot Guide',
+        path: 'docs/strategic-command/PM25_SCREENSHOT_GUIDE_TH.md',
+        description: 'Capture checklist, filenames, storage path, and required visible safety/provenance labels.',
+      },
     ],
   },
   {
