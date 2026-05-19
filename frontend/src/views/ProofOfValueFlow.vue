@@ -7,6 +7,7 @@
         <router-link to="/campaigns" class="nav-link">Campaigns</router-link>
         <router-link to="/comparator" class="nav-link">Comparator</router-link>
         <router-link to="/budget-planner" class="nav-link">Budget Planner</router-link>
+        <router-link to="/strategic-command" class="nav-link">Strategic Command</router-link>
         <router-link to="/resources" class="nav-link">Resources</router-link>
         <router-link to="/settings" class="nav-link">Settings</router-link>
       </div>
