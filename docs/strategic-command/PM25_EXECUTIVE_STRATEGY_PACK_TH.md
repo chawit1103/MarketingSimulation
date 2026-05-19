@@ -22,7 +22,7 @@ This package is prepared for a Strategic Command demo conversation with a politi
 
 ## Executive Summary
 
-The PM2.5 dust-free room issue has strong public value because it connects health protection, research translation, and local implementation. The main communication opportunity is to show that research and innovation can become practical help for vulnerable groups during high-dust periods.
+The PM2.5 dust-free room issue has strong public value because it connects health protection, research translation, and local implementation. The main communication opportunity is to show that research and innovation can become intended pilot support for vulnerable groups during high-dust periods, subject to approved measurement evidence and validated installation.
 
 The main risk is overclaiming. If the message sounds like a finished achievement, audiences may challenge the small pilot size, actual filtration performance, hidden operating costs, and whether this distracts from root-cause PM2.5 policy.
 
@@ -32,11 +32,11 @@ Recommended strategic framing:
 
 Recommended message posture:
 
-- Lead with vulnerable public health benefit
+- Lead with intended vulnerable-public health benefit, tied to approved evidence
 - Show proof and measurement before political credit
 - Explain 3,600 THB as a pilot cost, not a full lifecycle guarantee
 - Name hidden-cost questions proactively
-- Position the project as emergency harm reduction while root-cause policy continues
+- Position the project as intended emergency harm reduction while root-cause policy continues
 
 ## Public Sentiment Risk Brief
 
@@ -45,7 +45,7 @@ Recommended message posture:
 | Proof | ห้องต้นทุน 3,600 บาทลด PM2.5 ได้จริงหรือ | ใช้ evidence, measurement, and researcher explanation |
 | Scale | 83 ห้องพออะไรกับ 8 จังหวัด | สื่อสารว่าเป็น sandbox / pilot model เพื่อเรียนรู้ก่อนขยายผล |
 | Hidden costs | ค่าไฟ ค่า filter ค่าบำรุงรักษาใครจ่าย | เตรียม cost breakdown และ owner model |
-| Root cause | ทำไมห้องปลอดฝุ่นแทนการแก้ต้นเหตุ | บอกว่าเป็น harm reduction เร่งด่วน ไม่ใช่ตัวแทนนโยบายต้นเหตุ |
+| Root cause | ทำไมห้องปลอดฝุ่นแทนการแก้ต้นเหตุ | บอกว่าเป็น intended harm reduction ในพื้นที่นำร่อง ไม่ใช่ตัวแทนนโยบายต้นเหตุ |
 | Political PR | เป็นผลงานโชว์มากกว่านโยบายจริงหรือไม่ | ให้ researcher/local implementer voice และหลักฐานนำหน้า |
 
 ## Stakeholder / Synthetic Persona Reaction Map
@@ -56,7 +56,7 @@ Recommended message posture:
 | Urban Skeptic | สนใจต้นทุนต่ำถ้ามี proof | ตั้งคำถามเรื่อง scale, cost, and PR | ตัวเลขโปร่งใส ข้อจำกัดชัดเจน |
 | Local Implementer | สนใจนำไปใช้ในโรงเรียน/อปท. | กังวล maintenance และงบระยะยาว | คู่มือ แบบแปลน owner model |
 | Environmental Expert | พร้อมช่วย validate ถ้าข้อมูลดี | ไม่อยากให้แทน root-cause policy | methodology และ policy alignment |
-| Rural Community / Farmer | เห็นว่าพื้นที่เสี่ยงได้รับการช่วยเหลือ | กลัวถูกโยนความผิดเรื่องฝุ่น | ภาษาที่ไม่กล่าวโทษชุมชน |
+| Rural Community / Farmer | เห็นว่าพื้นที่เสี่ยงอาจได้รับการสนับสนุนผ่านโครงการนำร่อง | กลัวถูกโยนความผิดเรื่องฝุ่น | ภาษาที่ไม่กล่าวโทษชุมชน |
 
 ## Crisis Watchout Brief
 
@@ -70,7 +70,7 @@ Recommended message posture:
 
 3. **“People in boxes” backlash**
    - Public backlash says government puts people in boxes instead of addressing PM2.5 causes
-   - Prepared response: frame as immediate health protection for vulnerable groups while root-cause work continues
+   - Prepared response: frame as intended harm-reduction support for vulnerable groups in installed and validated pilot settings while root-cause work continues
 
 4. **Pilot size criticism**
    - 83 rooms are criticized as too few for 8 northern provinces
@@ -84,11 +84,11 @@ Recommended message posture:
 
 ### Current Risk
 
-The initial statement says “พิสูจน์แล้วว่านวัตกรรมไทยใช้งานได้จริง” and “ปกป้องสุขภาพ...ได้ทันที.” These phrases may be challenged if the team cannot show approved performance evidence and access details.
+The initial statement says “พิสูจน์แล้วว่านวัตกรรมไทยใช้งานได้จริง” and “ปกป้องสุขภาพ...ได้ทันที.” These phrases are preserved as the initial statement to test, but should not be repeated as customer-facing claims unless the team has approved performance measurement, installation evidence, and access details.
 
 ### Recommended Message
 
-> อว. ใช้งานวิจัยและนวัตกรรมช่วยลดผลกระทบจาก PM2.5 ต่อสุขภาพประชาชน โดยเริ่มจากห้องปลอดฝุ่นต้นทุนต่ำ 3,600 บาทต่อห้อง นำร่อง 83 ห้องใน 8 จังหวัดภาคเหนือ เพื่อพิสูจน์โมเดลที่ติดตั้งได้จริงในพื้นที่เสี่ยง ก่อนนำบทเรียนไปออกแบบการขยายผลร่วมกับพื้นที่และหน่วยงานที่เกี่ยวข้อง
+> อว. ใช้งานวิจัยและนวัตกรรมเพื่อทดสอบโมเดลลดผลกระทบจาก PM2.5 ต่อสุขภาพประชาชน โดยเริ่มจากห้องปลอดฝุ่นต้นทุนต่ำ 3,600 บาทต่อห้อง นำร่อง 83 ห้องใน 8 จังหวัดภาคเหนือ เพื่อประเมินโมเดลที่ติดตั้งได้จริงในพื้นที่เสี่ยง พร้อมตรวจวัดผลและนำบทเรียนไปออกแบบการขยายผลร่วมกับพื้นที่และหน่วยงานที่เกี่ยวข้อง
 
 ### Recommended Supporting Proof
 
@@ -104,11 +104,12 @@ The initial statement says “พิสูจน์แล้วว่านว�
 
 Response:
 
-> อว. เข้าใจว่าการแก้ต้นเหตุเป็นเรื่องสำคัญและต้องทำควบคู่กัน แต่ในช่วงค่าฝุ่นสูง สุขภาพของเด็ก ผู้สูงอายุ และกลุ่มเปราะบางรอไม่ได้ ห้องปลอดฝุ่นเป็นมาตรการลดผลกระทบเร่งด่วนที่ช่วยพื้นที่เสี่ยงได้ทันที
+> อว. เข้าใจว่าการแก้ต้นเหตุเป็นเรื่องสำคัญและต้องทำควบคู่กัน แต่ในช่วงค่าฝุ่นสูง สุขภาพของเด็ก ผู้สูงอายุ และกลุ่มเปราะบางรอไม่ได้ ห้องปลอดฝุ่นเป็นมาตรการลดผลกระทบเร่งด่วนที่มีเป้าหมายเพื่อช่วยกลุ่มเปราะบางในพื้นที่เสี่ยง โดยควรสื่อสารควบคู่กับหลักฐานการติดตั้ง การตรวจวัด และผลการทดสอบที่ได้รับอนุมัติ
 
 Next action:
 
 - Add root-cause policy alignment note approved by policy owner
+- Attach approved installation and measurement evidence before making public-health benefit claims
 - Avoid implying this pilot replaces broader PM2.5 policy
 
 ### Scenario B: “3,600 บาททำได้จริงหรือ”
