@@ -71,6 +71,9 @@ describe('StrategicCommand', () => {
     expect(text).toContain('Response Playbook')
     expect(text).toContain('Executive Strategy Pack')
     expect(text).toContain('Recommended Validation Step')
+    expect(text).toContain('Demo Mode')
+    expect(text).toContain('Synthetic Scenario')
+    expect(text).toContain('Decision-support estimate only; not a real-world outcome forecast')
   })
 
   it('shows safety boundaries without unsafe English claims', () => {
@@ -86,6 +89,9 @@ describe('StrategicCommand', () => {
     expect(text).toContain('ไม่ใช่เครื่องมือปั่นกระแส')
     expect(text).toContain('ไม่ใช่เครื่องมือโจมตีฝ่ายตรงข้าม')
     expect(text).toContain('ไม่สร้างข่าวปลอมหรือข้อมูลบิดเบือน')
+    expect(text).toContain('ไม่ทำนายผลการเลือกตั้ง')
+    expect(text).toContain('ไม่ประเมินผลกระทบต่อคะแนนเสียง')
+    expect(text).toContain('ไม่คำนวณ vote impact หรือ exact vote effect')
     expect(text).toContain('ต้องใช้ข้อมูลที่ได้รับอนุมัติเท่านั้น')
     expect(text).toContain('ต้องมี human review ก่อนสื่อสารสาธารณะจริง')
 

@@ -111,7 +111,11 @@
           <aside class="strategy-pack-preview" aria-label="Executive Strategy Pack preview">
             <div class="pack-header">
               <span>Executive Strategy Pack</span>
-              <strong>Decision Support</strong>
+              <strong>Demo Mode</strong>
+            </div>
+            <div class="pack-provenance" aria-label="Executive Strategy Pack provenance">
+              <span>Synthetic Scenario</span>
+              <p>Decision-support estimate only; not a real-world outcome forecast</p>
             </div>
             <ol>
               <li>Risk summary</li>
@@ -270,6 +274,9 @@ const safetyBoundaries = [
   'ไม่ใช่เครื่องมือปั่นกระแส',
   'ไม่ใช่เครื่องมือโจมตีฝ่ายตรงข้าม',
   'ไม่สร้างข่าวปลอมหรือข้อมูลบิดเบือน',
+  'ไม่ทำนายผลการเลือกตั้ง',
+  'ไม่ประเมินผลกระทบต่อคะแนนเสียง',
+  'ไม่คำนวณ vote impact หรือ exact vote effect',
   'ต้องใช้ข้อมูลที่ได้รับอนุมัติเท่านั้น',
   'ต้องมี human review ก่อนสื่อสารสาธารณะจริง',
 ]
@@ -502,6 +509,31 @@ main {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   text-transform: uppercase;
+}
+
+.pack-provenance {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid rgba(118, 224, 170, 0.24);
+  border-radius: var(--radius-md);
+  background: rgba(118, 224, 170, 0.08);
+}
+
+.pack-provenance span {
+  display: block;
+  color: #76e0aa;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.pack-provenance p {
+  margin: var(--space-2) 0 0;
+  color: #d7ecff;
+  font-size: var(--text-sm);
+  font-weight: 800;
+  line-height: 1.45;
 }
 
 .risk-gauge {
