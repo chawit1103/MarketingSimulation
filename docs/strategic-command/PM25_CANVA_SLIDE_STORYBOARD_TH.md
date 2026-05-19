@@ -70,11 +70,16 @@ Add a small amber risk strip: proof, scale, hidden costs, root cause.
 
 โจทย์นี้ดีสำหรับ demo เพราะเห็นได้ทันทีว่า “ข้อความเดียวกัน” อาจสร้างความเชื่อมั่นหรือสร้าง backlash ได้ ขึ้นกับ framing และหลักฐานที่เตรียมไว้
 
+### Footer / Provenance
+
+Demo Mode | Synthetic Scenario | Decision-Support Estimate
+
 ### Canva Design Notes
 
 - Use three large number tiles
 - Use amber for risk callouts
 - Avoid pollution disaster imagery that feels sensational
+- Keep provenance footer visible; do not crop it out when exporting or resizing
 
 ## Slide 3: Strategic Command Workflow
 
@@ -104,11 +109,15 @@ Policy Issue -> Synthetic Personas -> Crisis Watchouts -> Message Revision -> Re
 
 นี่ไม่ใช่ social listening สด ไม่ใช่ข้อมูลประชาชนจริง และไม่ใช่การคาดการณ์ผลลัพธ์จริง แต่เป็น decision-support workflow เพื่อเตรียมคำถาม ความเสี่ยง และหลักฐานที่ต้องใช้
 
+### Footer / Provenance
+
+Demo Mode | Synthetic Scenario | Decision-Support Estimate
+
 ### Canva Design Notes
 
 - Use simple arrows or connected blocks
 - Navy/white base, cyan connectors
-- Add provenance footer because this slide explains simulated workflow
+- Keep provenance footer visible because this slide explains simulated workflow
 
 ## Slide 4: Public Sentiment Risk Brief
 
@@ -142,11 +151,18 @@ Five risk cards with icons or colored labels:
 
 เป้าหมายของ brief นี้คือทำให้ทีมไม่โดนถามโดยไม่พร้อม โดยเฉพาะเรื่อง proof และ hidden costs ที่ควรมีข้อมูลอนุมัติก่อนใช้ public message
 
+### Footer / Provenance
+
+Demo Mode | Synthetic Scenario | Decision-Support Estimate
+
+Not election prediction | Not vote impact | Human review required
+
 ### Canva Design Notes
 
 - Use amber accents for risk
 - Red only for the highest crisis warning
 - Keep copy concise; detailed explanations go in speaker notes
+- Keep both provenance lines visible on the slide or presenter-safe footer area
 
 ## Slide 5: Persona Reaction Map
 
@@ -174,11 +190,18 @@ Two-column map: persona name on the left, likely concern on the right.
 
 เราไม่ได้ใช้ข้อมูลประชาชนจริงหรือ voter list Persona เหล่านี้เป็น synthetic personas เพื่อช่วยทีมเห็นมุมตีความและคำถามที่ต้องเตรียม
 
+### Footer / Provenance
+
+Demo Mode | Synthetic Scenario | Decision-Support Estimate
+
+Not election prediction | Not vote impact | Human review required
+
 ### Canva Design Notes
 
 - Use calm profile cards, not cartoon avatars
 - Keep design executive and respectful
 - Add a small label: Synthetic Personas
+- Keep both provenance lines visible; do not hide them behind persona cards
 
 ## Slide 6: Message Revision + Response Playbook
 
@@ -221,11 +244,18 @@ Add three response chips:
 
 จุดสำคัญคือเราไม่ได้ทำให้ข้อความดูสวยขึ้นเท่านั้น แต่ลด risk ของการสื่อสารเกินหลักฐาน โดยเฉพาะ health-impact claims ที่ต้องผูกกับ measurement evidence
 
+### Footer / Provenance
+
+Demo Mode | Synthetic Scenario | Decision-Support Estimate
+
+Not election prediction | Not vote impact | Human review required
+
 ### Canva Design Notes
 
 - Use before/after contrast, but keep both readable
 - Use amber caution marker on original message
 - Use cyan check marker on revised message
+- Keep both provenance lines visible because this slide contains recommendations and response playbook content
 
 ## Slide 7: Next Step
 
@@ -259,8 +289,15 @@ CTA panel with four checklist items:
 
 Footer:
 
-Demo Mode | Synthetic Scenario | Decision-Support Estimate  
+Demo Mode | Synthetic Scenario | Decision-Support Estimate
+
 Not election prediction, not vote impact, not public sentiment guarantee
+
+### Footer / Provenance
+
+Demo Mode | Synthetic Scenario | Decision-Support Estimate
+
+Not election prediction | Not vote impact | Human review required
 
 ### Speaker Notes
 
@@ -271,3 +308,4 @@ Not election prediction, not vote impact, not public sentiment guarantee
 - Strong CTA on navy background
 - Footer must be visible
 - Avoid salesy or consumer-marketing style
+- Keep both provenance lines visible on exported meeting slides and social crops

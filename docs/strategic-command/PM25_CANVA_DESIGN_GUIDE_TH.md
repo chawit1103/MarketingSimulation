@@ -100,13 +100,21 @@ Use in follow-up or appendix.
 
 ## Footer / Provenance Rule
 
-Every slide with simulated output must show:
+Every slide with simulated output, scenario data, synthetic persona analysis, risk brief, message revision, response playbook, recommendation, or next-step CTA must include a visible provenance footer.
+
+Required footer:
 
 `Demo Mode | Synthetic Scenario | Decision-Support Estimate`
 
 For CTA or safety-heavy slides, add:
 
 `Not election prediction | Not vote impact | Not public sentiment guarantee`
+
+For recommendation-heavy slides, use:
+
+`Not election prediction | Not vote impact | Human review required`
+
+Do not crop, cover, recolor into low contrast, or hide the provenance footer in slide exports, social crops, thumbnails, video exports, or follow-up images.
 
 ## Content Rules
 
@@ -117,6 +125,7 @@ For CTA or safety-heavy slides, add:
 - Do not use PII, voter lists, raw CRM, party membership data, secrets, or private screenshots
 - Do not claim production readiness
 - Do not claim exact public reaction, election outcome, or vote impact
+- Do not remove provenance footers when adapting the deck for social/video formats
 
 ## Export Guidance
 
@@ -124,4 +133,5 @@ If exporting from Canva:
 
 - Use PNG for individual slide previews
 - Use PDF only outside the repo if needed for a meeting
+- Check each exported slide/video crop to confirm provenance footer remains visible
 - Do not commit Canva exports, PPTX, PDF, or video files unless explicitly approved in a future task
