@@ -17,6 +17,7 @@ const BudgetPlanner = () => import('../views/BudgetPlanner.vue')
 const CalibrationView = () => import('../views/CalibrationView.vue')
 const ProofOfValueFlow = () => import('../views/ProofOfValueFlow.vue')
 const ResourcesHub = () => import('../views/ResourcesHub.vue')
+const StrategicCommand = () => import('../views/StrategicCommand.vue')
 
 const routes = [
   {
@@ -94,6 +95,11 @@ const routes = [
     path: '/resources',
     name: 'ResourcesHub',
     component: ResourcesHub
+  },
+  {
+    path: '/strategic-command',
+    name: 'StrategicCommand',
+    component: StrategicCommand
   },
   {
     path: '/calibration',

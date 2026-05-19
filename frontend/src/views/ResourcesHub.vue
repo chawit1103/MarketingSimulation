@@ -5,6 +5,7 @@
       <div class="nav-links">
         <router-link to="/" class="nav-link">Home</router-link>
         <router-link to="/proof-of-value" class="nav-link">Proof of Value</router-link>
+        <router-link to="/strategic-command" class="nav-link">Strategic Command</router-link>
         <router-link to="/campaigns" class="nav-link">Campaigns</router-link>
         <router-link to="/settings" class="nav-link">Settings</router-link>
       </div>
@@ -146,6 +147,39 @@ const resourceSections = [
         title: 'Proof-of-Value Pricing Options',
         path: 'docs/PROOF_OF_VALUE_PRICING_OPTIONS.md',
         description: 'Placeholder pricing and the recommended first-customer default offer.',
+      },
+    ],
+  },
+  {
+    eyebrow: 'Public Policy',
+    title: 'Public Policy / Strategic Command',
+    description: 'Thai-first resources for government communication, policy risk review, crisis-information simulation, and executive decision support.',
+    docs: [
+      {
+        title: '/strategic-command route',
+        path: 'strategic-command',
+        route: '/strategic-command',
+        description: 'Thai-first demo page for public policy and government communication stakeholders.',
+      },
+      {
+        title: 'Strategic Command Overview',
+        path: 'docs/STRATEGIC_COMMAND_TH.md',
+        description: 'Positioning, use cases, four pillars, output package, demo offer, and safety boundaries.',
+      },
+      {
+        title: 'Public Policy PoV Intake Template',
+        path: 'docs/PUBLIC_POLICY_POV_INTAKE_TEMPLATE_TH.md',
+        description: 'Approved intake fields, review checklist, and prohibited data boundaries for policy scenarios.',
+      },
+      {
+        title: 'Strategic Command Demo Script',
+        path: 'docs/STRATEGIC_COMMAND_DEMO_SCRIPT_TH.md',
+        description: '15-minute demo flow, 30-minute workshop flow, presenter questions, screen sequence, and next step.',
+      },
+      {
+        title: 'Strategic Command Safety Boundaries',
+        path: 'docs/STRATEGIC_COMMAND_SAFETY_BOUNDARIES_TH.md',
+        description: 'Allowed use, disallowed use, data boundary, output boundary, and political-risk exclusions.',
       },
     ],
   },

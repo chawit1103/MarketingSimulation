@@ -125,6 +125,7 @@ Operator proof-of-value workflow:
 
 - Use `/proof-of-value` to turn one customer-approved campaign brief into an operator checklist, structured proof-of-value payload, and Strategy Pack deliverable sequence.
 - Use `/resources` to open the in-app Proof-of-Value Resource Hub for curated customer, sales, operator, and safety documentation links.
+- Use `/strategic-command` for the separate public policy and government communication vertical. It is Thai-first and focuses on policy communication risk, crisis-information watchouts, synthetic public-sentiment simulation, and executive decision support.
 - The workflow flags missing approvals and unsafe intake signals before any customer-facing output is assembled.
 - It does not require live LLM/API/Neo4j credentials, live integrations, PII, raw CRM records, customer lists, or secrets.
 
@@ -144,6 +145,10 @@ Recommended customer-pilot docs:
 - [Customer Data Handling](docs/CUSTOMER_DATA_HANDLING.md)
 - [Customer Proof-of-Value Flow](docs/CUSTOMER_PROOF_OF_VALUE_FLOW.md)
 - [Customer Brief Intake Template](docs/CUSTOMER_BRIEF_INTAKE_TEMPLATE.md)
+- [Strategic Command Overview TH](docs/STRATEGIC_COMMAND_TH.md)
+- [Public Policy PoV Intake Template TH](docs/PUBLIC_POLICY_POV_INTAKE_TEMPLATE_TH.md)
+- [Strategic Command Demo Script TH](docs/STRATEGIC_COMMAND_DEMO_SCRIPT_TH.md)
+- [Strategic Command Safety Boundaries TH](docs/STRATEGIC_COMMAND_SAFETY_BOUNDARIES_TH.md)
 - [AI Research Prompt Pack](docs/AI_RESEARCH_PROMPT_PACK.md)
 - [PoV Intake Import Template](docs/POV_INTAKE_IMPORT_TEMPLATE.md)
 - [Raw Brief to PoV Example](docs/RAW_BRIEF_TO_POV_EXAMPLE.md)
