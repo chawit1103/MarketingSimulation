@@ -201,6 +201,26 @@ const resourceSections = [
         path: 'docs/strategic-command/PM25_SCREENSHOT_GUIDE_TH.md',
         description: 'Capture checklist, filenames, storage path, and required visible safety/provenance labels.',
       },
+      {
+        title: 'PM2.5 Canva Slide Storyboard',
+        path: 'docs/strategic-command/PM25_CANVA_SLIDE_STORYBOARD_TH.md',
+        description: 'Seven-slide Thai-first Canva storyboard for the Strategic Command PM2.5 meeting deck.',
+      },
+      {
+        title: 'PM2.5 Canva Design Guide',
+        path: 'docs/strategic-command/PM25_CANVA_DESIGN_GUIDE_TH.md',
+        description: 'Canva format, font, palette, screenshot layout, and provenance rules for the PM2.5 deck.',
+      },
+      {
+        title: 'PM2.5 Short Video Script',
+        path: 'docs/strategic-command/PM25_SHORT_VIDEO_SCRIPT_TH.md',
+        description: '60-90 second Thai video script for Canva video, Reels, LinkedIn, or Facebook follow-up.',
+      },
+      {
+        title: 'PM2.5 Follow-Up Email',
+        path: 'docs/strategic-command/PM25_FOLLOW_UP_EMAIL_TH.md',
+        description: 'Thai follow-up email draft after sending the Strategic Command PM2.5 demo deck.',
+      },
     ],
   },
   {
