@@ -1,10 +1,11 @@
-# Strategic Command Safety Boundaries
+# CivicSense Strategic Command Safety Boundaries
 
-เอกสารนี้กำหนดขอบเขตสำหรับ Strategic Command vertical ทุกครั้งที่ใช้ใน demo, workshop, docs, screenshots, exports หรือ executive pack
+เอกสารนี้กำหนดขอบเขตสำหรับ CivicSense / Strategic Command vertical ทุกครั้งที่ใช้ใน demo, workshop, docs, screenshots, exports หรือ executive pack
 
 ## Allowed Use
 
 - ประเมินความเสี่ยงของประเด็นนโยบายหรือประเด็นสาธารณะ
+- ประเมิน public responsiveness และความพร้อมของข้อความก่อนเผยแพร่
 - จำลองเสียงสะท้อนเชิงสมมุติจาก synthetic personas
 - เตรียม crisis watchouts สำหรับทีมสื่อสาร
 - ปรับข้อความให้ชัดเจนขึ้นและลดความคลุมเครือ
@@ -47,6 +48,8 @@
 ## Output Boundary
 
 ทุก output ต้องมี source/provenance label เช่น Demo Mode, Local Estimate, Live Backend, Backend Verified หรือ Unknown Source
+
+Thai-first public responsiveness label ที่แนะนำให้ใช้คือ “ความพร้อมต่อเสียงสาธารณะ”, “ประเด็นที่ต้องระวัง”, “ขั้นตอนตรวจสอบ” และ “Synthetic public-response scenario” โดยต้องระบุเสมอว่าเป็น estimate ไม่ใช่ผลลัพธ์จริง
 
 Output ต้องระบุว่า:
 

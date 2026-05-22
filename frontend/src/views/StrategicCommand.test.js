@@ -24,8 +24,8 @@ describe('StrategicCommand', () => {
     })
     await flushPromises()
 
-    expect(wrapper.text()).toContain('3C Simulator Strategic Command')
-    expect(wrapper.text()).toContain('ห้องจำลองสถานการณ์เพื่อทดสอบนโยบายและรับมือวิกฤตข่าวสาร')
+    expect(wrapper.text()).toContain('CivicSense')
+    expect(wrapper.text()).toContain('ระบบจำลองเสียงสะท้อนสาธารณะเพื่อการสื่อสารนโยบายอย่างรับผิดชอบ')
   })
 
   it('shows the requested Thai-first strategic command sections', () => {
@@ -34,7 +34,7 @@ describe('StrategicCommand', () => {
 
     expect(text).toContain('ทดสอบความเสี่ยงก่อนประกาศนโยบาย')
     expect(text).toContain('วิเคราะห์กลุ่มประชาชนที่อาจเข้าใจผิดหรือได้รับผลกระทบ')
-    expect(text).toContain('จำลองกระแสบน Facebook, TikTok, X และ LINE')
+    expect(text).toContain('จำลอง public responsiveness บน Facebook, TikTok, X และ LINE')
     expect(text).toContain('เตรียมแผนรับมือวิกฤตข่าวสาร')
     expect(text).toContain('สรุปผลเป็น Strategy Pack สำหรับผู้บริหาร')
   })
@@ -43,11 +43,14 @@ describe('StrategicCommand', () => {
     const wrapper = mountView()
     const text = wrapper.text()
 
-    expect(text).toContain('Crisis Intelligence')
-    expect(text).toContain('Social Media Simulation')
+    expect(text).toContain('Public Responsiveness Intelligence')
+    expect(text).toContain('Crisis-Information Watchouts')
     expect(text).toContain('Culturally Grounded Personas')
     expect(text).toContain('Executive-Ready Evidence')
     expect(text).toContain('ใช้ synthetic personas เพื่อฟังเสียงสะท้อนเชิงสมมุติ ไม่ใช่ข้อมูลประชาชนจริง')
+    expect(text).toContain('ความพร้อมต่อเสียงสาธารณะ')
+    expect(text).toContain('ประเด็นที่ต้องระวัง')
+    expect(text).toContain('ขั้นตอนตรวจสอบ')
   })
 
   it('renders policy intake fields and output package items', () => {
@@ -72,28 +75,20 @@ describe('StrategicCommand', () => {
     expect(text).toContain('Executive Strategy Pack')
     expect(text).toContain('Recommended Validation Step')
     expect(text).toContain('Demo Mode')
-    expect(text).toContain('Synthetic Scenario')
-    expect(text).toContain('Decision-support estimate only; not a real-world outcome forecast')
+    expect(text).toContain('Synthetic public-response scenario')
+    expect(text).toContain('Decision-support estimate only; not a real-world public outcome forecast')
   })
 
   it('shows safety boundaries without unsafe English claims', () => {
     const wrapper = mountView()
     const text = wrapper.text()
 
-    expect(text).toContain('เป็นระบบสนับสนุนการตัดสินใจ ไม่ใช่คำทำนายผลลัพธ์จริง')
-    expect(text).toContain('ไม่ใช้ข้อมูลส่วนบุคคล')
-    expect(text).toContain('ไม่ใช้รายชื่อประชาชน')
-    expect(text).toContain('ไม่ใช้ voter list')
-    expect(text).toContain('ไม่ใช้ raw CRM')
-    expect(text).toContain('ไม่ทำการแบ่งเป้ารายบุคคลทางการเมือง')
-    expect(text).toContain('ไม่ใช่เครื่องมือปั่นกระแส')
-    expect(text).toContain('ไม่ใช่เครื่องมือโจมตีฝ่ายตรงข้าม')
-    expect(text).toContain('ไม่สร้างข่าวปลอมหรือข้อมูลบิดเบือน')
-    expect(text).toContain('ไม่ทำนายผลการเลือกตั้ง')
-    expect(text).toContain('ไม่ประเมินผลกระทบต่อคะแนนเสียง')
-    expect(text).toContain('ไม่คำนวณ vote impact หรือ exact vote effect')
-    expect(text).toContain('ต้องใช้ข้อมูลที่ได้รับอนุมัติเท่านั้น')
-    expect(text).toContain('ต้องมี human review ก่อนสื่อสารสาธารณะจริง')
+    expect(text).toContain('ใช้เพื่อประเมินความชัดเจน ความเสี่ยง และความพร้อมของการสื่อสารนโยบายหรือประเด็นสาธารณะ')
+    expect(text).toContain('ไม่ใช้ข้อมูลประชาชนรายบุคคล รายชื่อประชาชน หรือ voter list')
+    expect(text).toContain('แสดง source/provenance label เช่น Demo Mode, Local Estimate, Live Backend, Backend Verified หรือ Unknown Source ทุกครั้ง')
+    expect(text).toContain('ไม่ใช่คำทำนายผลลัพธ์จริง คะแนนเสียง หรือกระแสสาธารณะที่รับประกันได้')
+    expect(text).toContain('ต้องมี human review และ validation step ก่อนนำไปใช้สื่อสารสาธารณะจริง')
+    expect(text).toContain('ห้ามใช้เพื่อ political microtargeting ปั่นกระแส โจมตีฝ่ายตรงข้าม สร้างข่าวปลอม หรือบิดเบือนข้อมูล')
 
     const unsafeClaims = [
       ['voter', 'targeting'].join(' '),

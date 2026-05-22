@@ -152,8 +152,8 @@ const resourceSections = [
   },
   {
     eyebrow: 'Public Policy',
-    title: 'Public Policy / Strategic Command',
-    description: 'Thai-first resources for government communication, policy risk review, crisis-information simulation, and executive decision support.',
+    title: 'CivicSense / Strategic Command',
+    description: 'Thai-first resources for public responsiveness intelligence, government communication, policy risk review, crisis-information simulation, and executive decision support.',
     docs: [
       {
         title: '/strategic-command route',
@@ -164,7 +164,12 @@ const resourceSections = [
       {
         title: 'Strategic Command Overview',
         path: 'docs/STRATEGIC_COMMAND_TH.md',
-        description: 'Positioning, use cases, four pillars, output package, demo offer, and safety boundaries.',
+        description: 'CivicSense positioning, use cases, four pillars, output package, demo offer, and safety boundaries.',
+      },
+      {
+        title: 'CivicSense Responsible Use',
+        path: 'docs/CIVICSENSE_RESPONSIBLE_USE_TH.md',
+        description: 'Thai-first public responsiveness labels, source/provenance boundaries, and responsible-use rules.',
       },
       {
         title: 'Public Policy PoV Intake Template',

@@ -1,7 +1,7 @@
 <template>
   <div class="strategic-command-page">
     <nav class="command-nav">
-      <div class="nav-brand">3C SIMULATOR</div>
+      <div class="nav-brand">CivicSense</div>
       <div class="nav-links">
         <router-link to="/" class="nav-link">Home</router-link>
         <router-link to="/strategic-command" class="nav-link">Strategic Command</router-link>
@@ -14,12 +14,12 @@
     <main>
       <section class="hero-section">
         <div class="hero-copy">
-          <p class="section-label">Strategic Command / Decision Intelligence</p>
-          <h1>3C Simulator Strategic Command</h1>
-          <h2>ห้องจำลองสถานการณ์เพื่อทดสอบนโยบายและรับมือวิกฤตข่าวสาร</h2>
+          <p class="section-label">{{ civicSenseProduct.name }} / {{ civicSenseProduct.descriptorEn }}</p>
+          <h1>CivicSense</h1>
+          <h2>{{ civicSenseProduct.taglineTh }}</h2>
           <p class="hero-subtitle">
-            จำลองเสียงสะท้อนจากประชาชน วิเคราะห์ความเสี่ยงของประเด็นอ่อนไหว
-            และเตรียมแผนสื่อสารก่อนลงสนามจริง
+            จำลองเสียงสะท้อนสาธารณะ วิเคราะห์ความเสี่ยงของประเด็นอ่อนไหว
+            และเตรียมแผนสื่อสารนโยบายก่อนลงสนามจริง โดยยังคงเป็น decision-support estimate เท่านั้น
           </p>
           <div class="hero-actions" aria-label="Strategic Command actions">
             <a class="command-button primary" href="#demo-flow">ขอ Demo 20 นาที</a>
@@ -30,8 +30,8 @@
 
         <aside class="command-panel" aria-label="Strategic Command dashboard preview">
           <div class="panel-header">
-            <span>Crisis Intelligence Preview</span>
-            <strong>Local Estimate</strong>
+            <span>{{ publicResponsivenessLabels.previewTitle }}</span>
+            <strong>{{ publicResponsivenessLabels.sourceMode }}</strong>
           </div>
           <div class="risk-gauge">
             <div class="gauge-score">72</div>
@@ -52,8 +52,8 @@
 
       <section class="briefing-section" aria-labelledby="helps-heading">
         <div class="section-heading">
-          <p class="section-label">What it helps with</p>
-          <h2 id="helps-heading">ช่วยทีมยุทธศาสตร์เห็นความเสี่ยงก่อนตัดสินใจ</h2>
+          <p class="section-label">Public Responsiveness</p>
+          <h2 id="helps-heading">ช่วยทีมยุทธศาสตร์เห็นความพร้อมต่อเสียงสาธารณะก่อนตัดสินใจ</h2>
         </div>
         <div class="help-grid">
           <article v-for="item in helpCards" :key="item" class="help-card">
@@ -66,7 +66,7 @@
       <section class="pillars-section" aria-labelledby="pillars-heading">
         <div class="section-heading">
           <p class="section-label">Four Pillars</p>
-          <h2 id="pillars-heading">แกนการวิเคราะห์สำหรับนโยบาย ประเด็นสาธารณะ และวิกฤตข่าวสาร</h2>
+          <h2 id="pillars-heading">แกนการวิเคราะห์สำหรับนโยบาย ประเด็นสาธารณะ และ public responsiveness</h2>
         </div>
         <div class="pillar-grid">
           <article v-for="pillar in pillars" :key="pillar.title" class="pillar-card">
@@ -114,8 +114,8 @@
               <strong>Demo Mode</strong>
             </div>
             <div class="pack-provenance" aria-label="Executive Strategy Pack provenance">
-              <span>Synthetic Scenario</span>
-              <p>Decision-support estimate only; not a real-world outcome forecast</p>
+              <span>{{ publicResponsivenessLabels.syntheticScenario }}</span>
+              <p>{{ publicResponsivenessLabels.decisionSupportOnly }}</p>
             </div>
             <ol>
               <li>Risk summary</li>
@@ -134,7 +134,7 @@
           <h2 id="safety-heading">ขอบเขตการใช้งานที่ต้องเห็นชัดในทุก Demo</h2>
         </div>
         <div class="boundary-grid">
-          <article v-for="boundary in safetyBoundaries" :key="boundary" class="boundary-card">
+          <article v-for="boundary in civicSenseResponsibleUseRules" :key="boundary" class="boundary-card">
             <span>{{ boundary }}</span>
           </article>
         </div>
@@ -177,16 +177,22 @@
 </template>
 
 <script setup>
+import {
+  civicSenseProduct,
+  civicSenseResponsibleUseRules,
+  publicResponsivenessLabels,
+} from '@/services/civicSense'
+
 const dashboardSignals = [
-  { label: 'Readiness', value: 'Amber', note: 'ข้อความต้องปรับก่อนเผยแพร่' },
-  { label: 'Watchouts', value: '5', note: 'ความเสี่ยงการตีความผิดและขยายประเด็น' },
-  { label: 'Validation', value: 'Required', note: 'ต้องมีขั้นตอนตรวจสอบภาคสนาม' },
+  { label: publicResponsivenessLabels.readiness, value: 'Amber', note: 'ข้อความต้องปรับก่อนเผยแพร่' },
+  { label: publicResponsivenessLabels.watchouts, value: '5', note: 'ความเสี่ยงการตีความผิดและขยายประเด็น' },
+  { label: publicResponsivenessLabels.validation, value: 'Required', note: 'ต้องมีขั้นตอนตรวจสอบภาคสนาม' },
 ]
 
 const helpCards = [
   'ทดสอบความเสี่ยงก่อนประกาศนโยบาย',
   'วิเคราะห์กลุ่มประชาชนที่อาจเข้าใจผิดหรือได้รับผลกระทบ',
-  'จำลองกระแสบน Facebook, TikTok, X และ LINE',
+  'จำลอง public responsiveness บน Facebook, TikTok, X และ LINE',
   'เตรียมแผนรับมือวิกฤตข่าวสาร',
   'สรุปผลเป็น Strategy Pack สำหรับผู้บริหาร',
 ]
@@ -194,13 +200,13 @@ const helpCards = [
 const pillars = [
   {
     index: '01',
-    title: 'Crisis Intelligence',
-    lead: 'ทดสอบความเสี่ยงก่อนเป็นข่าวลบ',
-    copy: 'วิเคราะห์ว่าประเด็นใดอาจถูกตีความผิด ขยายความผิด หรือกลายเป็นวิกฤตข่าวสาร',
+    title: 'Public Responsiveness Intelligence',
+    lead: 'ทดสอบความพร้อมต่อเสียงสาธารณะก่อนเผยแพร่',
+    copy: 'วิเคราะห์ว่าประเด็นใดอาจถูกตีความผิด ขยายความ หรือทำให้ประชาชนต้องการคำชี้แจงเพิ่ม',
   },
   {
     index: '02',
-    title: 'Social Media Simulation',
+    title: 'Crisis-Information Watchouts',
     lead: 'จำลองกระแสบนแพลตฟอร์มสังคมออนไลน์',
     copy: 'ประเมินการแพร่กระจายของประเด็นบน Facebook, TikTok, X และ LINE โดยใช้เป็น decision-support estimate เท่านั้น',
   },
@@ -262,23 +268,6 @@ const outputPackage = [
     title: 'Recommended Validation Step',
     copy: 'ขั้นตอนตรวจสอบกับข้อมูลที่ได้รับอนุมัติ เช่น expert review, survey หรือ stakeholder review',
   },
-]
-
-const safetyBoundaries = [
-  'เป็นระบบสนับสนุนการตัดสินใจ ไม่ใช่คำทำนายผลลัพธ์จริง',
-  'ไม่ใช้ข้อมูลส่วนบุคคล',
-  'ไม่ใช้รายชื่อประชาชน',
-  'ไม่ใช้ voter list',
-  'ไม่ใช้ raw CRM',
-  'ไม่ทำการแบ่งเป้ารายบุคคลทางการเมือง',
-  'ไม่ใช่เครื่องมือปั่นกระแส',
-  'ไม่ใช่เครื่องมือโจมตีฝ่ายตรงข้าม',
-  'ไม่สร้างข่าวปลอมหรือข้อมูลบิดเบือน',
-  'ไม่ทำนายผลการเลือกตั้ง',
-  'ไม่ประเมินผลกระทบต่อคะแนนเสียง',
-  'ไม่คำนวณ vote impact หรือ exact vote effect',
-  'ต้องใช้ข้อมูลที่ได้รับอนุมัติเท่านั้น',
-  'ต้องมี human review ก่อนสื่อสารสาธารณะจริง',
 ]
 
 const demoSteps = [

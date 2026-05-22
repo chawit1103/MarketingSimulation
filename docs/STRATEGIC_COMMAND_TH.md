@@ -1,13 +1,13 @@
-# 3C Simulator Strategic Command
+# CivicSense Strategic Command
 
 ## Positioning
 
-Strategic Command คือ vertical แยกสำหรับทีมสื่อสารภาครัฐ ทีมยุทธศาสตร์นโยบาย ทีมสื่อสารพรรคการเมือง และทีมที่ต้องประเมินความเสี่ยงของประเด็นสาธารณะก่อนสื่อสารจริง
+CivicSense คือ vertical แยกสำหรับทีมสื่อสารภาครัฐ ทีมยุทธศาสตร์นโยบาย ทีมสื่อสารพรรคการเมือง และทีมที่ต้องประเมิน public responsiveness ของประเด็นสาธารณะก่อนสื่อสารจริง
 
 หน้าที่ของ vertical นี้คือช่วยเตรียม decision-support evidence สำหรับ:
 
 - policy communication risk review,
-- public sentiment simulation แบบสมมุติ,
+- public responsiveness simulation แบบสมมุติ,
 - crisis-information watchouts,
 - message revision memo,
 - executive decision support.
@@ -18,9 +18,10 @@ Strategic Command คือ vertical แยกสำหรับทีมสื�
 
 `/proof-of-value` ถูกออกแบบสำหรับ brand, agency, PR, และ marketing operator ที่ต้องแปลง campaign brief เป็น output package ทางการตลาด
 
-`/strategic-command` ถูกแยกออกมาเพื่อไม่ให้ผู้ชมภาครัฐหรือทีมยุทธศาสตร์ทางการเมืองเข้าใจว่า flow นี้เป็น campaign optimization หรือเครื่องมือซื้อสื่อ จุดเน้นคือ:
+`/strategic-command` ถูกแยกออกมาเพื่อไม่ให้ผู้ชมภาครัฐหรือทีมยุทธศาสตร์ทางการเมืองเข้าใจว่า flow นี้เป็น campaign optimization หรือเครื่องมือซื้อสื่อ จุดเน้นของ CivicSense คือ:
 
 - risk before public communication,
+- public responsiveness readiness,
 - public issue framing,
 - crisis readiness,
 - culturally grounded synthetic personas,
@@ -39,13 +40,13 @@ Strategic Command คือ vertical แยกสำหรับทีมสื�
 
 ## Four Pillars
 
-### 1. Crisis Intelligence
+### 1. Public Responsiveness Intelligence
 
-ทดสอบความเสี่ยงก่อนเป็นข่าวลบ วิเคราะห์ว่าประเด็นใดอาจถูกตีความผิด ขยายความผิด หรือกลายเป็นวิกฤตข่าวสาร
+ทดสอบความพร้อมต่อเสียงสาธารณะก่อนเผยแพร่ วิเคราะห์ว่าประเด็นใดอาจถูกตีความผิด ขยายความ หรือทำให้ประชาชนต้องการคำชี้แจงเพิ่ม
 
-### 2. Social Media Simulation
+### 2. Crisis-Information Watchouts
 
-จำลองกระแสบน Facebook, TikTok, X และ LINE ในฐานะ decision-support estimate เท่านั้น ไม่ใช่การฟัง social live และไม่ใช่การยืนยันผลลัพธ์จริง
+จำลอง public responsiveness บน Facebook, TikTok, X และ LINE ในฐานะ decision-support estimate เท่านั้น ไม่ใช่การฟัง social live และไม่ใช่การยืนยันผลลัพธ์จริง
 
 ### 3. Culturally Grounded Personas
 
@@ -79,6 +80,8 @@ Strategic Command คือ vertical แยกสำหรับทีมสื�
 - สรุปผลเป็น decision-support estimate พร้อม validation step
 
 ## Safety Boundaries
+
+ดูรายละเอียด responsible-use labels เพิ่มเติมที่ `docs/CIVICSENSE_RESPONSIBLE_USE_TH.md`
 
 - เป็นระบบสนับสนุนการตัดสินใจ ไม่ใช่คำทำนายผลลัพธ์จริง
 - ไม่ใช้ข้อมูลส่วนบุคคล

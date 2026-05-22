@@ -125,7 +125,7 @@ Operator proof-of-value workflow:
 
 - Use `/proof-of-value` to turn one customer-approved campaign brief into an operator checklist, structured proof-of-value payload, and Strategy Pack deliverable sequence.
 - Use `/resources` to open the in-app Proof-of-Value Resource Hub for curated customer, sales, operator, and safety documentation links.
-- Use `/strategic-command` for the separate public policy and government communication vertical. It is Thai-first and focuses on policy communication risk, crisis-information watchouts, synthetic public-sentiment simulation, and executive decision support.
+- Use `/strategic-command` for CivicSense, the separate public policy and government communication vertical. It is Thai-first and focuses on public responsiveness intelligence, policy communication risk, crisis-information watchouts, synthetic public-response simulation, and executive decision support.
 - The workflow flags missing approvals and unsafe intake signals before any customer-facing output is assembled.
 - It does not require live LLM/API/Neo4j credentials, live integrations, PII, raw CRM records, customer lists, or secrets.
 
@@ -138,6 +138,7 @@ Customer data rules for the first pilot:
 - If customer-owned credentials are ever needed in a later approved phase, configure them only through an approved deployment secret path, environment variable, or secret manager.
 - Use anonymized or explicitly approved campaign briefs only.
 - Keep Demo Mode, Local Estimate, Live Backend, Backend Verified, and Unknown Source labels visible in the UI, screenshots, exports, and decks.
+- For CivicSense public-policy demos, use Thai-first public responsiveness labels such as “ความพร้อมต่อเสียงสาธารณะ”, “ประเด็นที่ต้องระวัง”, “ขั้นตอนตรวจสอบ”, and “Synthetic public-response scenario”; keep the output framed as decision-support evidence, not guaranteed public outcomes.
 
 Recommended customer-pilot docs:
 
