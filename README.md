@@ -400,6 +400,19 @@ OASIS remains the core simulation engine. Platform presets translate modern chan
 
 This keeps the backend compatible with the current OASIS runner while letting the product reflect real-world channel planning.
 
+Platform-specific engagement results use a separate synthetic result model. Each platform row carries:
+
+- `engagement_score` on a directional 0-100 scale
+- `confidence_level`
+- `evidence`
+- `assumptions`
+- `source_mode: no_live_synthetic`
+- `data_basis: synthetic_platform_model`
+- `live_data_used: false`
+- a no-live label stating that live social-listening, ad-platform, CRM, or platform API data was not used
+
+These metrics are scenario-modeling signals only. They are not live platform analytics and are not outcome guarantees.
+
 ### Executive Dashboard
 
 The dashboard is designed for business decisions, not only charts.
@@ -413,6 +426,7 @@ It includes:
 - crisis risk
 - brand perception shift
 - opinion polarization
+- platform engagement metrics with no-live labels
 - sentiment timeline
 - segment breakdown
 - simulated influence nodes

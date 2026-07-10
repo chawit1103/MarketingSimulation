@@ -119,3 +119,60 @@ def test_real_simulation_kpi_input_is_labeled_backend_verified():
     assert report.run_id == "run_real"
     assert report.confidence == 81
     assert report.overall_sentiment == 22.5
+
+
+def test_platform_engagement_metrics_are_synthetic_no_live_even_with_backend_kpis():
+    report = KPICalculator().calculate(
+        campaign_id="cmp_platform",
+        org_id="org_platform",
+        simulation_data={
+            "simulation_id": "sim_platform",
+            "run_id": "run_platform",
+            "confidence_score": 76,
+            "kpis": {
+                "overall_sentiment": 18.0,
+                "conversion_probability": 51.0,
+                "crisis_risk": 22.0,
+            },
+            "platform_engagement": [
+                {
+                    "platform": "tiktok",
+                    "engagement_score": 82,
+                    "modeled_metric_label": "Modeled creator-feed engagement",
+                    "confidence_level": "medium",
+                    "evidence": ["Creator-feed preset selected", "High message resonance"],
+                    "assumptions": ["Short-form video behavior mapped to OASIS feed actions"],
+                }
+            ],
+        },
+    )
+
+    metric = report.platform_engagement_metrics[0]
+    assert metric.platform == "tiktok"
+    assert metric.engagement_score == 82
+    assert metric.source_mode == "no_live_synthetic"
+    assert metric.data_basis == "synthetic_platform_model"
+    assert metric.live_data_used is False
+    assert metric.confidence_level == "medium"
+    assert "Creator-feed preset selected" in metric.evidence
+    assert "prediction" not in str(metric.model_dump()).lower()
+    assert "live" in metric.no_live_label.lower()
+
+
+def test_local_estimate_includes_default_no_live_platform_engagement_metrics(dashboard_context):
+    client, headers, campaign = dashboard_context
+
+    response = client.get(f"/api/dashboard/campaign/{campaign.campaign_id}/kpi", headers=headers)
+    payload = response.get_json()
+
+    assert response.status_code == 200
+    metrics = payload["data"]["platform_engagement_metrics"]
+    assert metrics
+    assert {metric["platform"] for metric in metrics} >= {"twitter_x", "reddit"}
+    for metric in metrics:
+        assert metric["source_mode"] == "no_live_synthetic"
+        assert metric["data_basis"] == "synthetic_platform_model"
+        assert metric["live_data_used"] is False
+        assert metric["evidence"]
+        assert metric["confidence_level"] in {"low", "medium", "medium_low"}
+        assert "Live social-listening/ad-platform data was not used" in metric["no_live_label"]

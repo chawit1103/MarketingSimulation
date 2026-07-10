@@ -36,6 +36,21 @@ class TimelinePoint(BaseModel):
     action_count: int = 0
 
 
+class PlatformEngagementMetric(BaseModel):
+    """Synthetic platform-specific engagement signal with explicit no-live provenance."""
+
+    platform: str
+    modeled_metric_label: str = "Synthetic modeled engagement"
+    engagement_score: float = 0.0                              # 0.0-100.0
+    confidence_level: str = "medium_low"                       # low | medium_low | medium | high
+    evidence: List[str] = Field(default_factory=list)
+    assumptions: List[str] = Field(default_factory=list)
+    source_mode: str = "no_live_synthetic"
+    data_basis: str = "synthetic_platform_model"
+    live_data_used: bool = False
+    no_live_label: str = "Live social-listening/ad-platform data was not used; metric is synthetic scenario modeling only."
+
+
 class ActionItem(BaseModel):
     """Actionable recommendation for the executive team."""
     priority: str = "medium"                                   # critical | high | medium
@@ -75,6 +90,7 @@ class ExecutiveReport(BaseModel):
     sentiment_by_segment: List[SegmentSentiment] = Field(default_factory=list)
     top_influencers: List[Influencer] = Field(default_factory=list)
     sentiment_timeline: List[TimelinePoint] = Field(default_factory=list)
+    platform_engagement_metrics: List[PlatformEngagementMetric] = Field(default_factory=list)
 
     # ---- Executive action plan (Think → Finish) ----
     winning_strategy: str = ""                  # แผนที่ชนะ
