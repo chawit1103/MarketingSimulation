@@ -432,7 +432,7 @@
     "actionValidationReason": "Source mode คือ {source}; confidence signal คือ {confidence}/100",
     "actionValidationImpact": "แยก directional planning signal ออกจาก evidence ที่ใช้อนุมัติจริง",
     "actionValidationRisk": "ถ้าข้าม validation อาจทำให้ guidance เชิงทิศทางถูกใช้เหมือนคำตอบที่มั่นใจเกินจริง",
-    "platformComparisonKicker": "PR4 Executive insight",
+    "platformComparisonKicker": "มุมมองผู้บริหาร",
     "platformComparisonTitle": "เปรียบเทียบแพลตฟอร์ม",
     "platformComparisonNote": "คะแนนช่องทางเป็นสัญญาณเชิงทิศทางจากการตั้งค่าแคมเปญ KPI timeline sentiment และ modeled influence nodes ปัจจุบัน ใช้เพื่อช่วยตัดสินใจ ไม่ใช่ผลวัด media performance จริง",
     "platformRole_primary": "ช่องทางหลัก",

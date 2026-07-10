@@ -432,7 +432,7 @@
     "actionValidationReason": "Source mode is {source}; confidence signal is {confidence}/100.",
     "actionValidationImpact": "Separates directional planning signals from evidence suitable for approval.",
     "actionValidationRisk": "Skipping validation can turn directional guidance into overconfident execution.",
-    "platformComparisonKicker": "PR4 Executive insight",
+    "platformComparisonKicker": "Executive insight",
     "platformComparisonTitle": "Platform comparison",
     "platformComparisonNote": "Directional channel scores derived from the current campaign configuration, KPI model, sentiment timeline, and modeled influence nodes. Treat as decision support, not measured media performance.",
     "platformRole_primary": "Primary focus",

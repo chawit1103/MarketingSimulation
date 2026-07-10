@@ -264,7 +264,7 @@
               <span class="brief-kicker">{{ $t('dashboard.platformComparisonKicker') }}</span>
               <h2 class="panel-title">{{ $t('dashboard.platformComparisonTitle') }}</h2>
             </div>
-            <ResultSourceBadge :source="resultSource.type" :warning="resultSource.warning" />
+            <ResultSourceBadge :source="resultSource.type" warning="" />
           </div>
           <p class="panel-note">{{ $t('dashboard.platformComparisonNote') }}</p>
           <div class="platform-bars">
