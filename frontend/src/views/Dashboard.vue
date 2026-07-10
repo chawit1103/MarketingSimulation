@@ -257,6 +257,80 @@
         </div>
       </section>
 
+      <section class="insight-upgrade-grid">
+        <div class="panel platform-comparison-panel">
+          <div class="evidence-header">
+            <div>
+              <span class="brief-kicker">{{ $t('dashboard.platformComparisonKicker') }}</span>
+              <h2 class="panel-title">{{ $t('dashboard.platformComparisonTitle') }}</h2>
+            </div>
+            <ResultSourceBadge :source="resultSource.type" :warning="resultSource.warning" />
+          </div>
+          <p class="panel-note">{{ $t('dashboard.platformComparisonNote') }}</p>
+          <div class="platform-bars">
+            <article v-for="item in platformComparison" :key="item.platform" class="platform-row">
+              <div class="platform-row-head">
+                <strong>{{ item.label }}</strong>
+                <span>{{ $t(`dashboard.platformRole_${item.role}`) }}</span>
+              </div>
+              <div class="platform-track" :aria-label="`${item.label} engagement ${item.engagementScore}`">
+                <div class="platform-fill" :style="{ width: platformScoreWidth(item.engagementScore) }">
+                  {{ item.engagementScore }}
+                </div>
+              </div>
+              <div class="platform-metrics">
+                <span>{{ $t('dashboard.platformSentiment') }} {{ formatSentiment(item.sentiment) }}</span>
+                <span>{{ $t('dashboard.platformConversion') }} {{ item.conversion }}%</span>
+                <span>{{ $t('dashboard.platformRisk') }} {{ item.risk }}%</span>
+                <span>{{ $t('dashboard.platformEvidence') }} {{ item.evidenceCount }}</span>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="panel polarity-panel">
+          <div class="evidence-header">
+            <div>
+              <span class="brief-kicker">{{ $t('dashboard.polarityKicker') }}</span>
+              <h2 class="panel-title">{{ $t('dashboard.polarityTitle') }}</h2>
+            </div>
+            <div class="confidence-pill">
+              <span>{{ $t('dashboard.opinionPolarization') }}</span>
+              <strong>{{ kpis.opinion_polarization || 0 }}%</strong>
+            </div>
+          </div>
+          <p class="panel-note">{{ $t('dashboard.polarityNote') }}</p>
+          <div class="polarity-stack">
+            <article v-for="bucket in polarityBreakdown" :key="bucket.key" class="polarity-row">
+              <div class="polarity-row-head">
+                <strong>{{ $t(bucket.labelKey) }}</strong>
+                <span>{{ bucket.share }}% · {{ formatSentiment(bucket.avgSentiment) }}</span>
+              </div>
+              <div class="polarity-track">
+                <div class="polarity-fill" :style="{ width: polarityWidth(bucket.share), background: bucket.color }"></div>
+              </div>
+              <small>{{ bucket.drivers.length ? bucket.drivers.join(' / ') : $t('dashboard.polarityNoDrivers') }}</small>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel explanation-panel">
+        <div class="evidence-header">
+          <div>
+            <span class="brief-kicker">{{ $t('dashboard.explanationKicker') }}</span>
+            <h2 class="panel-title">{{ $t('dashboard.explanationTitle') }}</h2>
+          </div>
+        </div>
+        <div class="explanation-grid">
+          <article v-for="panel in explanationPanels" :key="panel.key" class="explanation-card">
+            <span class="explanation-metric">{{ panel.metric }}</span>
+            <h3>{{ $t(panel.titleKey) }}</h3>
+            <p>{{ $t(panel.bodyKey) }}</p>
+          </article>
+        </div>
+      </section>
+
       <section class="decision-evidence panel">
         <div class="evidence-header">
           <div>
@@ -608,6 +682,7 @@ import { reviseBriefFromActionPlan } from '@/api/brief'
 import ExportButton from '@/components/ExportButton.vue'
 import ResultSourceBadge from '@/components/ResultSourceBadge.vue'
 import { sourceModeFromValue, trackEvent } from '@/services/analytics'
+import { buildExplanationPanels, buildPlatformComparison, buildPolarityBreakdown } from '@/services/dashboardInsights'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -720,7 +795,8 @@ const kpis = ref({
   conversion_probability: 67,
   social_influence: 78,
   message_resonance: 72,
-  crisis_risk: 'low'
+  crisis_risk: 'low',
+  opinion_polarization: 35,
 })
 
 // Timeline State
@@ -796,6 +872,23 @@ const actionPlanSections = computed(() => {
     items: sections[key]?.items || [],
   }))
 })
+
+const platformComparison = computed(() => buildPlatformComparison({
+  campaign: campaignDetails.value || {},
+  kpis: kpis.value,
+  timeline: timeline.value,
+  segments: segments.value,
+  influencers: influencers.value,
+}))
+
+const polarityBreakdown = computed(() => buildPolarityBreakdown(segments.value, timeline.value))
+
+const explanationPanels = computed(() => buildExplanationPanels({
+  kpis: kpis.value,
+  source: resultSource.value,
+  platformComparison: platformComparison.value,
+  polarityBreakdown: polarityBreakdown.value,
+}))
 
 // --- Computed: Grade class ---
 const gradeClass = computed(() => {
@@ -938,6 +1031,14 @@ function formatDecisionVerdict(verdict) {
 function barHeight(val) {
   const pct = Math.max(0, Math.min(100, ((val + 100) / 200) * 100))
   return pct + '%'
+}
+
+function platformScoreWidth(value) {
+  return Math.max(6, Math.min(100, Number(value || 0))) + '%'
+}
+
+function polarityWidth(value) {
+  return Math.max(4, Math.min(100, Number(value || 0))) + '%'
 }
 
 function priorityColor(p) {
@@ -2128,6 +2229,148 @@ font-size: var(--text-sm);
   color: var(--text-tertiary);
   font-size: var(--text-sm);
   line-height: 1.7;
+}
+
+/* ====================== PR4 INSIGHT UPGRADE ====================== */
+.insight-upgrade-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  gap: var(--space-4);
+  margin: 28px 0;
+}
+
+.platform-bars,
+.polarity-stack,
+.explanation-grid {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.platform-row,
+.polarity-row,
+.explanation-card {
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+}
+
+.platform-row-head,
+.polarity-row-head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.platform-row-head strong,
+.polarity-row-head strong,
+.explanation-card h3 {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+}
+
+.platform-row-head span,
+.polarity-row-head span {
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.platform-track,
+.polarity-track {
+  overflow: hidden;
+  height: 30px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  background: var(--bg-elevated);
+}
+
+.platform-fill,
+.polarity-fill {
+  height: 100%;
+  border-radius: inherit;
+}
+
+.platform-fill {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 44px;
+  padding-right: 10px;
+  color: #0a0a0a;
+  background: linear-gradient(90deg, var(--accent), var(--green));
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.platform-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.platform-metrics span,
+.polarity-row small,
+.explanation-card p {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.platform-metrics span {
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+}
+
+.polarity-fill {
+  min-width: 8px;
+}
+
+.polarity-row small {
+  display: block;
+  margin-top: var(--space-2);
+  color: var(--text-tertiary);
+}
+
+.explanation-panel {
+  margin-bottom: 28px;
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--border-subtle));
+}
+
+.explanation-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.explanation-metric {
+  display: inline-flex;
+  margin-bottom: var(--space-3);
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: var(--accent);
+  background: var(--accent-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.explanation-card h3 {
+  margin: 0 0 var(--space-2);
+}
+
+.explanation-card p {
+  margin: 0;
 }
 
 /* ====================== DECISION EVIDENCE ====================== */
@@ -3436,6 +3679,13 @@ font-size: var(--text-sm);
   .kpi-row {
     grid-template-columns: repeat(3, 1fr);
   }
+  .insight-upgrade-grid,
+  .explanation-grid {
+    grid-template-columns: 1fr;
+  }
+  .platform-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .influencer-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -3458,7 +3708,8 @@ font-size: var(--text-sm);
   }
   .scenario-row,
   .money-grid,
-  .what-if-result {
+  .what-if-result,
+  .platform-metrics {
     grid-template-columns: 1fr;
   }
   .brief-grid {
