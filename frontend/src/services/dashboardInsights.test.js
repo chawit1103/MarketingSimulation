@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  buildExecutiveDecisionBrief,
   buildExplanationPanels,
   buildPlatformComparison,
   buildPolarityBreakdown,
@@ -56,5 +57,56 @@ describe('dashboard insight helpers', () => {
 
     expect(panels.map((panel) => panel.bodyKey)).toContain('dashboard.explainEstimatedBody')
     expect(panels.map((panel) => panel.bodyKey)).toContain('dashboard.explainPilotBody')
+  })
+
+  it('builds an executive decision brief with report scope and safety guardrails', () => {
+    const brief = buildExecutiveDecisionBrief({
+      campaign: {
+        name: 'Premium Water Launch',
+        description: 'Launch message test',
+        target: { persona_count: 120 },
+        sim_config: { max_rounds: 8 },
+      },
+      campaignBrief: {
+        objective: 'Product launch',
+        audience: 'Thai urban millennials',
+        channels: 'LINE, TikTok',
+        platform: 'Both',
+        platformMode: 'Creator feed',
+      },
+      kpis: {
+        overall_sentiment: 34,
+        conversion_probability: 68,
+        social_influence: 71,
+        message_resonance: 74,
+        crisis_risk: 22,
+      },
+      source: { type: 'local_estimate', warning: 'Backend unavailable' },
+      trustPanel: { runId: 'demo-run', confidenceLevel: '78%', knownLimitations: ['No live ad platform data.'] },
+      platformComparison: [
+        { label: 'TikTok', engagementScore: 82, sentiment: 40, conversion: 72, risk: 18, evidenceCount: 3, role: 'primary' },
+        { label: 'LINE', engagementScore: 70, sentiment: 24, conversion: 64, risk: 25, evidenceCount: 2, role: 'support' },
+      ],
+      polarityBreakdown: [{ key: 'negative', share: 12, avgSentiment: -22, drivers: ['Skeptics'] }],
+      timeline: [{ round_num: 1, sentiment: 18, action_count: 9 }, { round_num: 2, sentiment: 38, action_count: 11 }],
+      segments: [{ name: 'Advocates', sentiment: 62, conversion: 76 }],
+      influencers: [{ agent_name: 'Creator A' }],
+      assumptions: ['Directional synthetic sample.'],
+      scoreExplanations: ['Strong positive modeled response.'],
+      riskDrivers: ['Claim proof needs validation.'],
+      simulatedQuotes: ['I would try this if the benefit is clear.'],
+      nextAction: 'Run a controlled validation test.',
+    })
+
+    expect(brief.user_input.campaign_name).toBe('Premium Water Launch')
+    expect(brief.scale.personas).toBe(120)
+    expect(brief.platform_allocation[0].platform).toBe('TikTok')
+    expect(brief.synthetic_results.conversion_probability).toBe(68)
+    expect(brief.charts_summary.sentiment_timeline).toHaveLength(2)
+    expect(brief.assumptions).toContain('Directional synthetic sample.')
+    expect(brief.limitations).toContain('No live ad platform data.')
+    expect(brief.safety_notices.join(' ')).toContain('synthetic/offline decision support')
+    expect(brief.decision_options.map((item) => item.option)).toContain('Controlled pilot')
+    expect(brief.recommended_next_action).toBe('Run a controlled validation test.')
   })
 })

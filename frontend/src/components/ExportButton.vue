@@ -92,6 +92,28 @@ async function download(format) {
   }
 }
 
+function csvCell(value) {
+  const text = value === null || value === undefined ? '' : String(value)
+  return `"${text.replace(/"/g, '""')}"`
+}
+
+function appendKeyValueRows(rows, title, data = {}) {
+  rows.push([])
+  rows.push([title])
+  for (const [key, value] of Object.entries(data || {})) {
+    rows.push([key, Array.isArray(value) || typeof value === 'object' ? JSON.stringify(value) : value])
+  }
+}
+
+function appendListRows(rows, title, items = []) {
+  if (!items?.length) return
+  rows.push([])
+  rows.push([title])
+  items.forEach((item, index) => {
+    rows.push([String(index + 1), Array.isArray(item) || typeof item === 'object' ? JSON.stringify(item) : item])
+  })
+}
+
 function downloadClientSide(format = 'client_csv') {
   showMenu.value = false
   trackExport(format)
@@ -99,6 +121,27 @@ function downloadClientSide(format = 'client_csv') {
   const rows = []
   rows.push([`MSaaS Report: ${props.data.title || 'Untitled'}`])
   rows.push([`Generated: ${new Date().toISOString()}`])
+
+  const executiveReport = props.data.executive_report
+  if (executiveReport) {
+    appendKeyValueRows(rows, 'Executive Decision Brief', {
+      title: executiveReport.title,
+      generated_at: executiveReport.generated_at,
+      recommended_next_action: executiveReport.recommended_next_action,
+    })
+    appendKeyValueRows(rows, 'User Input', executiveReport.user_input)
+    appendKeyValueRows(rows, 'Workflow & Source', executiveReport.workflow)
+    appendKeyValueRows(rows, 'Scale', executiveReport.scale)
+    appendKeyValueRows(rows, 'Synthetic Results', executiveReport.synthetic_results)
+    appendListRows(rows, 'Platform Allocation', executiveReport.platform_allocation)
+    appendKeyValueRows(rows, 'Evidence Summary', executiveReport.evidence)
+    appendKeyValueRows(rows, 'Charts Summary', executiveReport.charts_summary)
+    appendListRows(rows, 'Assumptions', executiveReport.assumptions)
+    appendListRows(rows, 'Limitations', executiveReport.limitations)
+    appendListRows(rows, 'Safety Notices', executiveReport.safety_notices)
+    appendListRows(rows, 'Decision Options', executiveReport.decision_options)
+  }
+
   rows.push([])
 
   const kpis = props.data.kpis || {}
@@ -136,7 +179,7 @@ function downloadClientSide(format = 'client_csv') {
     }
   }
 
-  const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n')
+  const csv = rows.map(r => r.map(csvCell).join(',')).join('\n')
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')

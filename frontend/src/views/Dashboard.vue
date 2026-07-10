@@ -682,7 +682,7 @@ import { reviseBriefFromActionPlan } from '@/api/brief'
 import ExportButton from '@/components/ExportButton.vue'
 import ResultSourceBadge from '@/components/ResultSourceBadge.vue'
 import { sourceModeFromValue, trackEvent } from '@/services/analytics'
-import { buildExplanationPanels, buildPlatformComparison, buildPolarityBreakdown } from '@/services/dashboardInsights'
+import { buildExecutiveDecisionBrief, buildExplanationPanels, buildPlatformComparison, buildPolarityBreakdown } from '@/services/dashboardInsights'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -714,6 +714,11 @@ const exportData = computed(() => ({
     roi_pct: kpis.value.conversion_probability - 40,
   },
   timeline: timeline.value,
+  executive_report: executiveDecisionBrief.value,
+  platform_allocation: platformComparison.value,
+  assumptions: assumptions.value,
+  limitations: trustPanel.value.knownLimitations,
+  safety_notices: executiveDecisionBrief.value.safety_notices,
   action_plan: displayActionPlan.value,
   recommendation: executiveSummaryTH.value || winningStrategy.value || 'Review action plan for next steps.',
   revenue_projection: {
@@ -888,6 +893,29 @@ const explanationPanels = computed(() => buildExplanationPanels({
   source: resultSource.value,
   platformComparison: platformComparison.value,
   polarityBreakdown: polarityBreakdown.value,
+}))
+
+const executiveDecisionBrief = computed(() => buildExecutiveDecisionBrief({
+  campaign: campaignDetails.value || {},
+  campaignBrief: campaignBrief.value,
+  kpis: kpis.value,
+  source: resultSource.value,
+  trustPanel: trustPanel.value,
+  platformComparison: platformComparison.value,
+  polarityBreakdown: polarityBreakdown.value,
+  timeline: timeline.value,
+  segments: segments.value,
+  influencers: influencers.value,
+  actionPlan: displayActionPlan.value,
+  decision: decisionStrategy.value,
+  businessImpact: businessImpact.value,
+  assumptions: assumptions.value,
+  scoreExplanations: scoreExplanations.value,
+  riskDrivers: riskDrivers.value,
+  simulatedQuotes: simulatedQuotes.value,
+  summary: executiveSummaryTH.value || winningStrategy.value,
+  recommendation: executiveSummaryTH.value || winningStrategy.value,
+  nextAction: decisionNextAction.value,
 }))
 
 // --- Computed: Grade class ---
