@@ -512,6 +512,7 @@ test('demo dashboard labels synthetic demo evidence', async ({ page }) => {
   await expect(page.getByText('Demo Mode').first()).toBeVisible()
   await expect(page.getByText('Confidence & Evidence')).toBeVisible()
   await expect(page.getByText('Synthetic demo data for product exploration')).toBeVisible()
+  await expect(page.getByText(/\b(?:PR[1-9]|M[0-9]+)\b/)).toHaveCount(0)
 })
 
 test('backend dashboard route shows backend verified source', async ({ page }) => {
