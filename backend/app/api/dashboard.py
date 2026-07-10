@@ -120,6 +120,9 @@ def get_campaign_kpi(campaign_id: str):
             "crisis_risk": report.crisis_risk,
             "brand_perception_shift": report.brand_perception_shift,
             "opinion_polarization": report.opinion_polarization,
+            "platform_engagement_metrics": [
+                metric.model_dump() for metric in report.platform_engagement_metrics
+            ],
             "generated_at": report.generated_at,
             "action_plan": ActionPlanService().generate(
                 campaign={"id": campaign_id, "name": campaign.name},

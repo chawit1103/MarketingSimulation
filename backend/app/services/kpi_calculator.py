@@ -13,6 +13,7 @@ from ..models.report import (
     SegmentSentiment,
     Influencer,
     TimelinePoint,
+    PlatformEngagementMetric,
     ActionItem,
 )
 from ..utils.logger import get_logger
@@ -117,6 +118,13 @@ class KPICalculator:
                 "Use this dashboard for planning direction only; validate with a real simulation or live audience test before spend decisions.",
             ]
 
+        # Platform metrics are always synthetic/no-live scenario signals even
+        # when aggregate KPIs came from a backend-verified simulation run.
+        report.platform_engagement_metrics = self._platform_engagement_metrics(
+            report=report,
+            simulation_data=simulation_data,
+        )
+
         # --- Action plan (same pipeline for mock & real) ---
         self._generate_action_plan(report)
 
@@ -211,6 +219,121 @@ class KPICalculator:
             report.sentiment_by_segment = [SegmentSentiment(segment_name="All personas", avg_sentiment=report.overall_sentiment)]
         if not report.sentiment_timeline:
             report.sentiment_timeline = [TimelinePoint(round_num=1, simulated_hour=1, avg_sentiment=report.overall_sentiment)]
+
+    # ------------------------------------------------------------------
+    # Platform engagement metrics (synthetic, no-live provenance)
+    # ------------------------------------------------------------------
+
+    def _platform_engagement_metrics(
+        self,
+        report: ExecutiveReport,
+        simulation_data: Optional[Dict[str, Any]],
+    ) -> List[PlatformEngagementMetric]:
+        explicit = (simulation_data or {}).get("platform_engagement")
+        if isinstance(explicit, list) and explicit:
+            return [
+                self._normalize_platform_engagement(row, report)
+                for row in explicit
+                if isinstance(row, dict)
+            ]
+
+        platforms = self._platforms_from_simulation_data(simulation_data)
+        rng = random.Random(f"{report.org_id}:{report.campaign_id}:platform_engagement")
+        return [
+            self._default_platform_engagement(platform, report, rng)
+            for platform in platforms
+        ]
+
+    def _platforms_from_simulation_data(self, simulation_data: Optional[Dict[str, Any]]) -> List[str]:
+        values = []
+        raw = simulation_data or {}
+        channels = raw.get("audience_channels") or raw.get("channels") or []
+        if isinstance(channels, list):
+            values.extend(str(channel or "").strip() for channel in channels)
+        platform_mode = str(raw.get("platform") or raw.get("platform_mode") or "").strip()
+        if platform_mode:
+            values.append(platform_mode)
+        normalized = ["twitter_x" if value == "twitter" else value for value in values if value]
+        if not normalized:
+            normalized = ["twitter_x", "reddit"]
+        return list(dict.fromkeys(normalized))
+
+    def _normalize_platform_engagement(
+        self,
+        row: Dict[str, Any],
+        report: ExecutiveReport,
+    ) -> PlatformEngagementMetric:
+        platform = str(row.get("platform") or row.get("channel") or "modeled_platform").strip()
+        evidence = self._string_list(row.get("evidence")) or [
+            f"Synthetic scenario metric derived from {report.source_mode} KPI context.",
+        ]
+        assumptions = self._string_list(row.get("assumptions")) or [
+            "Platform behavior is mapped to the closest available OASIS behavior model.",
+            "No live social-listening, ad-platform, CRM, or platform API data was used.",
+        ]
+        return PlatformEngagementMetric(
+            platform=platform,
+            modeled_metric_label=str(row.get("modeled_metric_label") or row.get("label") or "Synthetic modeled engagement"),
+            engagement_score=round(_clamp(float(row.get("engagement_score", row.get("score", 0.0))), 0.0, 100.0), 1),
+            confidence_level=self._confidence_level(row.get("confidence_level"), report.confidence),
+            evidence=evidence,
+            assumptions=assumptions,
+        )
+
+    def _default_platform_engagement(
+        self,
+        platform: str,
+        report: ExecutiveReport,
+        rng: random.Random,
+    ) -> PlatformEngagementMetric:
+        base = (
+            0.35 * _clamp(report.message_resonance, 0.0, 100.0)
+            + 0.30 * _clamp(report.social_influence_index, 0.0, 100.0)
+            + 0.20 * _scale_to_hundred(report.overall_sentiment, -100.0, 100.0)
+            + 0.15 * (100.0 - _clamp(report.crisis_risk, 0.0, 100.0))
+        )
+        score = round(_clamp(base + rng.uniform(-6.0, 6.0), 0.0, 100.0), 1)
+        label = {
+            "twitter_x": "Synthetic microblog engagement",
+            "reddit": "Synthetic community discussion engagement",
+            "facebook": "Synthetic community/social feed engagement",
+            "instagram": "Synthetic creator-feed engagement",
+            "tiktok": "Synthetic creator-feed engagement",
+            "youtube": "Synthetic video/community engagement",
+            "line": "Synthetic group-chat engagement",
+        }.get(platform, "Synthetic platform engagement")
+        return PlatformEngagementMetric(
+            platform=platform,
+            modeled_metric_label=label,
+            engagement_score=score,
+            confidence_level=self._confidence_level(None, report.confidence),
+            evidence=[
+                f"Derived from synthetic KPIs: message resonance {report.message_resonance:.1f}, social influence {report.social_influence_index:.1f}, sentiment {report.overall_sentiment:.1f}.",
+                "Platform mapping uses configured/synthetic campaign channel behavior, not observed platform analytics.",
+            ],
+            assumptions=[
+                "Engagement is a directional scenario signal on a 0-100 scale.",
+                "No live social-listening, ad-platform, CRM, or platform API data was used.",
+            ],
+        )
+
+    def _confidence_level(self, explicit: Any, score: Optional[float]) -> str:
+        if explicit:
+            return str(explicit)
+        if score is None:
+            return "medium_low"
+        if score >= 80:
+            return "medium"
+        if score >= 60:
+            return "medium_low"
+        return "low"
+
+    def _string_list(self, value: Any) -> List[str]:
+        if isinstance(value, list):
+            return [str(item) for item in value if str(item).strip()]
+        if value:
+            return [str(value)]
+        return []
 
     # ------------------------------------------------------------------
     # Mock-data computation
